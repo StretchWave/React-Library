@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "description": "Canonical component categories. Entries in catalog/catalog.json must use categories from this list.",
+  "categories": [
+    { "id": "buttons", "label": "Buttons", "description": "Pressable action triggers." },
+    { "id": "inputs", "label": "Inputs", "description": "Form controls that accept user input." },
+    { "id": "layout", "label": "Layout", "description": "Containers and structural building blocks." },
+    { "id": "display", "label": "Display", "description": "Static informational elements." },
+    { "id": "feedback", "label": "Feedback", "description": "Messages about system or user state." },
+    { "id": "navigation", "label": "Navigation", "description": "Controls for moving between views or panels." }
+  ]
+}

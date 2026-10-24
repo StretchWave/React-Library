@@ -1,0 +1,387 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-24T12:40:22.549Z",
+  "generator": "scripts/generate-index.mjs",
+  "counts": {
+    "entries": 6,
+    "themes": 6,
+    "categories": 6
+  },
+  "taxonomies": {
+    "themes": [
+      "classic-clean",
+      "midnight-glass",
+      "neon-cyberpunk",
+      "brutalist-print",
+      "retro-terminal",
+      "soft-pastel"
+    ],
+    "categories": [
+      "buttons",
+      "inputs",
+      "layout",
+      "display",
+      "feedback",
+      "navigation"
+    ]
+  },
+  "entries": [
+    {
+      "id": "alert",
+      "name": "Alert",
+      "summary": "Calls out a user-facing message as a tone-aware severity banner.",
+      "description": "Use an Alert to deliver a short, important message that belongs in the page flow: confirmations, warnings, or errors. The tone slot maps to theme-aware colors and a severity icon.",
+      "category": "feedback",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [
+        "banner",
+        "notice"
+      ],
+      "tags": [
+        "feedback",
+        "message",
+        "status"
+      ],
+      "status": "stable",
+      "version": "1.0.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [
+        {
+          "name": "tone",
+          "type": "\"info\" | \"success\" | \"warning\" | \"danger\"",
+          "required": false,
+          "default": "\"info\"",
+          "description": "Severity class that drives color and icon."
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "description": "Short headline rendered before the body."
+        },
+        {
+          "name": "dismissible",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Renders a dismiss button; dismissal is uncontrolled."
+        }
+      ],
+      "links": {
+        "source": "src/components/Alert/Alert.tsx",
+        "demo": "src/components/Alert/AlertDemo.tsx"
+      },
+      "a11yNotes": "Renders with role=\"alert\" so content is announced when inserted.",
+      "usedFrom": [
+        "src/catalog/demos.ts"
+      ]
+    },
+    {
+      "id": "badge",
+      "name": "Badge",
+      "summary": "Compact rounded label for statuses, counts and metadata.",
+      "description": "A Badge is a short, non-interactive label attached to other content: release channels, counts, or states. Tone variants map to theme-aware colors rather than fixed hexes.",
+      "category": "display",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [
+        "chip",
+        "label"
+      ],
+      "tags": [
+        "label",
+        "metadata",
+        "status"
+      ],
+      "status": "stable",
+      "version": "1.0.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [
+        {
+          "name": "tone",
+          "type": "\"neutral\" | \"accent\" | \"success\" | \"warning\" | \"danger\"",
+          "required": false,
+          "default": "\"neutral\"",
+          "description": "Color intent of the badge."
+        },
+        {
+          "name": "size",
+          "type": "\"sm\" | \"md\"",
+          "required": false,
+          "default": "\"md\"",
+          "description": "Density of the badge."
+        }
+      ],
+      "links": {
+        "source": "src/components/Badge/Badge.tsx",
+        "demo": "src/components/Badge/BadgeDemo.tsx"
+      },
+      "usedFrom": [
+        "src/catalog/demos.ts"
+      ]
+    },
+    {
+      "id": "button",
+      "name": "Button",
+      "summary": "Accessible action button with visual variants and sizes.",
+      "description": "The primary actionable control of the library. Buttons render as a real <button>, expose variant and size slots, and inherit focus styling from the active theme (--rl-focus).",
+      "category": "buttons",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [
+        "btn"
+      ],
+      "tags": [
+        "action",
+        "form",
+        "interactive"
+      ],
+      "status": "stable",
+      "version": "1.0.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [
+        {
+          "name": "variant",
+          "type": "\"primary\" | \"secondary\" | \"ghost\"",
+          "required": false,
+          "default": "\"primary\"",
+          "description": "Visual weight of the button."
+        },
+        {
+          "name": "size",
+          "type": "\"sm\" | \"md\" | \"lg\"",
+          "required": false,
+          "default": "\"md\"",
+          "description": "Control size."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Disables interaction."
+        },
+        {
+          "name": "onClick",
+          "type": "(event: React.MouseEvent<HTMLButtonElement>) => void",
+          "required": false,
+          "description": "Click handler."
+        }
+      ],
+      "links": {
+        "source": "src/components/Button/Button.tsx",
+        "demo": "src/components/Button/ButtonDemo.tsx"
+      },
+      "a11yNotes": "Native button semantics; focus ring from theme token --rl-focus.",
+      "usedFrom": [
+        "src/components/browser/DetailPane.tsx",
+        "src/catalog/demos.ts"
+      ]
+    },
+    {
+      "id": "card",
+      "name": "Card",
+      "summary": "Themed surface container that groups related content.",
+      "description": "Card is the base surface for grouping content. Elevation, padding, and optional header title all resolve through theme tokens, so the same Card looks native in every theme.",
+      "category": "layout",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [
+        "panel",
+        "surface"
+      ],
+      "tags": [
+        "container",
+        "layout",
+        "surface"
+      ],
+      "status": "stable",
+      "version": "1.0.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": false,
+          "description": "Optional header title."
+        },
+        {
+          "name": "elevation",
+          "type": "\"flat\" | \"raised\"",
+          "required": false,
+          "default": "\"raised\"",
+          "description": "Whether the card lifts from the surface."
+        },
+        {
+          "name": "padding",
+          "type": "\"compact\" | \"normal\"",
+          "required": false,
+          "default": "\"normal\"",
+          "description": "Inner spacing preset."
+        },
+        {
+          "name": "children",
+          "type": "React.ReactNode",
+          "required": true,
+          "description": "Card body."
+        }
+      ],
+      "links": {
+        "source": "src/components/Card/Card.tsx",
+        "demo": "src/components/Card/CardDemo.tsx"
+      },
+      "usedFrom": [
+        "src/components/browser/DetailPane.tsx",
+        "src/catalog/demos.ts"
+      ]
+    },
+    {
+      "id": "tabs",
+      "name": "TabSheet",
+      "summary": "Switchable panel set following the WAI-ARIA tabs pattern.",
+      "description": "TabSheet renders a labeled set of panels with an accessible tablist. In v0.2 it implements the core tabs pattern; focus structure and arrow-key navigation land in milestone M4.",
+      "category": "navigation",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [
+        "tab-group",
+        "tabstrip"
+      ],
+      "tags": [
+        "navigation",
+        "structure"
+      ],
+      "status": "beta",
+      "version": "0.2.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [
+        {
+          "name": "items",
+          "type": "Array<{ id: string; label: string; content: React.ReactNode }>",
+          "required": true,
+          "description": "Tabs and their panel content."
+        },
+        {
+          "name": "initialTab",
+          "type": "string",
+          "required": false,
+          "description": "Id of the tab selected on mount."
+        }
+      ],
+      "a11yNotes": "role=tablist/tab/tabpanel wiring is implemented; arrow-key roving focus is planned for M4.",
+      "usedFrom": [
+        "src/catalog/demos.ts"
+      ]
+    },
+    {
+      "id": "text-input",
+      "name": "TextInput",
+      "summary": "Labeled single-line text field with validation state.",
+      "description": "TextInput pairs a visible label with a real <input>, supports helper text and an invalid state, and inherits theme colors and radius from the active theme.",
+      "category": "inputs",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [
+        "input",
+        "textfield"
+      ],
+      "tags": [
+        "control",
+        "form"
+      ],
+      "status": "stable",
+      "version": "1.0.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "description": "Visible label bound to the control."
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": false,
+          "description": "Controlled value."
+        },
+        {
+          "name": "onChange",
+          "type": "(value: string) => void",
+          "required": false,
+          "description": "Controlled change handler receiving the next string value."
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "required": false,
+          "description": "Hint text when empty."
+        },
+        {
+          "name": "invalid",
+          "type": "boolean",
+          "required": false,
+          "default": "false",
+          "description": "Marks the field as failing validation."
+        },
+        {
+          "name": "helperText",
+          "type": "string",
+          "required": false,
+          "description": "Hint rendered under the field; doubles as the error message when invalid."
+        }
+      ],
+      "links": {
+        "source": "src/components/TextInput/TextInput.tsx",
+        "demo": "src/components/TextInput/TextInputDemo.tsx"
+      },
+      "a11yNotes": "Label is programmatically bound; helper text links via aria-describedby; invalid sets aria-invalid.",
+      "usedFrom": [
+        "src/catalog/demos.ts"
+      ]
+    }
+  ]
+}

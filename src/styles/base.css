@@ -1,0 +1,39 @@
+/* App-level bootstrap styles.
+ * Theme tokens appear here ONLY as inline fallbacks (mirroring the taxonomy's
+ * classic-clean) so the shell paints before milestone M3's ThemeProvider injects
+ * live tokens from taxonomy/themes.json. Do not add new hardcoded colors; extend
+ * the taxonomy instead. See AGENTS.md "Theming rules".
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--rl-font, "Inter", "Segoe UI", system-ui, sans-serif);
+  background: var(--rl-surface, #f7f8fa);
+  color: var(--rl-text, #1c2128);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: var(--rl-focus, 2px solid var(--rl-accent, #2563eb));
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3,
+p,
+ul {
+  margin: 0;
+}

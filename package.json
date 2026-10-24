@@ -1,0 +1,37 @@
+{
+  "name": "react-library",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Agent-first React component library with a canonical machine-readable catalog.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "validate": "node scripts/validate-catalog.mjs",
+    "generate": "node scripts/generate-index.mjs",
+    "lookup": "node scripts/lookup.mjs",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test:app": "vitest run",
+    "verify": "npm run validate -- --check-index --skip-links && npm run generate -- --skip-links && npm test && npm run test:app && npm run typecheck && npm run build"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "jsdom": "^29.1.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  }
+}

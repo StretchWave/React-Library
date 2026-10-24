@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "description": "Canonical theme taxonomy. Every theme defines all nine canonical --rl-* tokens. App and previews consume this; never hardcode theme colors elsewhere.",
+  "themes": [
+    {
+      "id": "classic-clean",
+      "label": "Classic Clean",
+      "base": "light",
+      "description": "Default professional light theme with a blue accent and soft radii.",
+      "tokens": {
+        "--rl-surface": "#f7f8fa",
+        "--rl-surface-alt": "#ffffff",
+        "--rl-text": "#1c2128",
+        "--rl-text-muted": "#5c6670",
+        "--rl-accent": "#2563eb",
+        "--rl-accent-contrast": "#ffffff",
+        "--rl-border": "#d8dee6",
+        "--rl-radius": "12px",
+        "--rl-font": "'Inter', 'Segoe UI', system-ui, sans-serif",
+        "--rl-shadow": "0 1px 3px rgb(15 23 42 / 0.12)",
+        "--rl-focus": "2px solid #2563eb"
+      }
+    },
+    {
+      "id": "midnight-glass",
+      "label": "Midnight Glass",
+      "base": "dark",
+      "description": "Dark glassmorphism with translucent surfaces and backdrop blur.",
+      "tokens": {
+        "--rl-surface": "#0c1220",
+        "--rl-surface-alt": "rgb(255 255 255 / 0.08)",
+        "--rl-text": "#e8ecf4",
+        "--rl-text-muted": "#9aa7b8",
+        "--rl-accent": "#7dd3fc",
+        "--rl-accent-contrast": "#06121e",
+        "--rl-border": "rgb(255 255 255 / 0.16)",
+        "--rl-radius": "16px",
+        "--rl-font": "'Inter', 'Segoe UI', system-ui, sans-serif",
+        "--rl-shadow": "0 8px 32px rgb(2 8 20 / 0.45)",
+        "--rl-backdrop": "blur(10px)",
+        "--rl-focus": "2px solid #7dd3fc"
+      }
+    },
+    {
+      "id": "neon-cyberpunk",
+      "label": "Neon Cyberpunk",
+      "base": "dark",
+      "description": "Neon green and cyan on near-black; hard edges and glow shadows.",
+      "tokens": {
+        "--rl-surface": "#0a0716",
+        "--rl-surface-alt": "#150f2e",
+        "--rl-text": "#f2e9ff",
+        "--rl-text-muted": "#9d8fc7",
+        "--rl-accent": "#00e676",
+        "--rl-accent-contrast": "#02150b",
+        "--rl-border": "#3a2d63",
+        "--rl-radius": "2px",
+        "--rl-font": "'JetBrains Mono', 'Cascadia Code', Consolas, monospace",
+        "--rl-shadow": "0 0 18px rgb(0 230 118 / 0.35)",
+        "--rl-focus": "2px solid #00e676"
+      }
+    },
+    {
+      "id": "brutalist-print",
+      "label": "Brutalist Print",
+      "base": "light",
+      "description": "Raw print poster energy: black borders, zero radius, hard offset shadow.",
+      "tokens": {
+        "--rl-surface": "#fdfbf3",
+        "--rl-surface-alt": "#fff8dd",
+        "--rl-text": "#111111",
+        "--rl-text-muted": "#444444",
+        "--rl-accent": "#111111",
+        "--rl-accent-contrast": "#fdfbf3",
+        "--rl-border": "#111111",
+        "--rl-radius": "0px",
+        "--rl-font": "'Archivo Black', 'Arial Black', 'Segoe UI', sans-serif",
+        "--rl-shadow": "6px 6px 0 #111111",
+        "--rl-focus": "2px dashed #111111"
+      }
+    },
+    {
+      "id": "retro-terminal",
+      "label": "Retro Terminal",
+      "base": "dark",
+      "description": "Phosphor green monospace on black, zero radius, dotted focus.",
+      "tokens": {
+        "--rl-surface": "#050a05",
+        "--rl-surface-alt": "#0a1a0d",
+        "--rl-text": "#33ff66",
+        "--rl-text-muted": "#1fa34c",
+        "--rl-accent": "#33ff66",
+        "--rl-accent-contrast": "#02150b",
+        "--rl-border": "#1fa34c",
+        "--rl-radius": "0px",
+        "--rl-font": "'VT323', 'Cascadia Mono', Consolas, monospace",
+        "--rl-shadow": "none",
+        "--rl-focus": "1px dotted #33ff66"
+      }
+    },
+    {
+      "id": "soft-pastel",
+      "label": "Soft Pastel",
+      "base": "light",
+      "description": "Friendly pastel purple palette with very rounded corners.",
+      "tokens": {
+        "--rl-surface": "#faf5ff",
+        "--rl-surface-alt": "#ffffff",
+        "--rl-text": "#3b3a5d",
+        "--rl-text-muted": "#7a778f",
+        "--rl-accent": "#c084fc",
+        "--rl-accent-contrast": "#2e1065",
+        "--rl-border": "#e4d4f5",
+        "--rl-radius": "20px",
+        "--rl-font": "'Nunito', 'Segoe UI', system-ui, sans-serif",
+        "--rl-shadow": "0 6px 16px rgb(126 86 180 / 0.18)",
+        "--rl-focus": "2px solid #c084fc"
+      }
+    }
+  ]
+}
