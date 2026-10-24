@@ -257,8 +257,10 @@ library, no UI kit, no CSS framework.
 1. Text search filters by id/name/summary/tags/aliases (pure module `src/lib/search.ts`,
    semantic parity with `scripts/lib/catalog.mjs` — unit-tested for both).
 2. Category filter and theme filter (from taxonomy data, not hardcoded lists).
-3. Detail pane shows: summary, status badge (color-coded), description, themes,
-   props table, category tags, links when present.
+3. Detail pane shows: summary, status badge (color-coded via app-level status tokens
+   defined in `src/styles/status.css` — status colors are deliberately
+   theme-independent release semantics, the only sanctioned color literals outside the
+   taxonomy), description, themes, props table, category tags, links when present.
 4. Keyboard: `/` focuses search; `Esc` clears it — covered by tests.
 5. Accessibility baseline: labeled search input, listbox/option semantics or
    button-based list, focus outlines via `--rl-focus`.

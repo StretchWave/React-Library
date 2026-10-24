@@ -1,12 +1,55 @@
-// App shell (M1). Renders the canonical catalog as-is:
-// header with counts, entry list, detail pane with empty-state placeholder.
-// M2 adds search/filters + full detail metadata; M3 adds theming + previews.
-import { useState } from "react";
-import { catalogCounts, entries, findEntry } from "./catalog/client";
+// App shell (M2). The catalog is the single source of truth; this view adds
+// search (query), category/theme filters (taxonomy-driven), selection, the "/"
+// shortcut and the filter empty state with reset.
+import { useEffect, useMemo, useRef, useState } from "react";
+import { DetailPane } from "./components/browser/DetailPane";
+import { EntryList } from "./components/browser/EntryList";
+import { FilterBar } from "./components/browser/FilterBar";
+import { catalogCounts, entries } from "./catalog/client";
+import { hasActiveFilters, searchEntries } from "./lib/search";
+import "./components/browser/browser.css";
+
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return (
+    target.tagName === "INPUT" ||
+    target.tagName === "TEXTAREA" ||
+    target.tagName === "SELECT" ||
+    target.isContentEditable
+  );
+}
 
 export default function App() {
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("");
+  const [theme, setTheme] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const selected = selectedId ? (findEntry(selectedId) ?? null) : null;
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    // "/" focuses search unless the user is already typing somewhere editable.
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "/" && !isEditableTarget(event.target)) {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  const filtersActive = hasActiveFilters(query, { category, theme });
+  const filtered = useMemo(
+    () => searchEntries(entries, query, { category, theme }),
+    [query, category, theme],
+  );
+  const selected = selectedId ? (entries.find((entry) => entry.id === selectedId) ?? null) : null;
+
+  function resetFilters() {
+    setQuery("");
+    setCategory("");
+    setTheme("");
+  }
 
   return (
     <div className="app-shell">
@@ -20,37 +63,27 @@ export default function App() {
         </div>
       </header>
       <main className="app-main">
-        <nav className="entry-nav" aria-label="Component catalog">
-          <ul className="entry-list">
-            {entries.map((entry) => (
-              <li key={entry.id}>
-                <button
-                  type="button"
-                  className={
-                    selectedId === entry.id ? "entry-item is-selected" : "entry-item"
-                  }
-                  aria-current={selectedId === entry.id ? "true" : undefined}
-                  onClick={() => setSelectedId(entry.id)}
-                >
-                  <span className="entry-label">{entry.name}</span>
-                  {" "}
-                  <span className="entry-status">{entry.status}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <section className="entry-nav" aria-label="Component catalog">
+          <FilterBar
+            query={query}
+            onQueryChange={setQuery}
+            category={category}
+            onCategoryChange={setCategory}
+            theme={theme}
+            onThemeChange={setTheme}
+            searchInputRef={searchInputRef}
+          />
+          <EntryList
+            entries={filtered}
+            totalCount={catalogCounts.entries}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            filtersActive={filtersActive}
+            onResetFilters={resetFilters}
+          />
+        </section>
         <section className="detail-pane" aria-label="Component details">
-          {selected ? (
-            <article className="detail-card">
-              <h2 className="detail-title">{selected.name}</h2>
-              <p className="detail-summary">{selected.summary}</p>
-            </article>
-          ) : (
-            <div className="detail-empty">
-              <p>Select a component from the catalog to inspect it.</p>
-            </div>
-          )}
+          <DetailPane entry={selected} />
         </section>
       </main>
     </div>

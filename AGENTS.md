@@ -92,7 +92,10 @@ Exit codes: `0` found · `1` no match · `2` unknown filter id · `64` usage err
   --rl-accent-contrast, --rl-border, --rl-radius, --rl-font`.
 - Optional (must inline-fallback): `--rl-shadow`, `--rl-focus`, `--rl-backdrop`.
 - App assigns tokens via `[data-theme="<id>"]`; nothing else may declare colors outside
-  taxonomy tokens. App chrome consumes the same tokens.
+  taxonomy tokens — one exception: `src/styles/status.css` defines app-level status
+  semantics (`--rl-status-stable|beta|experimental|deprecated[|-bg]`), deliberately
+  theme-independent (see MASTER_SPEC.md §10 M2 + checklist).
+- App chrome consumes the same tokens.
 
 ## Placeholders
 

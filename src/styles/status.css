@@ -1,0 +1,14 @@
+/* App-level status semantics. Deliberately theme-independent: these colors
+ * convey release state (stable/beta/experimental/deprecated), not theme
+ * personality. Sanctioned exception to the --rl-* only rule — see
+ * MASTER_SPEC.md §10 M2, AGENTS.md ("Theming rules"), checklist decisions. */
+:root {
+  --rl-status-stable: #15803d;
+  --rl-status-stable-bg: #dcf5e7;
+  --rl-status-beta: #b45309;
+  --rl-status-beta-bg: #fdeeda;
+  --rl-status-experimental: #7c3aed;
+  --rl-status-experimental-bg: #ede6fb;
+  --rl-status-deprecated: #b91c1c;
+  --rl-status-deprecated-bg: #fbdede;
+}

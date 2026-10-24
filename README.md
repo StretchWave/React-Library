@@ -14,8 +14,8 @@ Schema: [`docs/SCHEMA.md`](./docs/SCHEMA.md)
 |---|---|
 | Foundations: catalog schema, theme taxonomy, generator, validator, lookup CLI, AGENTS doc | ✅ working (29/29 tooling tests) |
 | App skeleton (M1): catalog-driven list + selection + detail empty state | ✅ working (verify gate green; browser-verified) |
-| Component browser (M2) | 🚧 in progress |
-| Theme engine + live previews (M3) | ⏳ planned |
+| Component browser (M2): search, taxonomy filters, full detail pane | ✅ working |
+| Theme engine + live previews (M3) | 🚧 in progress |
 | Advanced interactions (M4) | ⏳ planned |
 
 ## Quickstart

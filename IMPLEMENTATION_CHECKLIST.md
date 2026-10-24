@@ -9,8 +9,8 @@ Status legend: **[x] done (verified)** · **[~] partial** · **[ ] pending** ·
 |---|---|---|
 | Foundations (schema, taxonomy, tooling, docs) | ✅ done | `node --test tests/*.test.mjs` → 29/29 pass; `validate` OK (6/6/6); `generate` writes index; `lookup` text+JSON verified |
 | M1 App skeleton | ✅ done | `npm run verify` full chain green (29 tooling + 5 app tests, typecheck, vite build); dev-server smoke test + screenshots |
-| M2 Component browser | ⏳ in progress | — |
-| M3 Theme engine + previews + components | ⏳ pending | — |
+| M2 Component browser | ✅ done | 20/20 app tests + 32/32 node tests; dev-server walkthrough: search → "1 of 6 components" → TextInput detail fully rendered (screenshot) |
+| M3 Theme engine + previews + components | ⏳ in progress | — |
 | M4 Advanced interactions | ⏳ pending | — |
 
 Placeholders: none registered (TabSheet arrow-key navigation is *scheduled M4*, declared
@@ -73,15 +73,25 @@ in catalog `a11yNotes`; `--skip-links` is a scheduled-phase flag, removed at M3)
 M1 evidence recap: `npm run verify` → catalog valid (6/6/6, index up to date) ·
 `node --test` 29/29 · vitest 5/5 · `tsc --noEmit` clean · `vite build` ✓ (231 kB js).
 
-## 3) M2 — Component browser ⏳
+## 3) M2 — Component browser ✅
 
-- [ ] Pure search module `src/lib/search.ts` (parity with scripts/lib) + unit tests
-- [ ] Text search input wired; `/` focus + `Esc` clear shortcuts (tested)
-- [ ] Category filter + theme filter driven by taxonomy data
-- [ ] Detail pane: summary, status badge (color-coded), description, themes, props
-      table, tags, links (when present)
-- [ ] A11y baseline: labeled controls, focus-visible via `--rl-focus`
-- [ ] Component-render tests (list selection + a11y roles); `npm run verify` green
+- [x] Pure search module `src/lib/search.ts` (parity with scripts/lib) + unit tests
+      (`src/lib/search.test.ts` — ranking/filters/active-filters, incl. corrected
+      "label" expectation: exact alias badge outranks text-input summary match)
+- [x] Text search input wired; `/` focus + `Esc` clear shortcuts (tested)
+- [x] Category filter + theme filter driven by taxonomy data (`FilterBar`)
+- [x] Detail pane: summary, status badge (color-coded via `--rl-status-*`), description,
+      themes, props table, tags, aliases, links, a11y notes (`DetailPane`)
+- [x] A11y baseline: labeled controls, chips carry accessible names,
+      focus-visible via `--rl-focus`
+- [x] Filter empty state with "Reset filters" pulled forward from M4 (tested)
+- [x] `tests/css-theming.test.mjs`: guard against raw color literals outside
+      `var(--rl-*, fallback)` in src/components css (3 tests; 32/32 node tests)
+- [x] Component-render tests (App 5 + browser groups 6 + FilterBar 2 + DetailPane 2 +
+      search 5); `npm run verify` green (32/32 node, 20/20 app, typecheck, build)
+
+M2 evidence: browser walkthrough — search "text" → "1 of 6 components" → TextInput
+detail shows chip/meta/themes/props table (screenshot recorded).
 
 ## 4) M3 — Theme engine + live previews + component suite ⏳
 

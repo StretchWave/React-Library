@@ -1,0 +1,196 @@
+/* Component-browser UI (M2). Colors via --rl-* tokens (+ --rl-status-*), with
+ * classic-clean fallbacks that M3's ThemeProvider will drive live. */
+.filter-bar {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--rl-border, #d8dee6);
+}
+
+.filter-input,
+.filter-select {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  color: inherit;
+  background: var(--rl-surface, #f7f8fa);
+  border: 1px solid var(--rl-border, #d8dee6);
+  border-radius: var(--rl-radius, 12px);
+}
+
+.filter-select-label {
+  display: grid;
+  gap: 0.15rem;
+  font-size: 0.75rem;
+  color: var(--rl-text-muted, #5c6670);
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.result-count {
+  padding: 0.25rem 0.75rem 0;
+  font-size: 0.75rem;
+  color: var(--rl-text-muted, #5c6670);
+}
+
+.list-empty {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  text-align: center;
+  color: var(--rl-text-muted, #5c6670);
+  font-size: 0.9rem;
+}
+
+.reset-filters {
+  justify-self: center;
+  padding: 0.35rem 0.75rem;
+  font: inherit;
+  background: var(--rl-surface, #f7f8fa);
+  color: var(--rl-text, #1c2128);
+  border: 1px solid var(--rl-border, #d8dee6);
+  border-radius: var(--rl-radius, 12px);
+  cursor: pointer;
+}
+
+.reset-filters:hover {
+  background: var(--rl-surface-alt, #ffffff);
+}
+
+.status-chip {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.4;
+  border-radius: calc(var(--rl-radius, 12px) / 2);
+  border: 1px solid currentcolor;
+  white-space: nowrap;
+}
+
+.status-chip.is-stable {
+  color: var(--rl-status-stable, #15803d);
+  background: var(--rl-status-stable-bg, #dcf5e7);
+  border-color: transparent;
+}
+
+.status-chip.is-beta {
+  color: var(--rl-status-beta, #b45309);
+  background: var(--rl-status-beta-bg, #fdeeda);
+  border-color: transparent;
+}
+
+.status-chip.is-experimental {
+  color: var(--rl-status-experimental, #7c3aed);
+  background: var(--rl-status-experimental-bg, #ede6fb);
+  border-color: transparent;
+}
+
+.status-chip.is-deprecated {
+  color: var(--rl-status-deprecated, #b91c1c);
+  background: var(--rl-status-deprecated-bg, #fbdede);
+  border-color: transparent;
+}
+
+.entry-item.is-selected .status-chip {
+  color: var(--rl-accent-contrast, #ffffff);
+  background: transparent;
+  border-color: currentcolor;
+}
+
+/* Detail extras */
+.detail-description {
+  margin-top: 0.75rem;
+  max-width: 60ch;
+  color: var(--rl-text, #1c2128);
+}
+
+.detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.9rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--rl-text-muted, #5c6670);
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+}
+
+.neutral-chip {
+  padding: 0.1rem 0.55rem;
+  font-size: 0.75rem;
+  color: var(--rl-text, #1c2128);
+  background: var(--rl-surface, #f7f8fa);
+  border: 1px solid var(--rl-border, #d8dee6);
+  border-radius: calc(var(--rl-radius, 12px) / 2);
+}
+
+.inline-code {
+  padding: 0.05rem 0.35rem;
+  font-size: 0.8rem;
+  background: var(--rl-surface, #f7f8fa);
+  border: 1px solid var(--rl-border, #d8dee6);
+  border-radius: calc(var(--rl-radius, 12px) / 4);
+}
+
+.props-table {
+  width: 100%;
+  margin-top: 0.75rem;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.props-table caption {
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: 0.25rem;
+}
+
+.props-table th,
+.props-table td {
+  padding: 0.35rem 0.5rem;
+  border-top: 1px solid var(--rl-border, #d8dee6);
+  text-align: left;
+  vertical-align: top;
+}
+
+.props-table th {
+  color: var(--rl-text-muted, #5c6670);
+  font-weight: 600;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.detail-links {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.detail-links dt {
+  color: var(--rl-text-muted, #5c6670);
+}
+
+.detail-notes {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--rl-text, #1c2128);
+  background: var(--rl-surface, #f7f8fa);
+  border: 1px solid var(--rl-border, #d8dee6);
+  border-radius: calc(var(--rl-radius, 12px) / 2);
+}
+
+.field-label {
+  font-weight: 600;
+}
