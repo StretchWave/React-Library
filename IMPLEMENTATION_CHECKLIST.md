@@ -12,7 +12,7 @@ Status legend: **[x] done (verified)** · **[~] partial** · **[ ] pending** ·
 | M2 Component browser | ✅ done | 20/20 app tests + 32/32 node tests; dev-server walkthrough: search → "1 of 6 components" → TextInput detail fully rendered (screenshot) |
 | M3 Theme engine + previews + components | ✅ done | verify full-chain green **without --skip-links** (32/32 node, 50/50 app, typecheck, build); browser-verified: Midnight Glass scope restyles app + chat-free preview (screenshot) |
 | M4 Advanced interactions | ✅ done | verify full-chain green **flagless** (32/32 node, 54/54 app, typecheck, build); browser-verified: `#/component/tabs` deep link, copy-usage "Copied ✓" feedback, TabSheet ←/→/Home/End roving focus + selection-follows-focus (screenshot) |
-| M5 Real ingestion + gallery + selection + master prompt | 🚧 M5.1 + M5.2 done — schema v2; catalog 6 → 33 real entries (26 local / 7 external); M5.3–M5.6 pending | verify green: 55/55 node (+9 ingest), 56/56 app, typecheck, build (300.02 kB js); react-bits/aceternity/pryzm → reference-only per license research |
+| M5 Real ingestion + gallery + selection + master prompt | 🚧 M5.1–M5.4 done — schema v2; catalog 33 real entries (26 local / 7 external); gallery + honest previews + multi-selection live; M5.5–M5.6 pending | verify green: 55/55 node, 78/78 app, typecheck, build (314.97 kB js); react-bits/aceternity/pryzm → reference-only per license research |
 
 Placeholders: none. (TabSheet arrow-key navigation shipped in M4 — catalog `a11yNotes`
 and description updated at v0.3.0; `--skip-links` was removed at M3.)
@@ -247,7 +247,28 @@ Staged per MASTER_SPEC §10 M5. Sources researched & documented in
   branch (note renderer); no current entries use it since every record carries a
   verified link — exercised via unit tests in M5.6.
 
-### M5.4 — Multi-selection ⏳
+### M5.4 — Multi-selection ✅
+- [x] `src/lib/selection.ts` pure store: stable-id lists, toggle / append-order
+      add / up-down reorder (`moveById`), persistence helpers that prune
+      unknown + duplicate ids from stale payloads
+      (`rl.selection.v1` localStorage key)
+- [x] GalleryCard selection checkboxes ("Select <name> for the master prompt")
+      with an `is-selected` outline that never hides the preview; selection
+      survives filters, sorting, view switches, and reloads
+- [x] "Select all visible results" toolbar control (respects the active
+      filters) + "Clear all"; header chip shows `local/external/selected` counts
+- [x] `SelectionTray`: reviews every selected entry in one place regardless of
+      filters — reusable remove control, ↑/↓ reorder, per-item status/type
+      chips, and honest availability flags computed from the record
+      (`availabilityNotes`: missing retrieval, missing local extension point,
+      unavailable preview) raised BEFORE prompt generation
+- [x] Selection toggle also available in the browser detail pane
+- [x] "Generate master prompt" navigates to `#/prompt` (studio ships in M5.5;
+      the interim placeholder honestly reports the stored selection count)
+- [x] Tests: +5 selection-store unit tests, +6 tray tests, +7 App integration
+      tests (toggle, select-all-visible under filters, persistence + pruning,
+      tray reorder/remove, detail toggle, prompt navigation, empty-selection
+      honesty); verify gate green (55/55 node, 78/78 app, typecheck, build)
 
 ### M5.5 — Master prompt generation ⏳
 

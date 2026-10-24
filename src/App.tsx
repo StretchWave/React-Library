@@ -11,21 +11,24 @@ import { Gallery } from "./components/gallery/Gallery";
 import { catalogCounts, entries, findEntry } from "./catalog/client";
 import { hasActiveFilters, searchEntries, type SearchFilters } from "./lib/search";
 import { entryTypeOf } from "./catalog/types";
+import {
+  addIds,
+  loadSelection,
+  moveById as moveSelectionId,
+  saveSelection,
+  toggleId,
+} from "./lib/selection";
 import { ThemePicker } from "./theme/ThemePicker";
 import "./components/browser/browser.css";
 import "./components/browser/preview.css";
 import "./components/gallery/gallery.css";
 
-type View = "browser" | "gallery";
+type View = "browser" | "gallery" | "prompt";
 
 /** Deep links look like `#/component/<id>` (M4) and `#/gallery` (M5.3). */
 function entryIdFromHash(): string | null {
   const match = /#\/component\/([a-z0-9-]+)/.exec(window.location.hash);
   return match ? match[1] : null;
-}
-
-function isGalleryHash(): boolean {
-  return window.location.hash === "#/gallery";
 }
 
 function isEditableTarget(target: EventTarget | null): boolean {
@@ -47,6 +50,9 @@ export default function App() {
   const [source, setSource] = useState("");
   const [entryType, setEntryType] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selection, setSelection] = useState<string[]>(() =>
+    loadSelection(new Set(entries.map((entry) => entry.id))),
+  );
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -62,8 +68,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    // Hash deep links: honor #/component/<id> and #/gallery, keep back/forward
-    // in sync. Filters survive view switches because they live in this shell.
+    // Hash deep links: honor #/component/<id>, #/gallery, and #/prompt, and
+    // keep back/forward in sync. Filters and the selection survive view
+    // switches because both live in this shell (M5.4).
     const syncFromHash = () => {
       const id = entryIdFromHash();
       if (id && findEntry(id)) {
@@ -71,8 +78,12 @@ export default function App() {
         setSelectedId(id);
         return;
       }
-      if (isGalleryHash()) {
+      if (window.location.hash === "#/gallery") {
         setView("gallery");
+        return;
+      }
+      if (window.location.hash === "#/prompt") {
+        setView("prompt");
         return;
       }
       setView("browser");
@@ -82,6 +93,11 @@ export default function App() {
     window.addEventListener("hashchange", syncFromHash);
     return () => window.removeEventListener("hashchange", syncFromHash);
   }, []);
+
+  useEffect(() => {
+    // Persist the selection (pruned ids from a stale payload stay pruned).
+    saveSelection(selection);
+  }, [selection]);
 
   function selectEntry(id: string) {
     window.location.hash = `/component/${id}`;
@@ -96,6 +112,23 @@ export default function App() {
 
   function openBrowser() {
     setView("browser");
+  }
+
+  function openPrompt() {
+    window.location.hash = "/prompt";
+    setView("prompt");
+  }
+
+  function toggleSelection(id: string, next: boolean) {
+    setSelection((prev) => (next ? toggleId(prev, id) : prev.filter((candidate) => candidate !== id)));
+  }
+
+  function selectAllVisible() {
+    setSelection((prev) => addIds(prev, filtered.map((entry) => entry.id)));
+  }
+
+  function moveSelection(id: string, delta: -1 | 1) {
+    setSelection((prev) => moveSelectionId(prev, id, delta));
   }
 
   const filters: SearchFilters = { category, theme, aesthetic, source, entryType };
@@ -150,7 +183,7 @@ export default function App() {
           Gallery
         </button>
         <span className="view-counts">
-          {localCount} local · {externalCount} external references
+          {localCount} local · {externalCount} external · {selection.length} selected
         </span>
       </nav>
       <main className="app-main">
@@ -179,8 +212,36 @@ export default function App() {
               filtersActive={filtersActive}
               onResetFilters={resetFilters}
               onOpenDetail={selectEntry}
+              selectedIds={selection}
+              selectionItems={selection
+                .map((id) => findEntry(id))
+                .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))}
+              onToggleSelect={toggleSelection}
+              onSelectAllVisible={selectAllVisible}
+              onRemoveSelection={(id) => toggleSelection(id, false)}
+              onMoveSelection={moveSelection}
+              onClearSelection={() => setSelection([])}
+              onGeneratePrompt={openPrompt}
             />
           </>
+        ) : view === "prompt" ? (
+          // Placeholder (M5.4): the master-prompt studio lands in M5.5; the
+          // selection is already complete. Registered in the checklist.
+          <section className="detail-empty" aria-label="Master prompt studio">
+            <p>
+              Master-prompt studio arrives with the next M5 stage. Your selection
+              of {selection.length} component
+              {selection.length === 1 ? "" : "s"} is stored and will be used to
+              build the prompt.
+            </p>
+            <button
+              type="button"
+              className="reset-filters"
+              onClick={() => setView("gallery")}
+            >
+              Back to selection
+            </button>
+          </section>
         ) : (
           <>
             <section className="entry-nav" aria-label="Component catalog">
@@ -209,7 +270,11 @@ export default function App() {
               />
             </section>
             <section className="detail-pane" aria-label="Component details">
-              <DetailPane entry={selected} />
+              <DetailPane
+                entry={selected}
+                selected={selected ? selection.includes(selected.id) : undefined}
+                onToggleSelection={toggleSelection}
+              />
               <PreviewPanel entry={selected} />
             </section>
           </>

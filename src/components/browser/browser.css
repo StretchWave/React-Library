@@ -194,3 +194,28 @@
 .field-label {
   font-weight: 600;
 }
+
+/* --- M5.3/M5.4: provenance + selection additions --------------------------- */
+.detail-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.detail-select-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--rl-text-muted, #5c6670);
+  cursor: pointer;
+}
+
+.detail-select-toggle input {
+  accent-color: var(--rl-accent);
+}
+
+.detail-retrieval {
+  word-break: break-all;
+}

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { findEntry } from "./catalog/client";
 import type { CatalogEntry } from "./catalog/types";
+import { SELECTION_STORAGE_KEY } from "./lib/selection";
 import { DetailPane } from "./components/browser/DetailPane";
 import { FilterBar } from "./components/browser/FilterBar";
 import type { FilterBarProps } from "./components/browser/FilterBar";
@@ -293,6 +294,119 @@ describe("App (M5.3 gallery)", () => {
     expect(screen.getByRole("status").textContent).toContain("2 of 33 entries");
     fireEvent.click(screen.getByRole("button", { name: "Browser" }));
     expect((screen.getByLabelText("Search components") as HTMLInputElement).value).toBe("pattern");
+  });
+});
+
+describe("App (M5.4 multi-selection)", () => {
+  function trayCount(): string {
+    return screen.getByTestId("tray-count").textContent?.trim() ?? "";
+  }
+
+  it("adds and removes selections via the gallery checkboxes", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select Button for the master prompt" }));
+    expect(trayCount()).toBe("1");
+    expect(
+      (screen.getByRole("checkbox", { name: "Select Button for the master prompt" }) as HTMLInputElement)
+        .checked,
+    ).toBe(true);
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: "Select Button (shadcn) for the master prompt" }),
+    );
+    expect(trayCount()).toBe("2");
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select Button for the master prompt" }));
+    expect(trayCount()).toBe("1");
+    expect(
+      (
+        screen.getByRole("checkbox", {
+          name: "Select Button (shadcn) for the master prompt",
+        }) as HTMLInputElement
+      ).checked,
+    ).toBe(true);
+  });
+
+  it("select all visible respects the filters and survives filter changes", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    fireEvent.change(screen.getByLabelText("Filter by source library"), {
+      target: { value: "react-bits" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Select all visible results" }));
+    expect(trayCount()).toBe("7");
+    // Selection must survive filter/search changes (spec M5.4).
+    fireEvent.change(screen.getByLabelText("Filter by source library"), { target: { value: "" } });
+    fireEvent.change(screen.getByLabelText("Catalog availability"), { target: { value: "local" } });
+    expect(trayCount()).toBe("7");
+    expect(screen.getByRole("status").textContent).toContain("26 of 33 entries");
+    fireEvent.click(screen.getByRole("button", { name: "Clear all" }));
+    expect(trayCount()).toBe("0");
+  });
+
+  it("persists the selection and prunes ids that no longer exist", () => {
+    localStorage.setItem(
+      SELECTION_STORAGE_KEY,
+      JSON.stringify(["button", "magic-ui-dot-pattern", "extinct-id"]),
+    );
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    expect(trayCount()).toBe("2");
+    expect(JSON.parse(localStorage.getItem(SELECTION_STORAGE_KEY) ?? "[]")).toEqual([
+      "button",
+      "magic-ui-dot-pattern",
+    ]);
+  });
+
+  it("the tray reviews, reorders, and removes the selection", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: "Select Dot Pattern (Magic UI) for the master prompt" }),
+    );
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select Button for the master prompt" }));
+    const tray = screen.getByTestId("selection-tray");
+    let order = [...tray.querySelectorAll(".tray-name")].map((node) => node.textContent);
+    expect(order).toEqual(["Dot Pattern (Magic UI)", "Button"]);
+    fireEvent.click(screen.getByRole("button", { name: "Move Dot Pattern (Magic UI) later in the selection" }));
+    order = [...tray.querySelectorAll(".tray-name")].map((node) => node.textContent);
+    expect(order).toEqual(["Button", "Dot Pattern (Magic UI)"]);
+    fireEvent.click(screen.getByRole("button", { name: "Remove Dot Pattern (Magic UI) from the selection" }));
+    order = [...tray.querySelectorAll(".tray-name")].map((node) => node.textContent);
+    expect(order).toEqual(["Button"]);
+  });
+
+  it("the detail view offers a selection toggle (browser view)", () => {
+    renderApp();
+    fireEvent.click(entryItem("Button"));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select Button for the master prompt" }));
+    // The selection count chip in the header reflects browser-view selections.
+    expect(screen.getByText(/^26 local · 7 external · 1 selected$/)).toBeTruthy();
+  });
+
+  it("generate master prompt opens the prompt view with the selection intact", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select Button for the master prompt" }));
+    expect(
+      (screen.getByRole("button", { name: "Generate master prompt" }) as HTMLButtonElement).disabled,
+    ).toBe(false);
+    fireEvent.click(screen.getByRole("button", { name: "Generate master prompt" }));
+    expect(window.location.hash).toBe("#/prompt");
+    const studio = screen.getByRole("region", { name: "Master prompt studio" });
+    expect(studio.textContent).toContain("1 component");
+    fireEvent.click(screen.getByRole("button", { name: "Back to selection" }));
+    expect(trayCount()).toBe("1");
+  });
+
+  it("an empty selection cannot open the prompt view", () => {
+    // A crafted deep link into the studio with nothing selected must stay
+    // honest about the empty selection (hash is resolved before render here —
+    // the mount-time syncFromHash handles it deterministically).
+    window.location.hash = "#/prompt";
+    renderApp();
+    const studio = screen.getByRole("region", { name: "Master prompt studio" });
+    expect(studio.textContent).toContain("0 components");
+    expect(window.location.hash).toBe("#/prompt");
   });
 });
 

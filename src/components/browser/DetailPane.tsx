@@ -39,9 +39,12 @@ function LinksBlock({ links }: { links: EntryLinks }) {
 
 export interface DetailPaneProps {
   entry: CatalogEntry | null;
+  /** M5.4: when provided, detail rows offer a selection toggle. */
+  selected?: boolean;
+  onToggleSelection?: (id: string, next: boolean) => void;
 }
 
-export function DetailPane({ entry }: DetailPaneProps) {
+export function DetailPane({ entry, selected, onToggleSelection }: DetailPaneProps) {
   if (!entry) {
     return (
       <div className="detail-empty">
@@ -54,10 +57,23 @@ export function DetailPane({ entry }: DetailPaneProps) {
 
   return (
     <article className="detail-card" aria-labelledby="detail-title">
-      <h2 className="detail-title" id="detail-title">
-        {entry.name}
-      </h2>
-      <span className={`status-chip ${statusChipClass(entry)}`}>{entry.status}</span>
+      <div className="detail-title-row">
+        <h2 className="detail-title" id="detail-title">
+          {entry.name}
+        </h2>
+        <span className={`status-chip ${statusChipClass(entry)}`}>{entry.status}</span>
+        {onToggleSelection ? (
+          <label className="detail-select-toggle">
+            <input
+              type="checkbox"
+              checked={Boolean(selected)}
+              onChange={(event) => onToggleSelection(entry.id, event.target.checked)}
+              aria-label={`Select ${entry.name} for the master prompt`}
+            />
+            <span>select for prompt</span>
+          </label>
+        ) : null}
+      </div>
       <p className="detail-summary">{entry.summary}</p>
       {entry.description ? <p className="detail-description">{entry.description}</p> : null}
 
