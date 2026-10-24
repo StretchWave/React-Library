@@ -8,6 +8,7 @@ import { EntryList } from "./components/browser/EntryList";
 import { FilterBar } from "./components/browser/FilterBar";
 import { PreviewPanel } from "./components/browser/PreviewPanel";
 import { Gallery } from "./components/gallery/Gallery";
+import { PromptStudio } from "./components/prompt/PromptStudio";
 import { catalogCounts, entries, findEntry } from "./catalog/client";
 import { hasActiveFilters, searchEntries, type SearchFilters } from "./lib/search";
 import { entryTypeOf } from "./catalog/types";
@@ -22,6 +23,7 @@ import { ThemePicker } from "./theme/ThemePicker";
 import "./components/browser/browser.css";
 import "./components/browser/preview.css";
 import "./components/gallery/gallery.css";
+import "./components/prompt/prompt.css";
 
 type View = "browser" | "gallery" | "prompt";
 
@@ -225,23 +227,12 @@ export default function App() {
             />
           </>
         ) : view === "prompt" ? (
-          // Placeholder (M5.4): the master-prompt studio lands in M5.5; the
-          // selection is already complete. Registered in the checklist.
-          <section className="detail-empty" aria-label="Master prompt studio">
-            <p>
-              Master-prompt studio arrives with the next M5 stage. Your selection
-              of {selection.length} component
-              {selection.length === 1 ? "" : "s"} is stored and will be used to
-              build the prompt.
-            </p>
-            <button
-              type="button"
-              className="reset-filters"
-              onClick={() => setView("gallery")}
-            >
-              Back to selection
-            </button>
-          </section>
+          <PromptStudio
+            items={selection
+              .map((id) => findEntry(id))
+              .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))}
+            onBack={() => setView("gallery")}
+          />
         ) : (
           <>
             <section className="entry-nav" aria-label="Component catalog">

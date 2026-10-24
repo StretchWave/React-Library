@@ -398,6 +398,18 @@ describe("App (M5.4 multi-selection)", () => {
     expect(trayCount()).toBe("1");
   });
 
+  it("the studio prompt carries official retrieval and license facts from catalog records (M5.5)", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: "Select Split Text (React Bits) for the master prompt" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Generate master prompt" }));
+    const promptEl = screen.getByLabelText("Generated master prompt");
+    expect(promptEl.textContent).toContain("- Official retrieval (use exactly): npx shadcn@latest add");
+    expect(promptEl.textContent).toContain("Commons Clause");
+  });
+
   it("an empty selection cannot open the prompt view", () => {
     // A crafted deep link into the studio with nothing selected must stay
     // honest about the empty selection (hash is resolved before render here —
@@ -428,6 +440,26 @@ describe("PreviewPanel (M4 copy-usage)", () => {
     expect(snippet).toContain('import { Button } from "src/components/Button/Button"');
     expect(snippet).toContain("<Button");
     expect(screen.getByText("Copied ✓")).toBeTruthy();
+  });
+
+  it("falls back to recorded implementation paths for vendored entries", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    });
+    const entry = findEntry("shadcn-button") as CatalogEntry;
+    render(
+      <ThemeProvider>
+        <PreviewPanel entry={entry} />
+      </ThemeProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Copy usage snippet for Button (shadcn)" }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
+    const snippet = writeText.mock.calls[0]![0] as string;
+    expect(snippet).toContain(
+      `import { Buttonshadcn } from "${entry.implementation?.[0]?.replace(/\.tsx$/, "")}"`,
+    );
   });
 
   it("falls back to slice-free labels when links are absent", async () => {

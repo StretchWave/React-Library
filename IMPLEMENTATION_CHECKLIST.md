@@ -12,7 +12,7 @@ Status legend: **[x] done (verified)** · **[~] partial** · **[ ] pending** ·
 | M2 Component browser | ✅ done | 20/20 app tests + 32/32 node tests; dev-server walkthrough: search → "1 of 6 components" → TextInput detail fully rendered (screenshot) |
 | M3 Theme engine + previews + components | ✅ done | verify full-chain green **without --skip-links** (32/32 node, 50/50 app, typecheck, build); browser-verified: Midnight Glass scope restyles app + chat-free preview (screenshot) |
 | M4 Advanced interactions | ✅ done | verify full-chain green **flagless** (32/32 node, 54/54 app, typecheck, build); browser-verified: `#/component/tabs` deep link, copy-usage "Copied ✓" feedback, TabSheet ←/→/Home/End roving focus + selection-follows-focus (screenshot) |
-| M5 Real ingestion + gallery + selection + master prompt | 🚧 M5.1–M5.4 done — schema v2; catalog 33 real entries (26 local / 7 external); gallery + honest previews + multi-selection live; M5.5–M5.6 pending | verify green: 55/55 node, 78/78 app, typecheck, build (314.97 kB js); react-bits/aceternity/pryzm → reference-only per license research |
+| M5 Real ingestion + gallery + selection + master prompt | 🚧 M5.1–M5.5 done — schema v2; catalog 33 real entries (26 local / 7 external); gallery + honest previews + multi-selection + master-prompt studio live; M5.6 (docs/release) pending | verify green: 55/55 node (+9 prompt), 93/93 app, typecheck, build (320.16 kB js); react-bits/aceternity/pryzm → reference-only per license research |
 
 Placeholders: none. (TabSheet arrow-key navigation shipped in M4 — catalog `a11yNotes`
 and description updated at v0.3.0; `--skip-links` was removed at M3.)
@@ -270,7 +270,30 @@ Staged per MASTER_SPEC §10 M5. Sources researched & documented in
       tray reorder/remove, detail toggle, prompt navigation, empty-selection
       honesty); verify gate green (55/55 node, 78/78 app, typecheck, build)
 
-### M5.5 — Master prompt generation ⏳
+### M5.5 — Master prompt generation ✅
+- [x] `src/lib/prompt.ts` — deterministic pure builder (`buildMasterPrompt`):
+      standing rules for the consuming agent, license notices pulled verbatim
+      from records (Commons Clause text travels with react-bits items),
+      aggregated `— needed by` dependency rows (deduplicated across the
+      selection), per-entry sections in USER-DEFINED SELECTION ORDER with
+      local ⇄ external distinction (repo paths + manifest for local; official
+      retrieval + official page only for external), honest skip notes for ids
+      missing from the catalog, `npm run lookup -- <id> --json` verification line
+- [x] `src/components/prompt/PromptStudio.tsx` — `#/prompt` view: prominent
+      "Copy master prompt to clipboard" (disables at 0 selected), readable
+      pre-formatted prompt (`aria-label="Generated master prompt"`), selection
+      count status line, readiness warnings surfaced above the text, honest
+      empty state, "Back to selection"
+- [x] Prompt reflects the live selection at all times (recomputed from the
+      selection store, survives view switches); nothing is fabricated — every
+      fact is record-derived (verified by 9 unit tests against the real catalog)
+- [x] PreviewPanel usage snippet now derives valid identifiers for sourced
+      names and falls back to recorded implementation paths for vendored
+      entries (tested)
+- [x] App tests: end-to-end studio test (select react-bits entry → generate →
+      retrieval command + Commons Clause present), empty-selection honesty,
+      navigation round-trip; verify gate green (55/55 node, 93/93 app,
+      typecheck, build 320.16 kB js)
 
 ### M5.6 — Validation and release ⏳
 

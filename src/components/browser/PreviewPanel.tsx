@@ -7,15 +7,18 @@ import { useTheme } from "../../theme/ThemeProvider";
 import { copyText } from "../../lib/clipboard";
 
 export function usageSnippet(entry: CatalogEntry): string {
-  const source = entry.links?.source;
+  const source = entry.links?.source ?? entry.implementation?.[0];
+  // Derived identifier: catalog name with non-word chars stripped, so it stays
+  // a valid JSX symbol even for sourced names like "Button (shadcn)".
+  const identifier = entry.name.replace(/[^a-zA-Z0-9]/g, "");
   const importLine = source
-    ? `import { ${entry.name.replace(/\s+/g, "")} } from "${source.replace(/\.tsx$/, "")}";`
+    ? `import { ${identifier} } from "${source.replace(/\.tsx$/, "")}";`
     : `// ${entry.name} (no source link registered in the catalog yet)`;
   const propsLine = entry.props
     .filter((prop) => prop.required)
     .map((prop) => `${prop.name}={/* ${prop.type} */}`)
     .join(" ");
-  const example = `<${entry.name.replace(/\s+/g, "")}${propsLine ? " " + propsLine : ""} />`;
+  const example = `<${identifier}${propsLine ? " " + propsLine : ""} />`;
   return [importLine, "", `npm run lookup -- ${entry.id} --json   // full catalog record`, "", example].join("\n");
 }
 
