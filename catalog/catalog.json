@@ -210,7 +210,7 @@
       "id": "tabs",
       "name": "TabSheet",
       "summary": "Switchable panel set following the WAI-ARIA tabs pattern.",
-      "description": "TabSheet renders a labeled set of panels with an accessible tablist. In v0.2 it implements the core tabs pattern; focus structure and arrow-key navigation land in milestone M4.",
+      "description": "TabSheet renders a labeled set of panels with an accessible tablist. Selection follows focus with a roving tabindex, and the tablist supports ArrowLeft/ArrowRight plus Home/End navigation.",
       "category": "navigation",
       "themes": [
         "brutalist-print",
@@ -223,7 +223,7 @@
       "aliases": ["tab-group", "tabstrip"],
       "tags": ["navigation", "structure"],
       "status": "beta",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "addedDate": "2026-10-24",
       "externalDependencies": [],
       "props": [
@@ -240,7 +240,11 @@
           "description": "Id of the tab selected on mount."
         }
       ],
-      "a11yNotes": "role=tablist/tab/tabpanel wiring is implemented; arrow-key roving focus is planned for M4.",
+      "links": {
+        "source": "src/components/TabSheet/TabSheet.tsx",
+        "demo": "src/components/TabSheet/TabSheetDemo.tsx"
+      },
+      "a11yNotes": "role=tablist/tab/tabpanel wiring; arrow-key navigation with roving tabindex and selection-follows-focus.",
       "usedFrom": ["src/catalog/demos.ts"]
     },
     {

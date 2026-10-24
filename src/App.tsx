@@ -6,11 +6,17 @@ import { DetailPane } from "./components/browser/DetailPane";
 import { EntryList } from "./components/browser/EntryList";
 import { FilterBar } from "./components/browser/FilterBar";
 import { PreviewPanel } from "./components/browser/PreviewPanel";
-import { catalogCounts, entries } from "./catalog/client";
+import { catalogCounts, entries, findEntry } from "./catalog/client";
 import { hasActiveFilters, searchEntries } from "./lib/search";
 import { ThemePicker } from "./theme/ThemePicker";
 import "./components/browser/browser.css";
 import "./components/browser/preview.css";
+
+/** Deep links look like `#/component/<id>` (MASTER_SPEC.md §10 M4). */
+function entryIdFromHash(): string | null {
+  const match = /#\/component\/([a-z0-9-]+)/.exec(window.location.hash);
+  return match ? match[1] : null;
+}
 
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -40,6 +46,23 @@ export default function App() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+
+  useEffect(() => {
+    // Hash deep links: honor #/component/<id>, keep back/forward in sync.
+    const syncFromHash = () => {
+      const id = entryIdFromHash();
+      if (id && findEntry(id)) setSelectedId(id);
+      else setSelectedId(null);
+    };
+    syncFromHash();
+    window.addEventListener("hashchange", syncFromHash);
+    return () => window.removeEventListener("hashchange", syncFromHash);
+  }, []);
+
+  function selectEntry(id: string) {
+    window.location.hash = `/component/${id}`;
+    setSelectedId(id);
+  }
 
   const filtersActive = hasActiveFilters(query, { category, theme });
   const filtered = useMemo(
@@ -81,7 +104,7 @@ export default function App() {
             entries={filtered}
             totalCount={catalogCounts.entries}
             selectedId={selectedId}
-            onSelect={setSelectedId}
+            onSelect={selectEntry}
             filtersActive={filtersActive}
             onResetFilters={resetFilters}
           />

@@ -1,13 +1,40 @@
-// Live preview (M3): renders the selected entry's demo inside the active theme
-// scope. Lives outside DetailPane so the detail record stays provider-free.
+// Live preview (M3/M4): renders the selected entry's demo inside the active
+// theme scope and offers a copyable usage snippet derived from catalog data.
+import { useEffect, useState } from "react";
 import { getDemo } from "../../catalog/demos";
 import type { CatalogEntry } from "../../catalog/types";
 import { useTheme } from "../../theme/ThemeProvider";
+import { copyText } from "../../lib/clipboard";
+
+export function usageSnippet(entry: CatalogEntry): string {
+  const source = entry.links?.source;
+  const importLine = source
+    ? `import { ${entry.name.replace(/\s+/g, "")} } from "${source.replace(/\.tsx$/, "")}";`
+    : `// ${entry.name} (no source link registered in the catalog yet)`;
+  const propsLine = entry.props
+    .filter((prop) => prop.required)
+    .map((prop) => `${prop.name}={/* ${prop.type} */}`)
+    .join(" ");
+  const example = `<${entry.name.replace(/\s+/g, "")}${propsLine ? " " + propsLine : ""} />`;
+  return [importLine, "", `npm run lookup -- ${entry.id} --json   // full catalog record`, "", example].join("\n");
+}
 
 export function PreviewPanel({ entry }: { entry: CatalogEntry | null }) {
   const { theme } = useTheme();
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setCopied(false);
+  }, [entry?.id]);
+
   if (!entry) return null;
   const Demo = getDemo(entry.id);
+
+  async function handleCopy(): Promise<void> {
+    if (!entry) return;
+    const ok = await copyText(usageSnippet(entry));
+    setCopied(ok);
+  }
 
   return (
     <section
@@ -15,7 +42,17 @@ export function PreviewPanel({ entry }: { entry: CatalogEntry | null }) {
       data-testid="live-preview"
       aria-label={`Live preview of ${entry.name}`}
     >
-      <h3 className="preview-heading">Live preview</h3>
+      <div className="preview-heading-row">
+        <h3 className="preview-heading">Live preview</h3>
+        <button
+          type="button"
+          className="preview-copy"
+          aria-label={`Copy usage snippet for ${entry.name}`}
+          onClick={handleCopy}
+        >
+          {copied ? "Copied ✓" : "Copy usage"}
+        </button>
+      </div>
       <p className="preview-hint">
         Rendered in the active theme: <strong>{theme.label}</strong>. Use the theme
         picker to restyle instantly — colors come only from the taxonomy tokens.

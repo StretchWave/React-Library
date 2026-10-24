@@ -10,13 +10,13 @@ export function TabSheetDemo() {
             id: "overview",
             label: "Overview",
             content:
-              "Tabs pair a labeled set of tabs with one visible panel. Core WAI-ARIA wiring ships in v0.2.",
+              "Tabs pair a labeled set of tabs with one visible panel; focus the tablist and use ←/→ (Home/End).",
           },
           {
-            id: "roadmap",
-            label: "Roadmap",
+            id: "a11y",
+            label: "Accessibility",
             content:
-              "Arrow-key navigation and roving tabindex land in milestone M4 of the master spec.",
+              "Selection follows focus with a roving tabindex — only the active tab is in the tab order.",
           },
           {
             id: "api",

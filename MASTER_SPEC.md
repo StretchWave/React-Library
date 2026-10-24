@@ -324,6 +324,7 @@ npm run verify
 | `typescript` | dev | Type safety. |
 | `@types/react`, `@types/react-dom` | dev | React types. |
 | `vitest`, `jsdom`, `@testing-library/react` | dev | App-side testing. |
+| `@testing-library/dom` | dev | Mandatory peer of `@testing-library/react` v16 (npm auto-installed). *Amendment 2026-10-24.* |
 | *(none)* test-Runner for Node script tooling | dev | `node:test` is built-in — zero deps. |
 
 Anything else requires: spec §12 amendment + AGENTS.md update + checklist decision log,
@@ -351,3 +352,5 @@ masquerades as working. When done, status flips to *working* with the evidence
 *Change log:*
 - **v1.0 — 2026-10-24:** Drafted from kickoff brief (spec file missing → user-approved
   draft); established foundations-first milestone plan.
+- **v1.1 — 2026-10-24:** §12 amended to add `@testing-library/dom` (mandatory peer of
+  `@testing-library/react` v16, npm auto-installed). No other changes; M4 complete.

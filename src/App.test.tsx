@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { findEntry } from "./catalog/client";
@@ -14,6 +14,7 @@ const ENTRY_NAMES = ["Alert", "Badge", "Button", "Card", "TabSheet", "TextInput"
 
 beforeEach(() => {
   localStorage.clear();
+  window.location.hash = "";
 });
 
 /** App always mounts inside the theme provider (mirrors main.tsx). */
@@ -196,23 +197,79 @@ describe("DetailPane (M2)", () => {
   });
 });
 
-describe("PreviewPanel (M3)", () => {
-  it("renders the demo for a wired entry inside the active theme", () => {
+describe("App (M4 deep links)", () => {
+  it("deep link #/component/<id> selects that entry on load", () => {
+    window.location.hash = "/component/card";
+    renderApp();
+    expect(screen.getAllByRole("heading", { level: 2, name: "Card" }).length).toBeGreaterThan(0);
+  });
+
+  it("selection writes the hash; hash changes drive back/forward selection", async () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: /^Alert\b/ }));
+    expect(window.location.hash).toBe("#/component/alert");
+    expect(
+      screen.getAllByRole("heading", { level: 2, name: "Alert" }).length,
+    ).toBeGreaterThan(0);
+
+    // Simulate browser back/forward via hashchange (jsdom dispatches it async):
+    window.location.hash = "/component/badge";
+    await waitFor(() => {
+      expect(screen.getAllByRole("heading", { level: 2, name: "Badge" }).length).toBeGreaterThan(0);
+    });
+  });
+
+  it("clears selection when the hash leaves the component route", async () => {
+    window.location.hash = "/component/alert";
+    renderApp();
+    expect(screen.getAllByRole("heading", { level: 2, name: "Alert" }).length).toBeGreaterThan(0);
+    window.location.hash = "";
+    await waitFor(() => {
+      expect(screen.getAllByText(/Select a component from the catalog/).length).toBeGreaterThan(0);
+    });
+  });
+
+  it("ignores unknown ids in the hash", () => {
+    window.location.hash = "/component/extinct";
+    renderApp();
+    expect(screen.getAllByText(/Select a component from the catalog/).length).toBeGreaterThan(0);
+  });
+});
+
+describe("PreviewPanel (M4 copy-usage)", () => {
+  it("copies a usage snippet derived from catalog links", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    });
     render(
       <ThemeProvider>
         <PreviewPanel entry={findEntry("button") as CatalogEntry} />
       </ThemeProvider>,
     );
-    expect(screen.getByTestId("live-preview").textContent).toContain("active theme");
-    expect(document.querySelector('[data-demo-id="button"]')).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Copy usage snippet for Button" }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
+    const snippet = writeText.mock.calls[0]![0] as string;
+    expect(snippet).toContain('import { Button } from "src/components/Button/Button"');
+    expect(snippet).toContain("<Button");
+    expect(screen.getByText("Copied ✓")).toBeTruthy();
   });
 
-  it("renders nothing for entries without a demo (and null)", () => {
-    const { container } = render(
+  it("falls back to slice-free labels when links are absent", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    });
+    const ghost = { ...(findEntry("button") as CatalogEntry), id: "ghost", name: "GhostThing", links: undefined };
+    render(
       <ThemeProvider>
-        <PreviewPanel entry={null} />
+        <PreviewPanel entry={ghost} />
       </ThemeProvider>,
     );
-    expect(container.querySelector('[data-testid="live-preview"]')).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Copy usage snippet for GhostThing" }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
+    expect(writeText.mock.calls[0]![0]).toContain("// GhostThing (no source link registered");
   });
 });

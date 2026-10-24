@@ -12,7 +12,10 @@ Where docs disagree, `MASTER_SPEC.md` wins.
 2. **`catalog/catalog.json` is canonical.** `catalog/index.json` is generated — never
    hand-edit it; run `npm run generate` after any data change.
 3. **No new dependencies** without first amending `MASTER_SPEC.md` §12, this file, and
-   the checklist. Test-only `node:test` suites in `tests/` must stay zero-dependency.
+   the checklist. The allowed set is exactly §12 (runtime `react`/`react-dom`; dev
+   toolchain incl. `@testing-library/dom`, the mandatory peer of
+   `@testing-library/react` v16). Test-only `node:test` suites in `tests/` must stay
+   zero-dependency.
 4. **Components style with `--rl-*` variables only** (see §Theming rules). No hex/rgb
    literals in `src/components/**/*.css`; `tests/css-theming.test.mjs` (M2+) enforces it.
 5. **Honest status.** Unimplemented = placeholder, registered in

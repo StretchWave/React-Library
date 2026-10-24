@@ -11,10 +11,10 @@ Status legend: **[x] done (verified)** · **[~] partial** · **[ ] pending** ·
 | M1 App skeleton | ✅ done | `npm run verify` full chain green (29 tooling + 5 app tests, typecheck, vite build); dev-server smoke test + screenshots |
 | M2 Component browser | ✅ done | 20/20 app tests + 32/32 node tests; dev-server walkthrough: search → "1 of 6 components" → TextInput detail fully rendered (screenshot) |
 | M3 Theme engine + previews + components | ✅ done | verify full-chain green **without --skip-links** (32/32 node, 50/50 app, typecheck, build); browser-verified: Midnight Glass scope restyles app + chat-free preview (screenshot) |
-| M4 Advanced interactions | ⏳ in progress | — |
+| M4 Advanced interactions | ✅ done | verify full-chain green **flagless** (32/32 node, 54/54 app, typecheck, build); browser-verified: `#/component/tabs` deep link, copy-usage "Copied ✓" feedback, TabSheet ←/→/Home/End roving focus + selection-follows-focus (screenshot) |
 
-Placeholders: none registered (TabSheet arrow-key navigation is *scheduled M4*, declared
-in catalog `a11yNotes`; `--skip-links` is a scheduled-phase flag, removed at M3).
+Placeholders: none. (TabSheet arrow-key navigation shipped in M4 — catalog `a11yNotes`
+and description updated at v0.3.0; `--skip-links` was removed at M3.)
 
 ## Decisions log
 
@@ -38,6 +38,13 @@ in catalog `a11yNotes`; `--skip-links` is a scheduled-phase flag, removed at M3)
   (`success|warning|danger`) for Badge/Alert so meaning stays constant across themes.
 - 2026-10-24 — M3 shipped: theme engine + 6 components + demos + live preview;
   `npm run verify` is now fully flagless (link checks enforced everywhere).
+- 2026-10-24 — M4 shipped: TabSheet arrow-key navigation (roving tabindex,
+  selection-follows-focus, Home/End, Arrow keys wrap at both ends), copy-usage snippet
+  with clipboard fallback + "Copied ✓" feedback, hash deep links `#/component/<id>`
+  synced with `hashchange` (back/forward safe). Catalog `tabs` bumped to v0.3.0.
+- 2026-10-24 — `@testing-library/dom` appears as a direct devDependency because it is a
+  mandatory peer of `@testing-library/react` v16 (npm auto-installed it); spec §12
+  amended accordingly. Otherwise the dependency set matches §12 exactly.
 
 ## 1) Foundations — agent-first base (milestone complete ✅)
 
@@ -122,14 +129,30 @@ M3 semantic decision: status.css carries two vocabularies — release chips
 (stable/beta/experimental/deprecated) and component tones (success/warning/danger, used
 by Badge/Alert). Documented in AGENTS + status.css header.
 
-## 5) M4 — Advanced interactions & hardening ⏳
+## 5) M4 — Advanced interactions & hardening ✅
 
-- [ ] TabSheet arrow-key navigation + roving tabindex (close the scheduled M4 item)
-- [ ] Copy-usage-snippet button (clipboard + fallback, tested via mocked clipboard)
-- [ ] Hash deep links `#/component/<id>` incl. back/forward
-- [ ] Filter empty state with reset action (tested)
-- [ ] README/checklist/AGENTS final sweep to match reality; future-work list
-- [ ] Final `npm run verify` (full gate) recorded as release evidence
+- [x] TabSheet arrow-key navigation + roving tabindex (closes the scheduled M4 item) —
+      ArrowRight/ArrowLeft wrap at both ends, Home/End jump; selection follows focus;
+      catalog `tabs` bumped to **v0.3.0** with updated description + `a11yNotes`
+      (`TabSheet.tsx` + tests; index regenerated via `npm run generate`)
+- [x] Copy-usage-snippet button — `src/lib/clipboard.ts` (async clipboard API with a
+      hidden-textarea `execCommand("copy")` fallback for non-secure contexts/jsdom);
+      button announces "Copied ✓"; tested with a mocked clipboard in
+      `PreviewPanel.test.tsx`
+- [x] Hash deep links `#/component/<id>` — App syncs selection ↔ `location.hash`,
+      listens to `hashchange` (back/forward safe); jsdom's async hashchange handled via
+      `waitFor` in tests (`App.test.tsx`, 2 dedicated tests)
+- [x] Filter empty state with reset action — shipped early in M2 (tested there)
+- [x] README/checklist/AGENTS/spec final sweep to match reality; future-work list
+      refreshed (M4 features documented, status tables flipped, docs consistent)
+- [x] Final `npm run verify` (full flagless gate) recorded as release evidence
+
+M4 evidence recap: `npm run verify` → catalog valid (6/6/6, index up to date) ·
+`node --test` 32/32 · vitest 54/54 · `tsc --noEmit` clean · `vite build` ✓
+(248.72 kB js / 12.29 kB css). Browser walkthrough on `#/component/tabs`: deep link
+restored TabSheet selection; Copy usage → "Copied ✓"; ArrowRight → Accessibility panel,
+End → API, Home → Overview, ArrowLeft from first wraps to API — all while rendered in
+Midnight Glass (screenshot recorded).
 
 ## 6) Future work (explicitly not now)
 
