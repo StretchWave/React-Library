@@ -1,0 +1,46 @@
+/* TabSheet — token-only theming. */
+.rl-tabsheet {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.rl-tabsheet__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  border-bottom: 1px solid var(--rl-border, #d8dee6);
+  padding-bottom: 0.35rem;
+}
+
+.rl-tabsheet__tab {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.8rem;
+  color: var(--rl-text-muted, #5c6670);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--rl-radius, 12px);
+  cursor: pointer;
+}
+
+.rl-tabsheet__tab:hover {
+  color: var(--rl-text, #1c2128);
+  background: var(--rl-surface-alt, #ffffff);
+}
+
+.rl-tabsheet__tab.is-active {
+  color: var(--rl-accent-contrast, #ffffff);
+  background: var(--rl-accent, #2563eb);
+  border-color: transparent;
+}
+
+.rl-tabsheet__tab:focus-visible {
+  outline: var(--rl-focus, 2px solid var(--rl-accent, #2563eb));
+  outline-offset: 2px;
+}
+
+.rl-tabsheet__panel {
+  font-size: 0.85rem;
+  color: var(--rl-text, #1c2128);
+  min-height: 3rem;
+}

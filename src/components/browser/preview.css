@@ -1,0 +1,28 @@
+/* Live preview panel (M3). Token-only colors. */
+.preview-panel {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  max-width: 60ch;
+  border: 1px solid var(--rl-border, #d8dee6);
+  border-radius: var(--rl-radius, 12px);
+  background: var(--rl-surface, #f7f8fa);
+}
+
+.preview-heading {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--rl-text, #1c2128);
+}
+
+.preview-hint {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--rl-text-muted, #5c6670);
+}
+
+.preview-stage {
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  border: 1px dashed var(--rl-border, #d8dee6);
+  border-radius: calc(var(--rl-radius, 12px) / 2);
+}

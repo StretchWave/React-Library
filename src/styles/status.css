@@ -1,7 +1,11 @@
 /* App-level status semantics. Deliberately theme-independent: these colors
- * convey release state (stable/beta/experimental/deprecated), not theme
- * personality. Sanctioned exception to the --rl-* only rule — see
- * MASTER_SPEC.md §10 M2, AGENTS.md ("Theming rules"), checklist decisions. */
+ * convey release state AND semantic health, not theme personality. Sanctioned
+ * exception to the --rl-* only rule — see MASTER_SPEC.md §10 M2, AGENTS.md
+ * ("Theming rules"), checklist decisions.
+ *
+ * Release vocabulary (browser chips):        stable / beta / experimental / deprecated
+ * Component vocabulary (Badge/Alert tones):  success / warning / danger
+ *   (info tones fall back to the theme accent token, not a status color) */
 :root {
   --rl-status-stable: #15803d;
   --rl-status-stable-bg: #dcf5e7;
@@ -11,4 +15,11 @@
   --rl-status-experimental-bg: #ede6fb;
   --rl-status-deprecated: #b91c1c;
   --rl-status-deprecated-bg: #fbdede;
+
+  --rl-status-success: #15803d;
+  --rl-status-success-bg: #dcf5e7;
+  --rl-status-warning: #b45309;
+  --rl-status-warning-bg: #fdeeda;
+  --rl-status-danger: #b91c1c;
+  --rl-status-danger-bg: #fbdede;
 }

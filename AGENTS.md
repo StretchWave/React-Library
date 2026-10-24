@@ -23,13 +23,13 @@ Where docs disagree, `MASTER_SPEC.md` wins.
 
 | Command | Purpose |
 |---|---|
-| `npm run validate` | Validate catalog + taxonomy. Exit 1 on error. Flags: `--check-index`, `--skip-links` (pre-M3 only). |
+| `npm run validate` | Validate catalog + taxonomy. Exit 1 on error. Flags: `--check-index`; `--skip-links` exists for pre-M3 phases only and is no longer needed now that component files exist. |
 | `npm run generate` | Regenerate `catalog/index.json` (validates first). |
 | `npm run lookup -- <q>` | Component lookup (see crib sheet). |
 | `npm test` | Zero-dep tooling suites (`node --test tests/*.test.mjs`). |
 | `npm run dev` / `build` / `preview` / `typecheck` | App toolchain (M1+). |
 | `npm run test:app` | Vitest suites for the app (M1+). |
-| `npm run verify` | Full release gate (M1+). Until M3 it runs the validator with `--skip-links`. |
+| `npm run verify` | Full release gate (M1+). Since M3 the link checks run everywhere — component files exist. |
 
 > PowerShell: pass CLI flags with `npm run x -- --flag`, lookup args with
 > `npm run lookup -- button --json`.
@@ -93,8 +93,9 @@ Exit codes: `0` found · `1` no match · `2` unknown filter id · `64` usage err
 - Optional (must inline-fallback): `--rl-shadow`, `--rl-focus`, `--rl-backdrop`.
 - App assigns tokens via `[data-theme="<id>"]`; nothing else may declare colors outside
   taxonomy tokens — one exception: `src/styles/status.css` defines app-level status
-  semantics (`--rl-status-stable|beta|experimental|deprecated[|-bg]`), deliberately
-  theme-independent (see MASTER_SPEC.md §10 M2 + checklist).
+  semantics (`--rl-status-stable|beta|experimental|deprecated` for release chips and
+  `--rl-status-success|warning|danger` for tone-aware components, each with a `-bg`
+  companion token), deliberately theme-independent (see MASTER_SPEC.md §10 M2 + checklist).
 - App chrome consumes the same tokens.
 
 ## Placeholders

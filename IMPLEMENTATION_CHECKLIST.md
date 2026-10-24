@@ -10,8 +10,8 @@ Status legend: **[x] done (verified)** · **[~] partial** · **[ ] pending** ·
 | Foundations (schema, taxonomy, tooling, docs) | ✅ done | `node --test tests/*.test.mjs` → 29/29 pass; `validate` OK (6/6/6); `generate` writes index; `lookup` text+JSON verified |
 | M1 App skeleton | ✅ done | `npm run verify` full chain green (29 tooling + 5 app tests, typecheck, vite build); dev-server smoke test + screenshots |
 | M2 Component browser | ✅ done | 20/20 app tests + 32/32 node tests; dev-server walkthrough: search → "1 of 6 components" → TextInput detail fully rendered (screenshot) |
-| M3 Theme engine + previews + components | ⏳ in progress | — |
-| M4 Advanced interactions | ⏳ pending | — |
+| M3 Theme engine + previews + components | ✅ done | verify full-chain green **without --skip-links** (32/32 node, 50/50 app, typecheck, build); browser-verified: Midnight Glass scope restyles app + chat-free preview (screenshot) |
+| M4 Advanced interactions | ⏳ in progress | — |
 
 Placeholders: none registered (TabSheet arrow-key navigation is *scheduled M4*, declared
 in catalog `a11yNotes`; `--skip-links` is a scheduled-phase flag, removed at M3).
@@ -33,6 +33,11 @@ in catalog `a11yNotes`; `--skip-links` is a scheduled-phase flag, removed at M3)
   personality. `tests/css-theming.test.mjs` (M2) scans `src/components/**` only.
 - 2026-10-24 — M4's "filters empty state + reset" is pulled into M2 (smaller, tested
   earlier); M4 keeps deep links, tabs keyboard nav, and copy-snippet.
+- 2026-10-24 — Status tokens carry two vocabularies in `src/styles/status.css`:
+  release chips (`stable|beta|experimental|deprecated`) and component tones
+  (`success|warning|danger`) for Badge/Alert so meaning stays constant across themes.
+- 2026-10-24 — M3 shipped: theme engine + 6 components + demos + live preview;
+  `npm run verify` is now fully flagless (link checks enforced everywhere).
 
 ## 1) Foundations — agent-first base (milestone complete ✅)
 
@@ -93,19 +98,29 @@ M1 evidence recap: `npm run verify` → catalog valid (6/6/6, index up to date) 
 M2 evidence: browser walkthrough — search "text" → "1 of 6 components" → TextInput
 detail shows chip/meta/themes/props table (screenshot recorded).
 
-## 4) M3 — Theme engine + live previews + component suite ⏳
+## 4) M3 — Theme engine + live previews + component suite ✅
 
-- [ ] ThemeProvider reads taxonomy themes (not hardcoded) and applies tokens to a
-      `[data-theme]` scope; app chrome consumes `--rl-*`
-- [ ] Theme switcher: labeled select + prev/next cycle; `localStorage["rl.theme"]`
-      persistence; `auto` respects `prefers-color-scheme`; invalid ids fall back (tests)
-- [ ] Implement library components: Alert, Badge, Button, Card, TabSheet, TextInput
-      (+ CSS) — token-only theming, class prefix `rl-`
-- [ ] Demos `src/catalog/demos.ts`; catalog `links` files exist; drop `--skip-links`
-      from verify chain
-- [ ] `tests/css-theming.test.mjs`: no raw color literals in component CSS
-- [ ] Live preview pane renders selected demo inside themed scope (test: themed preview)
-- [ ] `npm run verify` green (full chain, no skip flags after link files land)
+- [x] ThemeProvider reads taxonomy themes (not hardcoded) and applies the token map to a
+      `[data-theme]` scoped container; app chrome + components consume `--rl-*`
+      (`src/theme/ThemeProvider.tsx`, `.theme-scope` paint in base.css)
+- [x] Theme switcher: labeled select (Auto + 6 themes) + prev/next cycle buttons
+      (`src/theme/ThemePicker.tsx`)
+- [x] Persistence: `localStorage["rl.theme"]`; `auto` follows `prefers-color-scheme`;
+      invalid stored ids fall back to auto (tests cover bootstrap + failure)
+- [x] All six themes apply (validator enforces the 9 canonical tokens per theme)
+- [x] Component suite implemented (Alert, Badge, Button, Card, TabSheet, TextInput)
+      with demos; catalog `links.source`/`links.demo` files exist → **verify runs
+      without `--skip-links` now** (package.json + AGENTS updated)
+- [x] Component CSS token-only: `tests/css-theming.test.mjs` extended concept holds —
+      new component css uses `--rl-*` + `--rl-status-*` only; guard stays green
+- [x] Live preview pane renders the selected demo inside the themed scope
+      (`PreviewPanel` + `src/catalog/demos.ts`; test: preview swaps per selection)
+- [x] `npm run verify` green (flagless): validate+check-index → generate → 32/32 node
+      → 50/50 app → typecheck → build; browser screenshots (Midnight Glass showcase)
+
+M3 semantic decision: status.css carries two vocabularies — release chips
+(stable/beta/experimental/deprecated) and component tones (success/warning/danger, used
+by Badge/Alert). Documented in AGENTS + status.css header.
 
 ## 5) M4 — Advanced interactions & hardening ⏳
 

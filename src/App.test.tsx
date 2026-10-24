@@ -1,15 +1,45 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
-import { FilterBar } from "./components/browser/FilterBar";
-import { DetailPane } from "./components/browser/DetailPane";
 import { findEntry } from "./catalog/client";
+import type { CatalogEntry } from "./catalog/types";
+import { DetailPane } from "./components/browser/DetailPane";
+import { FilterBar } from "./components/browser/FilterBar";
+import type { FilterBarProps } from "./components/browser/FilterBar";
+import { PreviewPanel } from "./components/browser/PreviewPanel";
+import { ThemeProvider } from "./theme/ThemeProvider";
+import { THEME_STORAGE_KEY } from "./theme/theme";
 
 const ENTRY_NAMES = ["Alert", "Badge", "Button", "Card", "TabSheet", "TextInput"] as const;
 
+beforeEach(() => {
+  localStorage.clear();
+});
+
+/** App always mounts inside the theme provider (mirrors main.tsx). */
+function renderApp() {
+  return render(
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>,
+  );
+}
+
+function defaultProps(overrides: Partial<FilterBarProps> = {}): FilterBarProps {
+  return {
+    query: "",
+    onQueryChange: vi.fn(),
+    category: "",
+    onCategoryChange: vi.fn(),
+    theme: "",
+    onThemeChange: vi.fn(),
+    ...overrides,
+  };
+}
+
 describe("App (M1 skeleton)", () => {
   it("renders every canonical catalog entry name", () => {
-    render(<App />);
+    renderApp();
     expect(screen.getByText("React Library")).toBeTruthy();
     for (const name of ENTRY_NAMES) {
       expect(screen.getByRole("button", { name: new RegExp(`^${name}\\b`) })).toBeTruthy();
@@ -17,19 +47,19 @@ describe("App (M1 skeleton)", () => {
   });
 
   it("shows the empty state until an entry is selected", () => {
-    render(<App />);
-    expect(screen.getByText(/Select a component from the catalog/)).toBeTruthy();
+    renderApp();
+    expect(screen.getAllByText(/Select a component from the catalog/).length).toBeGreaterThan(0);
   });
 
   it("updates the detail pane when an entry is selected", () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByRole("button", { name: /^Card\b/ }));
     expect(screen.getAllByRole("heading", { level: 2, name: "Card" }).length).toBeGreaterThan(0);
     expect(screen.getAllByText("Themed surface container that groups related content.").length).toBeGreaterThan(0);
   });
 
   it("switches detail when another entry is selected", () => {
-    render(<App />);
+    renderApp();
     fireEvent.click(screen.getByRole("button", { name: /^Card\b/ }));
     fireEvent.click(screen.getByRole("button", { name: /^Alert\b/ }));
     expect(screen.getAllByRole("heading", { level: 2, name: "Alert" }).length).toBeGreaterThan(0);
@@ -37,7 +67,7 @@ describe("App (M1 skeleton)", () => {
   });
 
   it("marks the selected entry with aria-current", () => {
-    render(<App />);
+    renderApp();
     const before = screen.getByRole("button", { name: /^Button\b/ });
     expect(before.getAttribute("aria-current")).toBeNull();
     fireEvent.click(before);
@@ -47,7 +77,7 @@ describe("App (M1 skeleton)", () => {
 
 describe("App (M2 component browser)", () => {
   it("filters by query from the search box", () => {
-    render(<App />);
+    renderApp();
     fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "tabs" } });
     expect(screen.getByRole("status").textContent).toContain("1 of 6 components");
     expect(screen.getByRole("button", { name: /^TabSheet\b/ })).toBeTruthy();
@@ -55,21 +85,20 @@ describe("App (M2 component browser)", () => {
   });
 
   it("filters by category via the taxonomy-driven select", () => {
-    render(<App />);
+    renderApp();
     fireEvent.change(screen.getByLabelText("Category"), { target: { value: "inputs" } });
     expect(screen.getByRole("status").textContent).toContain("1 of 6 components");
     expect(screen.getByRole("button", { name: /^TextInput\b/ })).toBeTruthy();
   });
 
   it("filters by theme via the taxonomy-driven select", () => {
-    render(<App />);
-    fireEvent.change(screen.getByLabelText("Theme"), { target: { value: "retro-terminal" } });
-    // Every entry supports every theme, so all six remain.
+    renderApp();
+    fireEvent.change(screen.getByLabelText("Filter by theme"), { target: { value: "retro-terminal" } });
     expect(screen.getByRole("status").textContent).toContain("6 of 6 components");
   });
 
   it("shows the filter empty state and restores on Reset filters", () => {
-    render(<App />);
+    renderApp();
     fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "zzz-no-match" } });
     expect(screen.getByText(/No components match/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Reset filters" }));
@@ -78,7 +107,7 @@ describe("App (M2 component browser)", () => {
   });
 
   it('the "/" shortcut focuses search; Escape clears the query', () => {
-    render(<App />);
+    renderApp();
     fireEvent.keyDown(window, { key: "/" });
     const input = screen.getByLabelText("Search components") as HTMLInputElement;
     expect(document.activeElement).toBe(input);
@@ -89,65 +118,101 @@ describe("App (M2 component browser)", () => {
   });
 
   it("keeps list, detail, and filter state independent when selecting an entry", () => {
-    render(<App />);
+    renderApp();
     fireEvent.change(screen.getByLabelText("Category"), { target: { value: "display" } });
     fireEvent.click(screen.getByRole("button", { name: /^Badge\b/ }));
     expect(screen.getAllByRole("heading", { level: 2, name: "Badge" }).length).toBeGreaterThan(0);
-    // Selected entry stays selected even though the list keeps showing only display entries.
     expect(screen.getByRole("button", { name: /^Badge\b/ }).getAttribute("aria-current")).toBe("true");
+  });
+});
+
+describe("App (M3 theme engine + live preview)", () => {
+  it("the theme picker switches the [data-theme] scope from taxonomy data", () => {
+    renderApp();
+    expect(document.querySelector('[data-theme="classic-clean"]')).toBeTruthy();
+    fireEvent.change(screen.getByLabelText("Theme"), { target: { value: "retro-terminal" } });
+    expect(document.querySelector('[data-theme="retro-terminal"]')).toBeTruthy();
+    expect(document.querySelector('[data-theme="classic-clean"]')).toBeNull();
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe("retro-terminal");
+  });
+
+  it("cycle buttons step through the taxonomy order and persist", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Next theme" }));
+    expect(document.querySelector('[data-theme="midnight-glass"]')).toBeTruthy();
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe("midnight-glass");
+    fireEvent.click(screen.getByRole("button", { name: "Previous theme" }));
+    expect(document.querySelector('[data-theme="classic-clean"]')).toBeTruthy();
+  });
+
+  it("renders the live preview for the selected entry's demo", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: /^Button\b/ }));
+    expect(screen.getByTestId("live-preview")).toBeTruthy();
+    expect(document.querySelector('[data-demo-id="button"]')).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /^TabSheet\b/ }));
+    expect(document.querySelector('[data-demo-id="tabs"]')).toBeTruthy();
+  });
+
+  it("invalid persisted theme ids resolve like auto on load", () => {
+    localStorage.setItem(THEME_STORAGE_KEY, "extinct-theme");
+    renderApp();
+    expect(document.querySelector('[data-theme="classic-clean"]')).toBeTruthy();
   });
 });
 
 describe("FilterBar (M2)", () => {
   it("Escape clears the query via onQueryChange('')", () => {
     const onQueryChange = vi.fn();
-    render(
-      <FilterBar
-        query="whatever"
-        onQueryChange={onQueryChange}
-        category=""
-        onCategoryChange={vi.fn()}
-        theme=""
-        onThemeChange={vi.fn()}
-      />,
-    );
+    render(<FilterBar {...defaultProps({ query: "whatever", onQueryChange })} />);
     fireEvent.keyDown(screen.getByLabelText("Search components"), { key: "Escape" });
     expect(onQueryChange).toHaveBeenCalledWith("");
   });
 
   it("exposes labeled category and theme selects", () => {
-    render(
-      <FilterBar
-        query=""
-        onQueryChange={vi.fn()}
-        category=""
-        onCategoryChange={vi.fn()}
-        theme=""
-        onThemeChange={vi.fn()}
-      />,
-    );
-    expect((screen.getByLabelText("Category") as HTMLSelectElement).options.length).toBe(7); // All + 6
-    expect((screen.getByLabelText("Theme") as HTMLSelectElement).options.length).toBe(7);
+    render(<FilterBar {...defaultProps()} />);
+    expect((screen.getByLabelText("Category") as HTMLSelectElement).options.length).toBe(7);
+    expect((screen.getByLabelText("Filter by theme") as HTMLSelectElement).options.length).toBe(7);
   });
 });
 
 describe("DetailPane (M2)", () => {
   it("renders status chip, metadata, themes, tags, aliases, and props table", () => {
-    const button = findEntry("button");
-    expect(button).toBeTruthy();
-    render(<DetailPane entry={button!} />);
+    const button = findEntry("button") as CatalogEntry;
+    render(<DetailPane entry={button} />);
     expect(screen.getByText("stable")).toBeTruthy();
     expect(screen.getByText("#action")).toBeTruthy();
     expect(screen.getByText("alias: btn")).toBeTruthy();
-    expect(screen.getAllByTestId("theme-chips")).toBeTruthy();
+    expect(screen.getByTestId("theme-chips")).toBeTruthy();
     expect(screen.getAllByText("classic-clean").length).toBeGreaterThan(0);
     expect(screen.getByRole("table").textContent).toContain("variant");
-    expect(screen.getAllByLabelText("File links").length).toBeGreaterThan(0);
+    expect(screen.getByLabelText("File links")).toBeTruthy();
     expect(screen.getByText(/Accessibility:/)).toBeTruthy();
   });
 
   it("renders the empty state for null entries", () => {
     render(<DetailPane entry={null} />);
     expect(screen.getByText(/Select a component/)).toBeTruthy();
+  });
+});
+
+describe("PreviewPanel (M3)", () => {
+  it("renders the demo for a wired entry inside the active theme", () => {
+    render(
+      <ThemeProvider>
+        <PreviewPanel entry={findEntry("button") as CatalogEntry} />
+      </ThemeProvider>,
+    );
+    expect(screen.getByTestId("live-preview").textContent).toContain("active theme");
+    expect(document.querySelector('[data-demo-id="button"]')).toBeTruthy();
+  });
+
+  it("renders nothing for entries without a demo (and null)", () => {
+    const { container } = render(
+      <ThemeProvider>
+        <PreviewPanel entry={null} />
+      </ThemeProvider>,
+    );
+    expect(container.querySelector('[data-testid="live-preview"]')).toBeNull();
   });
 });

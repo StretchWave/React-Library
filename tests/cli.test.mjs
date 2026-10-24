@@ -60,18 +60,18 @@ test("lookup without arguments is a usage error", () => {
 });
 
 test("generate writes the index; validate --check-index accepts it", () => {
-  const generated = run("scripts/generate-index.mjs", ["--skip-links"]);
+  const generated = run("scripts/generate-index.mjs");
   assert.equal(generated.status, 0, generated.stderr);
   assert.ok(generated.stdout.includes("6 entries"));
 
-  const validated = run("scripts/validate-catalog.mjs", ["--skip-links", "--check-index"]);
+  const validated = run("scripts/validate-catalog.mjs", ["--check-index"]);
   assert.equal(validated.status, 0, validated.stdout);
   assert.ok(validated.stdout.includes("Catalog valid"));
   assert.ok(validated.stdout.includes("index up to date"));
 });
 
 test("validate --check-index fails when the index is behind the catalog", () => {
-  assert.equal(run("scripts/generate-index.mjs", ["--skip-links"]).status, 0);
+  assert.equal(run("scripts/generate-index.mjs").status, 0);
 
   const stale = run("--input-type=module", ["-e", `import { readFileSync, writeFileSync } from "node:fs";
     const file = "catalog/index.json";
@@ -82,10 +82,10 @@ test("validate --check-index fails when the index is behind the catalog", () => 
   `]);
   assert.equal(stale.status, 0, stale.stderr);
 
-  const validated = run("scripts/validate-catalog.mjs", ["--skip-links", "--check-index"]);
+  const validated = run("scripts/validate-catalog.mjs", ["--check-index"]);
   assert.equal(validated.status, 1);
   assert.ok(validated.stdout.includes("stale or divergent"));
 
   // Self-heal the working tree: the index is a derived artifact, regenerate it.
-  assert.equal(run("scripts/generate-index.mjs", ["--skip-links"]).status, 0);
+  assert.equal(run("scripts/generate-index.mjs").status, 0);
 });

@@ -1,0 +1,63 @@
+/* Button — token-only theming (spec: --rl-*; optional tokens fall back inline). */
+.rl-button {
+  font: inherit;
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--rl-accent, #2563eb);
+  border-radius: var(--rl-radius, 12px);
+  background: var(--rl-accent, #2563eb);
+  color: var(--rl-accent-contrast, #ffffff);
+  box-shadow: var(--rl-shadow, none);
+  cursor: pointer;
+  transition: filter 120ms ease, opacity 120ms ease;
+}
+
+.rl-button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.rl-button:active:not(:disabled) {
+  filter: brightness(0.96);
+}
+
+.rl-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rl-button:focus-visible {
+  outline: var(--rl-focus, 2px solid var(--rl-accent, #2563eb));
+  outline-offset: 2px;
+}
+
+.rl-button--secondary {
+  background: var(--rl-surface-alt, #ffffff);
+  border-color: var(--rl-border, #d8dee6);
+  color: var(--rl-text, #1c2128);
+  box-shadow: none;
+}
+
+.rl-button--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--rl-accent, #2563eb);
+  box-shadow: none;
+}
+
+.rl-button--ghost:hover:not(:disabled) {
+  background: var(--rl-surface-alt, #ffffff);
+  filter: none;
+}
+
+.rl-button--sm {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+}
+
+.rl-button--md {
+  padding: 0.45rem 1rem;
+}
+
+.rl-button--lg {
+  padding: 0.6rem 1.3rem;
+  font-size: 1.05rem;
+}

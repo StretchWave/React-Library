@@ -1,0 +1,30 @@
+/* Card — token-only theming. */
+.rl-card {
+  background: var(--rl-surface-alt, #ffffff);
+  border: 1px solid var(--rl-border, #d8dee6);
+  border-radius: var(--rl-radius, 12px);
+  padding: 1rem;
+}
+
+.rl-card--raised {
+  box-shadow: var(--rl-shadow, none);
+}
+
+.rl-card--flat {
+  box-shadow: none;
+}
+
+.rl-card--compact {
+  padding: 0.6rem;
+}
+
+.rl-card__title {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+  color: var(--rl-text, #1c2128);
+}
+
+.rl-card__body {
+  font-size: 0.9rem;
+  color: var(--rl-text-muted, #5c6670);
+}

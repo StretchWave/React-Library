@@ -1,0 +1,46 @@
+/* Badge — tone mapping (comments document the semantic contract):
+ * neutral  → surface-alt + border + text
+ * accent   → accent + accent-contrast
+ * success  → --rl-status-stable (green, release semantics)
+ * warning  → --rl-status-beta (amber, release semantics)
+ * danger   → --rl-status-deprecated (red, release semantics) */
+.rl-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: calc(var(--rl-radius, 12px) / 2);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  background: var(--rl-surface-alt, #ffffff);
+  border: 1px solid var(--rl-border, #d8dee6);
+  color: var(--rl-text, #1c2128);
+  white-space: nowrap;
+}
+
+.rl-badge--sm {
+  padding: 0.1rem 0.45rem;
+  font-size: 0.7rem;
+}
+
+.rl-badge--accent {
+  background: var(--rl-accent, #2563eb);
+  border-color: transparent;
+  color: var(--rl-accent-contrast, #ffffff);
+}
+
+.rl-badge--success {
+  background: var(--rl-status-success-bg, #dcf5e7);
+  border-color: transparent;
+  color: var(--rl-status-success, #15803d);
+}
+
+.rl-badge--warning {
+  background: var(--rl-status-warning-bg, #fdeeda);
+  border-color: transparent;
+  color: var(--rl-status-warning, #b45309);
+}
+
+.rl-badge--danger {
+  background: var(--rl-status-danger-bg, #fbdede);
+  border-color: transparent;
+  color: var(--rl-status-danger, #b91c1c);
+}

@@ -8,8 +8,10 @@
 
 .app-header {
   display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
   padding: 1rem 1.5rem;
   background: var(--rl-surface-alt, #ffffff);
   border-bottom: 1px solid var(--rl-border, #d8dee6);

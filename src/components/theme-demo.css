@@ -1,0 +1,23 @@
+/* Shared demo scaffolding for preview panes (token-only). Import once per
+ * component css? Each Demo imports './<Name>.css' implicitly via the component;
+ * these utilities are imported by the demos themselves. */
+.rl-demo {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  font-family: var(--rl-font, "Inter", "Segoe UI", system-ui, sans-serif);
+  color: var(--rl-text, #1c2128);
+}
+
+.rl-demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rl-demo-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}

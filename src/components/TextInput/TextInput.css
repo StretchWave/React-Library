@@ -1,0 +1,40 @@
+/* TextInput — token-only theming. */
+.rl-text-input {
+  display: grid;
+  gap: 0.25rem;
+  max-width: 22rem;
+}
+
+.rl-text-input__label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--rl-text, #1c2128);
+}
+
+.rl-text-input__control {
+  font: inherit;
+  padding: 0.45rem 0.7rem;
+  color: var(--rl-text, #1c2128);
+  background: var(--rl-surface-alt, #ffffff);
+  border: 1px solid var(--rl-border, #d8dee6);
+  border-radius: var(--rl-radius, 12px);
+}
+
+.rl-text-input__control:focus-visible {
+  outline: var(--rl-focus, 2px solid var(--rl-accent, #2563eb));
+  outline-offset: 1px;
+}
+
+.is-invalid .rl-text-input__control {
+  border-color: var(--rl-status-danger, #b91c1c);
+}
+
+.rl-text-input__helper {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--rl-text-muted, #5c6670);
+}
+
+.rl-text-input__helper--error {
+  color: var(--rl-status-danger, #b91c1c);
+}

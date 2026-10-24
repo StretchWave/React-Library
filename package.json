@@ -17,7 +17,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test:app": "vitest run",
-    "verify": "npm run validate -- --check-index --skip-links && npm run generate -- --skip-links && npm test && npm run test:app && npm run typecheck && npm run build"
+    "verify": "npm run validate -- --check-index && npm run generate && npm test && npm run test:app && npm run typecheck && npm run build"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.2",

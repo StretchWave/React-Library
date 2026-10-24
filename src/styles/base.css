@@ -30,6 +30,12 @@ body {
   outline-offset: 2px;
 }
 
+.theme-scope {
+  min-height: 100%;
+  background: var(--rl-surface, #f7f8fa);
+  color: var(--rl-text, #1c2128);
+}
+
 h1,
 h2,
 h3,

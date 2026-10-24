@@ -1,13 +1,16 @@
-// App shell (M2). The catalog is the single source of truth; this view adds
-// search (query), category/theme filters (taxonomy-driven), selection, the "/"
-// shortcut and the filter empty state with reset.
+// App shell (M3). Catalog data remains the single source of truth; this view
+// composes the browser (search/filters/detail), the taxonomy-driven theme
+// engine (ThemeProvider/ThemePicker), and live component previews.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DetailPane } from "./components/browser/DetailPane";
 import { EntryList } from "./components/browser/EntryList";
 import { FilterBar } from "./components/browser/FilterBar";
+import { PreviewPanel } from "./components/browser/PreviewPanel";
 import { catalogCounts, entries } from "./catalog/client";
 import { hasActiveFilters, searchEntries } from "./lib/search";
+import { ThemePicker } from "./theme/ThemePicker";
 import "./components/browser/browser.css";
+import "./components/browser/preview.css";
 
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -61,6 +64,7 @@ export default function App() {
             {catalogCounts.themes} themes
           </p>
         </div>
+        <ThemePicker />
       </header>
       <main className="app-main">
         <section className="entry-nav" aria-label="Component catalog">
@@ -84,6 +88,7 @@ export default function App() {
         </section>
         <section className="detail-pane" aria-label="Component details">
           <DetailPane entry={selected} />
+          <PreviewPanel entry={selected} />
         </section>
       </main>
     </div>

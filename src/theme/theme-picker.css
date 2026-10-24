@@ -1,0 +1,37 @@
+/* Theme picker chrome — token-only colors. */
+.theme-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.theme-picker-label {
+  font-size: 0.75rem;
+  color: var(--rl-text-muted, #5c6670);
+}
+
+.theme-picker-select {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.4rem;
+  color: inherit;
+  background: var(--rl-surface, #f7f8fa);
+  border: 1px solid var(--rl-border, #d8dee6);
+  border-radius: var(--rl-radius, 12px);
+}
+
+.theme-picker-cycle {
+  width: 1.8rem;
+  height: 1.8rem;
+  font-size: 1rem;
+  line-height: 1;
+  color: inherit;
+  background: var(--rl-surface, #f7f8fa);
+  border: 1px solid var(--rl-border, #d8dee6);
+  border-radius: var(--rl-radius, 12px);
+  cursor: pointer;
+}
+
+.theme-picker-cycle:hover {
+  background: var(--rl-surface-alt, #ffffff);
+}

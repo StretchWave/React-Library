@@ -59,7 +59,7 @@ export function FilterBar({
           </select>
         </label>
         <label className="filter-select-label">
-          Theme
+          Filter by theme
           <select
             className="filter-select"
             value={theme}
