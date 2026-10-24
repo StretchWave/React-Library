@@ -231,7 +231,10 @@ export default function App() {
             items={selection
               .map((id) => findEntry(id))
               .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))}
-            onBack={() => setView("gallery")}
+            onBack={() => {
+              window.location.hash = "/gallery";
+              setView("gallery");
+            }}
           />
         ) : (
           <>

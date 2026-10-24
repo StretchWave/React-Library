@@ -12,7 +12,7 @@ Status legend: **[x] done (verified)** · **[~] partial** · **[ ] pending** ·
 | M2 Component browser | ✅ done | 20/20 app tests + 32/32 node tests; dev-server walkthrough: search → "1 of 6 components" → TextInput detail fully rendered (screenshot) |
 | M3 Theme engine + previews + components | ✅ done | verify full-chain green **without --skip-links** (32/32 node, 50/50 app, typecheck, build); browser-verified: Midnight Glass scope restyles app + chat-free preview (screenshot) |
 | M4 Advanced interactions | ✅ done | verify full-chain green **flagless** (32/32 node, 54/54 app, typecheck, build); browser-verified: `#/component/tabs` deep link, copy-usage "Copied ✓" feedback, TabSheet ←/→/Home/End roving focus + selection-follows-focus (screenshot) |
-| M5 Real ingestion + gallery + selection + master prompt | 🚧 M5.1–M5.5 done — schema v2; catalog 33 real entries (26 local / 7 external); gallery + honest previews + multi-selection + master-prompt studio live; M5.6 (docs/release) pending | verify green: 55/55 node (+9 prompt), 93/93 app, typecheck, build (320.16 kB js); react-bits/aceternity/pryzm → reference-only per license research |
+| M5 Real ingestion + gallery + selection + master prompt | ✅ complete — schema v2; catalog 33 real entries (26 local / 7 external); gallery + honest previews; multi-selection tray; master-prompt studio (`#/prompt`); browser smoke verified; README/AGENTS docs current | verify green: 55/55 node (+9 prompt), 93/93 app, typecheck, build (320.16 kB js); react-bits/aceternity/pryzm → reference-only per license research |
 
 Placeholders: none. (TabSheet arrow-key navigation shipped in M4 — catalog `a11yNotes`
 and description updated at v0.3.0; `--skip-links` was removed at M3.)
@@ -295,7 +295,27 @@ Staged per MASTER_SPEC §10 M5. Sources researched & documented in
       navigation round-trip; verify gate green (55/55 node, 93/93 app,
       typecheck, build 320.16 kB js)
 
-### M5.6 — Validation and release ⏳
+### M5.6 — Validation and release ✅
+- [x] Gate: `npm run verify` flagless green — 55/55 node tooling tests,
+      93/93 app tests, typecheck, production build (320 kB js / 87 kB gzip)
+- [x] Browser-verified on the dev build (Chromium, localhost:5174):
+      gallery renders all 33 cards with honest preview kinds; checkbox
+      selection updates the tray + header counts; `rl.selection.v1` storage
+      matches the tray content; reorder edge-controls disable at the ends;
+      "Generate master prompt" opens `#/prompt` with selection order preserved;
+      the generated prompt carries the official retrieval line, the react-bits
+      Commons Clause notice, official page URL, vendored local paths, and the
+      deduplicated `— needed by` dependency row; copy button reports `Copied ✓`
+      (clipboard write verified); gallery restyles live under the
+      retro-terminal theme; console clean (no warnings/errors)
+- [x] README rewritten for M5: status table, browse features (gallery +
+      selection + prompt), catalog-at-a-glance (33 entries, schema v2, the two
+      theme systems), in-app components vs catalog-only data, sources &
+      licensing table, ingestion commands
+- [x] `package.json` gains `ingest-shadcn` / `ingest-magicui` script aliases
+      (documented in AGENTS.md command table; no new dependencies)
+- [x] Back-navigation hash coherence: "Back to selection" now returns to
+      `#/gallery` instead of leaving `#/prompt` in the URL
 
 ## 6) Future work (explicitly not now)
 

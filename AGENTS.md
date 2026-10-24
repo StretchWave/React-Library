@@ -32,6 +32,7 @@ Where docs disagree, `MASTER_SPEC.md` wins.
 | `npm test` | Zero-dep tooling suites (`node --test tests/*.test.mjs`). |
 | `npm run dev` / `build` / `preview` / `typecheck` | App toolchain (M1+). |
 | `npm run test:app` | Vitest suites for the app (M1+). |
+| `npm run ingest-shadcn` / `npm run ingest-magicui` | Re-run the official-registry ingestion adapters (M5). Dry-run default; `--write` vendors files + merges entries idempotently. |
 | `npm run verify` | Full release gate (M1+). Since M3 the link checks run everywhere — component files exist. |
 
 > PowerShell: pass CLI flags with `npm run x -- --flag`, lookup args with
