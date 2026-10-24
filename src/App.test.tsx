@@ -34,6 +34,12 @@ function defaultProps(overrides: Partial<FilterBarProps> = {}): FilterBarProps {
     onCategoryChange: vi.fn(),
     theme: "",
     onThemeChange: vi.fn(),
+    aesthetic: "",
+    onAestheticChange: vi.fn(),
+    source: "",
+    onSourceChange: vi.fn(),
+    entryType: "",
+    onEntryTypeChange: vi.fn(),
     ...overrides,
   };
 }
@@ -184,6 +190,10 @@ describe("FilterBar (M2)", () => {
     expect((screen.getByLabelText("Category") as HTMLSelectElement).options.length).toBe(23);
     // 1 "All themes" + 6 application appearance themes
     expect((screen.getByLabelText("Filter by theme") as HTMLSelectElement).options.length).toBe(7);
+    // M5.3: 1 all + 12 aesthetics, 1 + 9 sources, 3 availability options
+    expect((screen.getByLabelText("Filter by aesthetic") as HTMLSelectElement).options.length).toBe(13);
+    expect((screen.getByLabelText("Filter by source library") as HTMLSelectElement).options.length).toBe(10);
+    expect(screen.getByLabelText("Catalog availability")).toBeTruthy();
   });
 });
 
@@ -243,6 +253,46 @@ describe("App (M4 deep links)", () => {
     window.location.hash = "/component/extinct";
     renderApp();
     expect(screen.getAllByText(/Select a component from the catalog/).length).toBeGreaterThan(0);
+  });
+});
+
+describe("App (M5.3 gallery)", () => {
+  it("renders a preview card per entry with honest preview kinds", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    const grid = screen.getByRole("list", { name: /component gallery/i });
+    expect(grid.querySelectorAll("li[data-entry-id]").length).toBe(33);
+    // Seeded six render the vetted live demo; ingested tailwind items link out.
+    expect(document.querySelector('li[data-preview-kind="local-demo"][data-entry-id="button"]')).toBeTruthy();
+    const official = screen.getAllByRole("link", { name: /Open official preview/ });
+    expect(official.length).toBe(20); // 16 shadcn + 4 Magic UI official doc pages
+    expect(official.some((link) => (link.getAttribute("href") ?? "").includes("ui.shadcn.com"))).toBe(true);
+    expect(screen.getAllByRole("link", { name: /View at source/ }).length).toBe(7);
+  });
+
+  it("supports source filtering inside the gallery view", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    fireEvent.change(screen.getByLabelText("Filter by source library"), {
+      target: { value: "react-bits" },
+    });
+    expect(screen.getByRole("status").textContent).toContain("7 of 33 entries");
+    const externalChips = screen
+      .getAllByText("external reference")
+      .filter((chip) => chip.className === "type-chip");
+    expect(externalChips.length).toBe(7);
+  });
+
+  it("the #/gallery deep link opens the gallery and filters persist across views", () => {
+    window.location.hash = "#/gallery";
+    renderApp();
+    expect(screen.getByRole("region", { name: "Component gallery" })).toBeTruthy();
+    fireEvent.change(screen.getByLabelText("Search components"), {
+      target: { value: "pattern" },
+    });
+    expect(screen.getByRole("status").textContent).toContain("2 of 33 entries");
+    fireEvent.click(screen.getByRole("button", { name: "Browser" }));
+    expect((screen.getByLabelText("Search components") as HTMLInputElement).value).toBe("pattern");
   });
 });
 

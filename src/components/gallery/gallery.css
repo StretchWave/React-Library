@@ -1,0 +1,181 @@
+/* Gallery view styles (M5.3) — themeable only through --rl-* tokens. */
+
+/* --- view switcher ---------------------------------------------------------- */
+.app-views {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.25rem 0;
+}
+
+.view-switch {
+  border: 1px solid var(--rl-border);
+  background: var(--rl-surface);
+  color: var(--rl-text);
+  border-radius: var(--rl-radius);
+  padding: 0.35rem 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--rl-font);
+}
+
+.view-switch.is-active {
+  color: var(--rl-accent-contrast);
+  background: var(--rl-accent);
+  border-color: var(--rl-accent);
+}
+
+.view-switch:focus-visible,
+.view-counts:focus-visible {
+  outline: var(--rl-focus, 2px solid var(--rl-accent));
+  outline-offset: 2px;
+}
+
+.view-counts {
+  margin-left: auto;
+  color: var(--rl-text-muted);
+  font-size: 0.85rem;
+}
+
+.gallery-view {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.gallery-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr));
+  gap: 0.9rem;
+  align-items: start;
+}
+
+.gallery-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.75rem;
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius);
+  background: var(--rl-surface-alt);
+  box-shadow: var(--rl-shadow, none);
+  min-width: 0;
+}
+
+/* --- preview frames ------------------------------------------------------- */
+.preview-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 7.5rem;
+  padding: 0.4rem;
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius);
+  background: var(--rl-surface);
+  overflow: hidden;
+  position: relative;
+}
+
+.preview-frame.is-link,
+.preview-frame.is-static {
+  flex-direction: column;
+  gap: 0.35rem;
+  color: var(--rl-text);
+  text-decoration: none;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Optional token with a token-derived fallback (no raw colors). */
+.preview-frame.is-link:hover,
+.preview-frame.is-link:focus-visible {
+  outline: var(--rl-focus, 2px solid var(--rl-accent));
+  outline-offset: 2px;
+}
+
+.preview-frame-hint {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--rl-text-muted);
+  word-break: break-all;
+}
+
+.preview-frame.is-empty p {
+  color: var(--rl-text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+  margin: 0;
+}
+
+.preview-demo-scale {
+  transform: scale(0.72);
+  transform-origin: center;
+  pointer-events: none;
+  max-width: 100%;
+}
+
+/* --- card body ------------------------------------------------------------ */
+.gallery-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.gallery-title {
+  font-size: 1rem;
+  font-family: var(--rl-font);
+  color: var(--rl-text);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.gallery-summary {
+  font-size: 0.85rem;
+  color: var(--rl-text-muted);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.type-chip {
+  color: var(--rl-accent-contrast);
+  background: var(--rl-accent);
+  border-radius: var(--rl-radius);
+  padding: 0.1rem 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.license-chip,
+.aesthetic-chip {
+  border: 1px dashed var(--rl-border);
+  color: var(--rl-text-muted);
+  border-radius: var(--rl-radius);
+  padding: 0.1rem 0.5rem;
+  font-size: 0.78rem;
+}
+
+.gallery-details {
+  margin-top: auto;
+  align-self: flex-start;
+  color: var(--rl-accent-contrast);
+  background: var(--rl-accent);
+  border: none;
+  border-radius: var(--rl-radius);
+  padding: 0.4rem 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gallery-details:focus-visible {
+  outline: var(--rl-focus, 2px solid var(--rl-accent));
+  outline-offset: 2px;
+}

@@ -60,6 +60,10 @@ export function aestheticById(id: string): AestheticDoc | undefined {
   return aesthetics.find((aesthetic) => aesthetic.id === id);
 }
 
+export function attributeById(id: string): AttributeDoc | undefined {
+  return attributes.find((attribute) => attribute.id === id);
+}
+
 export function sourceById(id: string): SourceDoc | undefined {
   return sources.find((source) => source.id === id);
 }

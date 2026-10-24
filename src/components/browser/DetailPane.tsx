@@ -1,8 +1,9 @@
-// Full record display (M2): status chip, metadata, themes, props table, links.
-// Data comes exclusively from the catalog entry record — no hardcoding.
+// Full record display (M2; extended M5.3 with v2 provenance): status chip,
+// metadata, themes, props table, links, plus source/library, license,
+// retrieval, dependencies and local-path data — all from the catalog record.
 import type { CatalogEntry } from "../../catalog/types";
-import { categoryById } from "../../catalog/client";
-import type { EntryLinks } from "../../catalog/types";
+import { aestheticById, attributeById, categoryById, sourceById } from "../../catalog/client";
+import { entryTypeOf, type EntryLinks } from "../../catalog/types";
 import { statusChipClass } from "./statusChip";
 
 function LinkLine({ label, path }: { label: string; path: string }) {
@@ -94,6 +95,26 @@ export function DetailPane({ entry }: DetailPaneProps) {
         </div>
       ) : null}
 
+      {(entry.aesthetics ?? []).length > 0 ? (
+        <div className="chip-row" data-testid="aesthetic-chips" aria-label="Visual aesthetics">
+          {(entry.aesthetics ?? []).map((id) => (
+            <span key={id} className="aesthetic-chip">
+              {aestheticById(id)?.label ?? id}
+            </span>
+          ))}
+        </div>
+      ) : null}
+
+      {(entry.attributes ?? []).length > 0 ? (
+        <div className="chip-row" data-testid="attribute-chips" aria-label="Technical attributes">
+          {(entry.attributes ?? []).map((id) => (
+            <span key={id} className="neutral-chip">
+              {attributeById(id)?.label ?? id}
+            </span>
+          ))}
+        </div>
+      ) : null}
+
       {entry.props.length > 0 ? (
         <table className="props-table">
           <caption>Props</caption>
@@ -123,6 +144,93 @@ export function DetailPane({ entry }: DetailPaneProps) {
       ) : null}
 
       <LinksBlock links={entry.links ?? {}} />
+
+      {/* --- v2 provenance (M5.3) ---------------------------------------- */}
+      <div className="detail-notes">
+        <span className="field-label">Catalog type: </span>
+        {entryTypeOf(entry) === "external"
+          ? "external reference — implementation is not stored in this repository"
+          : "local — implementation available in-repo"}
+      </div>
+
+      {entry.source ? (
+        <div className="detail-notes">
+          <span className="field-label">Source library: </span>
+          {sourceById(entry.source)?.name ?? entry.source}
+          {entry.sourceUrl ? (
+            <>
+              {" — "}
+              <a href={entry.sourceUrl} target="_blank" rel="noreferrer noopener">
+                {entry.sourceUrl}
+              </a>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+
+      {entry.license ? (
+        <div className="detail-notes">
+          <span className="field-label">License: </span>
+          {[entry.license.spdx ? `SPDX ${entry.license.spdx}` : null, entry.license.note]
+            .filter(Boolean)
+            .join(" — ")}
+        </div>
+      ) : null}
+
+      {entry.retrieval ? (
+        <div className="detail-notes">
+          <span className="field-label">Retrieval: </span>
+          <code className="inline-code detail-retrieval">{entry.retrieval}</code>
+        </div>
+      ) : null}
+
+      {(entry.dependencies ?? []).length > 0 ? (
+        <div className="detail-notes">
+          <span className="field-label">Runtime dependencies (target project): </span>
+          {(entry.dependencies ?? [])
+            .map((dep) => `${dep.name}${dep.reason ? ` (${dep.reason})` : ""}`)
+            .join(", ")}
+        </div>
+      ) : null}
+
+      {entry.manifest ? (
+        <div className="detail-notes">
+          <span className="field-label">Manifest: </span>
+          <code className="inline-code">{entry.manifest}</code>
+        </div>
+      ) : null}
+
+      {entry.localDir ? (
+        <div className="detail-notes">
+          <span className="field-label">Local directory: </span>
+          <code className="inline-code">{entry.localDir}</code>
+        </div>
+      ) : null}
+
+      {(entry.implementation ?? []).length > 0 ? (
+        <dl className="detail-links" aria-label="Implementation files">
+          <div>
+            <dt>Implementation files</dt>
+          </div>
+          {(entry.implementation ?? []).map((file) => (
+            <div key={file}>
+              <dt aria-hidden="true" />
+              <dd>
+                <code className="inline-code">{file}</code>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+
+      {entry.preview && entry.preview.url && entry.preview.type !== "static" ? (
+        <div className="detail-notes">
+          <span className="field-label">Preview: </span>
+          <a href={entry.preview.url} target="_blank" rel="noreferrer noopener">
+            Open external preview ↗
+          </a>
+        </div>
+      ) : null}
 
       {entry.externalDependencies.length > 0 ? (
         <div className="detail-notes">

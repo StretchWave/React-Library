@@ -221,9 +221,36 @@ Staged per MASTER_SPEC §10 M5. Sources researched & documented in
       tests updated to the populated-catalog reality
 - [ ] UI reporting of counts → M5.3 (gallery)
 
-### M5.3 — Gallery and visual previews ⏳
+### M5.3 — Gallery and visual previews ✅
+- [x] `src/components/gallery/` — Gallery (card grid over the shared filters),
+      GalleryCard (name/status/type/source/license chips + aesthetic & attribute
+      chips + Details), PreviewBox (`local-demo | external | source-link |
+      static | none` honest modes; `previewKind()` resolver)
+- [x] Honest previews: seeded six render the vetted demo registry live; the 20
+      Tailwind-based vendored items link to their official doc pages
+      ("Open official preview"); the 7 Commons-Clause-bound react-bits items
+      show "View at source" — zero fabricated embeds, no ingested code executed
+      in the app bundle (previews come only from `src/catalog/demos.ts` records
+      or record-verified URLs)
+- [x] M5 filters added to FilterBar (aesthetic / source library / catalog
+      availability) and wired through the app-side search mirror
+- [x] DetailPane v2 provenance: catalog type, source library + link, license,
+      retrieval instructions, runtime dependencies (with reasons), manifest +
+      implementation paths, aesthetic/attribute chips, preview link
+- [x] `#/gallery` deep link; filters/shared view state persists across the
+      Browser ⇄ Gallery switch
+- [x] gallery.css is `--rl-*` token-only (css-theming guard passes)
+- [x] Tests: +3 App gallery tests (honest kinds; source filtering; deep link +
+      filter persistence), FilterBar option assertions updated; verify gate green
+      (55/55 node, 59/59 app, typecheck, build)
+- Note: "unavailable" preview fallback path is covered by PreviewBox's `none`
+  branch (note renderer); no current entries use it since every record carries a
+  verified link — exercised via unit tests in M5.6.
+
 ### M5.4 — Multi-selection ⏳
+
 ### M5.5 — Master prompt generation ⏳
+
 ### M5.6 — Validation and release ⏳
 
 ## 6) Future work (explicitly not now)
