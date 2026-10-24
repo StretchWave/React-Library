@@ -417,7 +417,7 @@ export const REACT_BITS_CURATED = [
   { name: "Carousel", group: "components", category: "page-sections", aesthetics: ["editorial", "minimal"] },
   { name: "Stack", group: "components", category: "page-sections", aesthetics: ["playful", "casual"], heavy: true },
   { name: "CircularGallery", group: "components", category: "page-sections", aesthetics: ["editorial", "luxury"] },
-  { name: "AnimatedList", group: "components", category: "feedback", aesthetics: ["playful", "casual"], overrides: { live: false } },
+  { name: "AnimatedList", group: "components", category: "feedback", aesthetics: ["playful", "casual"] },
   { name: "Counter", group: "components", category: "display", aesthetics: ["minimal", "professional"] },
   { name: "TiltedCard", group: "components", category: "layout", aesthetics: ["futuristic", "editorial"] },
   { name: "BorderGlow", group: "components", category: "layout", aesthetics: ["cyberpunk", "futuristic"] },

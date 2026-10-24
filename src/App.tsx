@@ -2,7 +2,7 @@
 // truth; this view composes the browser (search/filters/detail), the gallery
 // (visual card grid over the same filters), the taxonomy-driven theme engine
 // (ThemeProvider/ThemePicker), and live component previews.
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 import { DetailPane } from "./components/browser/DetailPane";
 import { EntryList } from "./components/browser/EntryList";
 import { FilterBar } from "./components/browser/FilterBar";
@@ -23,13 +23,26 @@ import { ThemePicker } from "./theme/ThemePicker";
 import "./components/browser/browser.css";
 import "./components/browser/preview.css";
 import "./components/gallery/gallery.css";
+import "./components/preview/preview.css";
 import "./components/prompt/prompt.css";
 
-type View = "browser" | "gallery" | "prompt";
+type View = "browser" | "gallery" | "prompt" | "preview";
 
-/** Deep links look like `#/component/<id>` (M4) and `#/gallery` (M5.3). */
+/** M6.2: the preview workspace (vendored showcases + animation engines) is a
+ * heavy view, so it loads lazily — browser/gallery users never pay for it. */
+const PreviewWorkspace = lazy(() =>
+  import("./components/preview/PreviewWorkspace").then((module) => ({ default: module.PreviewWorkspace })),
+);
+
+/** Deep links look like `#/component/<id>` (M4), `#/gallery` (M5.3),
+ * `#/preview/<id>` (M6.2), and `#/prompt` (M5.4). */
 function entryIdFromHash(): string | null {
   const match = /#\/component\/([a-z0-9-]+)/.exec(window.location.hash);
+  return match ? match[1] : null;
+}
+
+function previewIdFromHash(): string | null {
+  const match = /#\/preview\/([a-z0-9-]+)/.exec(window.location.hash);
   return match ? match[1] : null;
 }
 
@@ -78,6 +91,12 @@ export default function App() {
       if (id && findEntry(id)) {
         setView("browser");
         setSelectedId(id);
+        return;
+      }
+      const previewId = previewIdFromHash();
+      if (previewId) {
+        setView("preview");
+        setSelectedId(findEntry(previewId) ? previewId : null);
         return;
       }
       if (window.location.hash === "#/gallery") {
@@ -226,6 +245,20 @@ export default function App() {
               onGeneratePrompt={openPrompt}
             />
           </>
+        ) : view === "preview" ? (
+          <Suspense
+            fallback={
+              <main className="workspace-empty" data-testid="preview-loading" aria-label="Preview workspace">
+                Loading preview…
+              </main>
+            }
+          >
+            <PreviewWorkspace
+              entry={selected}
+              selected={selected ? selection.includes(selected.id) : undefined}
+              onToggleSelection={toggleSelection}
+            />
+          </Suspense>
         ) : view === "prompt" ? (
           <PromptStudio
             items={selection
@@ -269,6 +302,13 @@ export default function App() {
                 selected={selected ? selection.includes(selected.id) : undefined}
                 onToggleSelection={toggleSelection}
               />
+              {selected ? (
+                <p className="workspace-open-row">
+                  <a className="workspace-open" href={`#/preview/${selected.id}`}>
+                    Open full preview workspace ↗
+                  </a>
+                </p>
+              ) : null}
               <PreviewPanel entry={selected} />
             </section>
           </>

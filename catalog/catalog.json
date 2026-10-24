@@ -588,7 +588,7 @@
       "id": "react-bits-animated-list",
       "name": "Animated List (React Bits)",
       "summary": "Animated List: A scrolling list whose rows spring into view, with a gliding selection and arrow keys.",
-      "description": "Animated List is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A scrolling list whose rows spring into view, with a gliding selection and arrow keys. The entry records the animation runtime (dom) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Animated List is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A scrolling list whose rows spring into view, with a gliding selection and arrow keys. The entry records the animation runtime (dom) and the preview workspace renders it live.",
       "category": "feedback",
       "themes": [
         "brutalist-print",
@@ -620,9 +620,8 @@
       "externalId": "AnimatedList",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/AnimatedList-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/animated-list/",
       "preview": {
-        "type": "external",
-        "url": "https://reactbits.dev/components/animated-list",
-        "note": "Preview requires component styling outside this app's runtime; see the official demo."
+        "type": "local-demo",
+        "note": "Live preview renders the vendored component in the preview workspace."
       },
       "localDir": "catalog/components/react-bits/animated-list",
       "manifest": "catalog/components/react-bits/animated-list/component.json",

@@ -51,6 +51,29 @@ function trackDeps(entry) {
 }
 
 // --- Vendored (TS-CSS variant) items ---------------------------------------
+const VENDOR_BANNER = "// @ts-nocheck\n/* eslint-disable */\n";
+
+/** Writes the manifest + vendored source files. TS/TSX sources get an automated
+ *  review banner added by the adapter (never a hand edit): the catalog app keeps
+ *  strict type checking for its own code while third-party sources stay
+ *  byte-for-byte the official payload otherwise. */
+function writeVendored(dir, registry, { fetchedAt }) {
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    path.join(dir, "component.json"),
+    JSON.stringify(composeReactBitsManifest(currentName, currentGroup, registry, registryUrl, { fetchedAt }), null, 2) + "\n",
+  );
+  for (const file of registry.files ?? []) {
+    const basename = fileBasename(file.path);
+    const content = /\.(tsx?|jsx?)$/.test(basename) ? VENDOR_BANNER + (file.content ?? "") : `${file.content ?? ""}`;
+    writeFileSync(path.join(dir, basename), content, "utf8");
+  }
+}
+
+let currentName = "";
+let currentGroup = "";
+let registryUrl = "";
+
 for (const curated of REACT_BITS_CURATED) {
   const { name, group, heavy = false } = curated;
   const slug = reactBitsSlugFor(name);
@@ -70,14 +93,10 @@ for (const curated of REACT_BITS_CURATED) {
       overrides: { ...curated.overrides, ...curated, heavy },
     });
     if (write) {
-      mkdirSync(dir, { recursive: true });
-      writeFileSync(
-        path.join(dir, "component.json"),
-        JSON.stringify(composeReactBitsManifest(name, group, registry, url, { fetchedAt }), null, 2) + "\n",
-      );
-      for (const file of registry.files ?? []) {
-        writeFileSync(path.join(dir, fileBasename(file.path)), `${file.content ?? ""}`, "utf8");
-      }
+      currentName = name;
+      currentGroup = group;
+      registryUrl = url;
+      writeVendored(dir, registry, { fetchedAt });
     }
     const result = replaceEntry(working, entry);
     if (result.merged) {
@@ -118,14 +137,10 @@ for (const curated of REACT_BITS_EXTERNAL_CURATED) {
       });
       const dir = path.join(root, "catalog", "components", "react-bits", slug);
       if (write) {
-        mkdirSync(dir, { recursive: true });
-        writeFileSync(
-          path.join(dir, "component.json"),
-          JSON.stringify(composeReactBitsManifest(name, group, res.registry, res.url, { fetchedAt }), null, 2) + "\n",
-        );
-        for (const file of res.registry.files ?? []) {
-          writeFileSync(path.join(dir, fileBasename(file.path)), `${file.content ?? ""}`, "utf8");
-        }
+        currentName = name;
+        currentGroup = group;
+        registryUrl = res.url;
+        writeVendored(dir, res.registry, { fetchedAt });
       }
       const result = replaceEntry(working, entry);
       if (result.merged) {

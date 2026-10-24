@@ -1,8 +1,11 @@
-// Gallery view (M5.3 + M5.4): the full searchable card grid over the catalog,
-// selection controls, and the selection tray. Receives pre-filtered entries
-// plus the app-level selection state; every card is data-driven from the
-// canonical record with an honest preview.
+// Gallery view (M5.3 + M5.4 + M6.4): the full searchable card grid over the
+// catalog, selection controls, the selection tray, and the global preview
+// motion toggle. Receives pre-filtered entries plus the app-level selection
+// state; every card is data-driven from the canonical record with an honest
+// preview.
+import { useSyncExternalStore } from "react";
 import type { CatalogEntry } from "../../catalog/types";
+import { isMotionPlaying, setMotionPlaying, subscribeMotion } from "../../lib/motion";
 import { GalleryCard } from "./GalleryCard";
 import { SelectionTray } from "./SelectionTray";
 
@@ -39,6 +42,7 @@ export function Gallery({
   onGeneratePrompt,
 }: GalleryProps) {
   const selectedSet = new Set(selectedIds);
+  const motionOn = useSyncExternalStore(subscribeMotion, isMotionPlaying);
   return (
     <section className="gallery-view" aria-label="Component gallery">
       <div className="gallery-toolbar">
@@ -48,6 +52,14 @@ export function Gallery({
             : `${totalCount} entries · ${new Set(entries.map((entry) => entry.source).filter(Boolean)).size} source libraries`}
         </p>
         <div className="gallery-bulk-actions">
+          <button
+            type="button"
+            className="gallery-motion-toggle"
+            aria-pressed={!motionOn}
+            onClick={() => setMotionPlaying(!motionOn)}
+          >
+            {motionOn ? "Pause previews" : "Play previews"}
+          </button>
           <button
             type="button"
             className="gallery-bulk-select"

@@ -8,6 +8,8 @@ import { DetailPane } from "./components/browser/DetailPane";
 import { FilterBar } from "./components/browser/FilterBar";
 import type { FilterBarProps } from "./components/browser/FilterBar";
 import { PreviewPanel } from "./components/browser/PreviewPanel";
+import { SHOWCASE_IDS, getShowcase } from "./catalog/showcases";
+import { entries } from "./catalog/client";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { THEME_STORAGE_KEY } from "./theme/theme";
 
@@ -264,10 +266,10 @@ describe("App (M5.3 gallery)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
     const grid = screen.getByRole("list", { name: /component gallery/i });
     expect(grid.querySelectorAll("li[data-entry-id]").length).toBe(87);
-    // Seeded six render the vetted live demo; ingested tailwind items link out.
+    // Seeded six render the vetted live demo; ingested doc-page items link out.
     expect(document.querySelector('li[data-preview-kind="local-demo"][data-entry-id="button"]')).toBeTruthy();
     const official = screen.getAllByRole("link", { name: /Open official preview/ });
-    expect(official.length).toBe(21); // 16 shadcn + 4 Magic UI doc pages + 1 react-bits opt-out (AnimatedList)
+    expect(official.length).toBe(20); // 16 shadcn + 4 Magic UI doc pages (M6.2: AnimatedList runs live now)
     expect(official.some((link) => (link.getAttribute("href") ?? "").includes("ui.shadcn.com"))).toBe(true);
     expect(screen.getAllByRole("link", { name: /View at source/ }).length).toBe(21); // raw-WebGL react-bits variants (vendored, official demo only)
   });
@@ -284,7 +286,7 @@ describe("App (M5.3 gallery)", () => {
     expect(document.querySelector('li[data-preview-kind="source-link"][data-entry-id="react-bits-fluid-glass"]')).toBeTruthy();
     expect(
       document.querySelectorAll('li[data-preview-kind="local-demo"][data-entry-id^="react-bits-"]').length,
-    ).toBe(39); // 39 runtime-live vendored items (dom/gsap/motion/physics, minus one opt-out)
+    ).toBe(40); // 40 runtime-live vendored items (dom/gsap/motion/physics; M6.2 flips AnimatedList live via the installed icon runtime)
   });
 
   it("the #/gallery deep link opens the gallery and filters persist across views", () => {
@@ -422,6 +424,161 @@ describe("App (M5.4 multi-selection)", () => {
     const studio = screen.getByRole("region", { name: "Master prompt studio" });
     expect(studio.textContent).toContain("0 components");
     expect(window.location.hash).toBe("#/prompt");
+  });
+});
+
+describe("App (M6.2 preview workspace)", () => {
+  it("deep link #/preview/<id> runs a vendored stage with live controls", async () => {
+    window.location.hash = "/preview/react-bits-shiny-text";
+    renderApp();
+    const stage = await screen.findByTestId("preview-stage");
+    expect(stage).toBeTruthy();
+    expect(stage.textContent).toContain("Shiny text shimmer");
+    expect(screen.getByTestId("preview-controls")).toBeTruthy();
+    // Replay affordance exists for every runnable stage.
+    expect(screen.getByTestId("preview-replay")).toBeTruthy();
+    // Changing the Text control updates the stage content live.
+    const text = screen.getByLabelText("Text") as HTMLInputElement;
+    expect(text.value).toBe("Shiny text shimmer");
+    fireEvent.change(text, { target: { value: "Fall shimmer" } });
+    expect(screen.getByTestId("preview-stage").textContent).toContain("Fall shimmer");
+    // Stage mode flips the wrap attribute (tokens-only backgrounds).
+    fireEvent.change(screen.getByLabelText("Stage background mode"), { target: { value: "grid" } });
+    expect(screen.getByTestId("preview-stage-wrap").getAttribute("data-stage")).toBe("grid");
+    // Viewport constrains the stage frame.
+    fireEvent.change(screen.getByLabelText("Stage viewport width"), { target: { value: "375" } });
+    const frame = screen.getByTestId("preview-stage");
+    expect(frame.getAttribute("data-viewport")).toBe("375");
+    expect((frame as HTMLElement).style.maxWidth).toBe("375px");
+  });
+
+  it("the info rail carries runtime, retrieval, license, dependencies, and selection", async () => {
+    window.location.hash = "/preview/react-bits-decrypted-text";
+    renderApp();
+    const rail = await screen.findByTestId("preview-rail");
+    expect(rail.textContent).toContain("runtime: motion");
+    expect(rail.textContent).toContain("Commons Clause");
+    expect(rail.textContent).toContain("npx shadcn@latest add");
+    expect(rail.textContent).toContain("Related in this source");
+    const record = screen.getByTestId("preview-full-record");
+    expect(record.getAttribute("href")).toBe("#/component/react-bits-decrypted-text");
+    // Selection works from the workspace rail with the shared wording.
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select Decrypted Text (React Bits) for the master prompt" }));
+    expect(screen.getByText(/^87 local · 0 external · 1 selected$/)).toBeTruthy();
+  });
+
+  it("non-runnable entries show an honest kind card instead of a stage", async () => {
+    window.location.hash = "/preview/react-bits-fluid-glass";
+    renderApp();
+    const honest = await screen.findByTestId("preview-honest");
+    expect(honest.textContent).toContain("source-link");
+    expect(screen.queryByTestId("preview-controls")).toBeNull();
+    expect(screen.queryByTestId("preview-stage")).toBeNull();
+    const official = screen.getByRole("link", { name: "Open official preview ↗" });
+    expect((official.getAttribute("href") ?? "").startsWith("http")).toBe(true);
+    expect(
+      honest.querySelector('[data-testid="preview-full-record"]')?.getAttribute("href"),
+    ).toBe("#/component/react-bits-fluid-glass");
+  });
+
+  it("seeded components reuse their vetted demos in the workspace", async () => {
+    window.location.hash = "/preview/card";
+    renderApp();
+    await screen.findByTestId("preview-rail");
+    expect(document.querySelector('[data-demo-id="card"]')).toBeTruthy();
+    expect(screen.getByTestId("preview-rail").textContent).toContain("local record");
+  });
+
+  it("the browser detail pane links into the workspace (href) and deep link opens it", async () => {
+    renderApp();
+    fireEvent.click(entryItem("Card"));
+    // jsdom does not navigate on anchor clicks; assert the deep link affordance,
+    // then enter the route the way a browser would (hash change).
+    expect(screen.getByRole("link", { name: "Open full preview workspace ↗" }).getAttribute("href")).toBe(
+      "#/preview/card",
+    );
+    window.location.hash = "/preview/card";
+    await waitFor(() => {
+      expect(screen.getByTestId("preview-workspace")).toBeTruthy();
+    });
+    expect(document.querySelector('[data-demo-id="card"]')).toBeTruthy();
+  });
+
+  it("unknown preview ids fall back to the workspace empty state", async () => {
+    window.location.hash = "/preview/extinct";
+    renderApp();
+    expect(await screen.findByRole("link", { name: "Back to gallery" })).toBeTruthy();
+  });
+
+  it("every runnable catalog entry resolves through the showcase registry", () => {
+    const live = entries.filter(
+      (entry) => entry.source === "react-bits" && entry.preview?.type === "local-demo",
+    );
+    expect(live.length).toBe(40);
+    for (const entry of live) {
+      expect(SHOWCASE_IDS).toContain(entry.id);
+      expect(getShowcase(entry.id)).toBeTruthy();
+    }
+    for (const seededId of ["alert", "badge", "button", "card", "tabs", "text-input"]) {
+      expect(getShowcase(seededId)).toBeTruthy();
+    }
+    // Honest invariant: records without runtime preview resolve no stage.
+    expect(getShowcase("react-bits-fluid-glass")).toBeUndefined();
+    // Registry ids stay unique (a second registration would throw on import).
+    expect(new Set(SHOWCASE_IDS).size).toBe(40);
+  });
+});
+
+describe("App (M6.4 gallery motion)", () => {
+  function cardFrame(entryId: string): HTMLElement | null {
+    return document.querySelector<HTMLElement>(
+      `li[data-entry-id="${entryId}"] .preview-frame`,
+    );
+  }
+
+  it("gallery cards play showcase previews on demand (manual fallback in jsdom)", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    fireEvent.change(screen.getByLabelText("Filter by source library"), {
+      target: { value: "react-bits" },
+    });
+    fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "shiny" } });
+    const card = cardFrame("react-bits-shiny-text");
+    expect(card?.getAttribute("data-preview-kind")).toBe("local-demo");
+    expect(card?.getAttribute("data-played")).toBe("false");
+    fireEvent.click(screen.getByRole("button", { name: "Play preview of Shiny Text (React Bits)" }));
+    expect(cardFrame("react-bits-shiny-text")?.getAttribute("data-played")).toBe("true");
+    expect(
+      document.querySelector('li[data-entry-id="react-bits-shiny-text"] .preview-mini-stage'),
+    ).toBeTruthy();
+  });
+
+  it("heavy previews keep a workspace link instead of auto playback", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    fireEvent.change(screen.getByLabelText("Filter by source library"), {
+      target: { value: "react-bits" },
+    });
+    fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "falling" } });
+    const card = cardFrame("react-bits-falling-text");
+    expect(card?.getAttribute("data-heavy")).toBe("true");
+    expect(screen.queryByRole("button", { name: "Play preview of Falling Text (React Bits)" })).toBeNull();
+    const open = card?.querySelector("a");
+    expect(open?.getAttribute("href")).toBe("#/preview/react-bits-falling-text");
+    expect(card?.textContent).toContain("Heavy preview");
+  });
+
+  it("the gallery motion toggle pauses and persists", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    // Default is playing (visual-gallery-first goal); toggles flip everywhere.
+    fireEvent.click(screen.getByRole("button", { name: "Pause previews" }));
+    expect(localStorage.getItem("rl-motion-play")).toBe("paused");
+    expect(document.querySelectorAll(".preview-mini-stage").length).toBe(0);
+    expect(screen.getAllByText("Previews are paused.").length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole("button", { name: "Play previews" }));
+    expect(localStorage.getItem("rl-motion-play")).toBe("playing");
+    expect(screen.getAllByRole("button", { name: /^Play preview of / }).length).toBeGreaterThan(0);
   });
 });
 
