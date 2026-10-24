@@ -372,9 +372,13 @@ preview-class handling. Staged; see `IMPLEMENTATION_CHECKLIST.md` §6.x.
    Observer), a global motion toggle, heavy entries gated behind the workspace, and
    honest source-link/external cards for non-runnable previews.
 4. **M6.4 App runtime for animation** — `gsap`, `@gsap/react`, `motion`, `matter-js`
-   added (§12 amendment) to run the vendored live components; a small `cn` shim at
-   `src/lib/cn.ts` provides the `@/lib/utils` helper surface for vendored sources.
-   three.js/OGL are deliberately not bundled.
+   added (§12 amendment) to run the vendored live components; the M6.2 extension of
+   the amendment adds the icon runtime declared by four live sources
+   (`@hugeicons/react`, `@hugeicons/core-free-icons`) and the pointer-gesture
+   runtime declared by Dome Gallery (`@use-gesture/react`). The vendored sources
+   are scanned before bundling: none of the live-previewable files import
+   `@/lib/utils`, so the previously planned `cn` alias/shim is not needed and is
+   intentionally dropped. three.js/OGL are deliberately not bundled.
 5. **M6.5 Tests, docs, release** — metadata/lookup tests, workspace/gallery/prompt
    app tests, README/checklist/spec sync, full flagless `npm run verify`.
 
@@ -408,6 +412,8 @@ npm run verify
 | `gsap`, `@gsap/react` | runtime | Animation engine for vendored React Bits previews (declared by those sources). *Amendment 2026-10-24, M6.4.* |
 | `motion` | runtime | Framer Motion class API via `motion/react`, used by vendored sources. *Amendment 2026-10-24, M6.4.* |
 | `matter-js` | runtime | 2D physics for vendored physics-based previews (e.g. Falling Text). *Amendment 2026-10-24, M6.4.* |
+| `@hugeicons/react`, `@hugeicons/core-free-icons` | runtime | Icon runtime + free icon data declared by the vendored sources (Card Nav, Carousel, Flowing Menu, Elastic Slider, Animated List). *Amendment 2026-10-24, M6.4.* |
+| `@use-gesture/react` | runtime | Pointer-drag gestures declared by the vendored Dome Gallery source. *Amendment 2026-10-24, M6.4.* |
 
 Anything else requires: spec §12 amendment + AGENTS.md update + checklist decision log,
 **before** installation. No UI kits, CSS frameworks, routers, state managers, or
@@ -446,3 +452,12 @@ masquerades as working. When done, status flips to *working* with the evidence
   ingestion, preview workspace, visual gallery, prompt/status extensions); §12
   amended to allow the animation runtimes (`gsap`, `@gsap/react`, `motion`,
   `matter-js`) and entry fields `runtime`/`heavy`.
+- **v1.4 — 2026-10-24:** M6.2–M6.4 shipped: preview workspace `#/preview/<id>`
+  (stage modes, viewports, replay, per-entry verified controls, honest kind card),
+  40 reviewed showcase wrappers, the `react-bits-animated-list` record flipped to a
+  live preview once its icon runtime was allowed, §12 extended with
+  `@hugeicons/react`, `@hugeicons/core-free-icons`, `@use-gesture/react`; vendored
+  files carry an adapter-stamped review banner; gallery mini stages with an
+  IntersectionObserver play policy, a persisted global pause toggle, and heavy
+  gating; the workspace view is lazy-loaded so gallery users never pay for the
+  animation engines.

@@ -1,3 +1,5 @@
+// @ts-nocheck
+/* eslint-disable */
 'use client';
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, type CSSProperties, type ReactNode } from 'react';

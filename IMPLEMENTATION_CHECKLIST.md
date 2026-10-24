@@ -363,6 +363,61 @@ master prompt — with honest handling of what can and cannot run in this app.
   39 runtime-live react-bits) · 21 `source-link` (react-bits raw-WebGL variants) ·
   21 official link cards (16 shadcn + 4 magic-ui docs + AnimatedList opt-out)
 
+### M6.2–M6.4 — Preview workspace, showcases, gallery motion ✅ (2026-10-24)
+
+- [x] Showcase contract: `src/catalog/showcases/types.tsx` (`Showcase`,
+      `ShowcaseControl`, `defineShowcase` — scalar-only defaults/targets) +
+      `helpers.tsx` (self-contained SVG data-URI placeholders, `CenteredStage`)
+- [x] 40 reviewed wrappers across `text.tsx` (13) · `motion.tsx` (7) · `nav.tsx` (5) ·
+      `surfaces.tsx` (5) · `sections.tsx` (7) · `backgrounds.tsx` (2) · `lists.tsx` (1),
+      covering exactly the 40 `local-demo` react-bits entries; control option unions
+      verified against the vendored sources (e.g. RotatingText `slide|flip|blur|scale|drop`,
+      SpotlightCard `circle|beam`, Noise blend modes, FlowingMenu directions) rather
+      than guessed; array/ReactNode data stays inside wrapper functions
+- [x] `src/components/preview/PreviewWorkspace.tsx` + token-only `preview.css`:
+      `#/preview/<id>` route in App (lazy chunk), stage modes neutral/inverted/grid,
+      viewports full/1280/768/375, Replay remount, per-entry controls (text/number/
+      boolean/select) with a reset, honest kind card for source-link/external entries
+      (official link + note), and the info rail (status/type/runtime/heavy/preview
+      chips, source + license verbatim, retrieval, target dependencies, vendored
+      file paths, related-in-source links, selection toggle, full-record link)
+- [x] Registry invariant tested: every `local-demo` react-bits id resolves via
+      `getShowcase`, sourced `source-link` records resolve none, ids unique —
+      the app renders vendored code only through this registry
+- [x] `react-bits-animated-list` flipped from its M6.1 opt-out to a live record:
+      its exclusion basis (`@hugeicons/*` not allowed) is gone after the §12
+      extension, so it was re-vendored without `live:false` and given the last
+      wrapper (`lists.tsx`) — one entry, honest kind `local-demo`
+- [x] §12 amendment extension + installs: `@hugeicons/react`, `@hugeicons/core-free-icons`
+      (declared by Card Nav, Carousel, Flowing Menu, Elastic Slider, AnimatedList),
+      `@use-gesture/react` (declared by Dome Gallery); AGENTS.md rule 3 updated
+- [x] Vendored-code review banner: the ingestion adapter stamps
+      `// @ts-nocheck /* eslint-disable */` onto the code files it writes
+      (automated, never a hand edit); the app keeps strict TypeScript on its own
+      code while third-party sources stay byte-verbatim otherwise
+- [x] M6.3 gallery motion: `src/lib/motion.ts` preference store
+      (`rl-motion-play`, default playing, external store), toolbar
+      "Pause previews"/"Play previews" (`aria-pressed`), `PreviewBox` MiniStage for
+      all 46 local-demo cards — auto-play via IntersectionObserver when visible +
+      playing, manual Play fallback, unmount off-screen; `source-link`/`external`
+      cards unchanged (20 official + 21 at-source links)
+- [x] Heavy gating: Stack + Falling Text show workspace-bound placeholders in the
+      gallery (`data-heavy="true"`); only the workspace runs them
+- [x] M6.2 workspace shipped lazy: React.lazy + Suspense split the animation
+      engines into an on-demand chunk (main 432 kB / 100 kB gzip; workspace chunk
+      782 kB / 266 kB gzip) — browsing and gallery don't pay for gsap/motion/matter-js
+- [x] Tests: workspace (stage + controls + rail facts + honest card + seeded reuse +
+      registry invariant + unknown id) and gallery motion (manual play fallback,
+      heavy placeholder, persisted pause) suites added; gallery counts updated to the
+      AnimatedList flip — app suite 104/104; tooling 64/64; typecheck + build green;
+      flagless `npm run verify` green
+- [x] Browser smoke (5173): `#/preview/react-bits-shiny-text` mounts the lazy stage
+      with no console errors; `#/gallery` shows 87 cards, 44 play buttons
+      (46 local-demo − 2 heavy), 2 heavy workspace links, and the motion toggle
+- Catalog truth: **87 entries, all local** (shadcn 16 · magic-ui 4 · react-bits 61 ·
+  seeded 6). Preview kinds: **46 `local-demo`** (6 seeded demos + 40 runtime-live
+  react-bits) · 21 `source-link` (react-bits raw-WebGL variants) · 0 `external`
+
 ## 6) Future work (explicitly not now)
 
 - Catalog JSON Schema file for cross-tool validation

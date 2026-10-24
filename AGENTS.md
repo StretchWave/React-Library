@@ -13,7 +13,8 @@ Where docs disagree, `MASTER_SPEC.md` wins.
    hand-edit it; run `npm run generate` after any data change.
 3. **No new dependencies** without first amending `MASTER_SPEC.md` §12, this file, and
    the checklist. The allowed set is exactly §12 (runtime `react`/`react-dom` plus the
-   M6 animation runtimes `gsap`, `@gsap/react`, `motion`, `matter-js`; dev toolchain
+   M6 animation/interaction runtimes `gsap`, `@gsap/react`, `motion`, `matter-js`,
+   `@hugeicons/react`, `@hugeicons/core-free-icons`, `@use-gesture/react`; dev toolchain
    incl. `@testing-library/dom`, the mandatory peer of `@testing-library/react` v16).
    Test-only `node:test` suites in `tests/` must stay zero-dependency.
 4. **Components style with `--rl-*` variables only** (see §Theming rules). No hex/rgb

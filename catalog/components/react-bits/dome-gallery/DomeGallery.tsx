@@ -1,3 +1,5 @@
+// @ts-nocheck
+/* eslint-disable */
 'use client';
 
 import { useEffect, useMemo, useRef, useCallback } from 'react';

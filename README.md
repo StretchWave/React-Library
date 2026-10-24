@@ -20,6 +20,7 @@ Schema: [`docs/SCHEMA.md`](./docs/SCHEMA.md)
 | Advanced interactions (M4): TabSheet arrow keys, copy-usage, hash deep links | ✅ working |
 | Catalog ingestion (M5.1–M5.2): schema v2, 9-source registry, 16 shadcn + 4 Magic UI vendored, 7 verified react-bits references | ✅ working — 33 real entries (26 local / 7 external) |
 | Gallery + honest previews (M5.3), multi-selection (M5.4), master prompt (M5.5) | ✅ working |
+| Animation-first correction (M6): 87 real entries (all local), 61 verified React Bits items vendored from the official registry, 46 live previews (6 demos + 40 showcase stages), preview workspace `#/preview/<id>` with per-entry controls (lazy-loaded), gallery mini stages with a persisted play/pause toggle, heavy entries gated to the workspace | ✅ working (verify gate green; browser-verified) |
 
 ## Browse features
 
@@ -31,10 +32,20 @@ Schema: [`docs/SCHEMA.md`](./docs/SCHEMA.md)
   manifest/implementation paths, aesthetics/attributes).
 - Live preview rendered in the active theme; **Copy usage** puts a ready-to-paste
   snippet on your clipboard.
-- Gallery view (`#/gallery`, header switch): card grid over the same filters with
-  honest previews per entry — live vetted demos for the six in-app components,
-  "Open official preview" links for vendored Tailwind-based items, "View at source"
-  for reference-only entries. Ingested third-party code is never executed in the app.
+- Gallery view (`#/gallery`, header switch): preview-first card grid over the same
+  filters with honest previews per entry — live mini stages for the six in-app
+  components and the 40 runnable React Bits items (auto-play on visibility, manual
+  Play fallback), "Open official preview" links for doc-page items, "View at source"
+  for the raw-WebGL variants, and heavy items (Stack, Falling Text) gated behind the
+  preview workspace. A persisted **Pause previews** toggle stops every mini stage.
+  Ingested third-party code is never executed in the app outside the reviewed
+  showcase wrappers.
+- Preview workspace (`#/preview/<id>`): full-stage live preview for every runnable
+  entry with stage background modes (neutral/inverted/grid), viewport widths
+  (full/1280/768/375), Replay, per-entry controls verified against the vendored
+  sources, an information rail (source, license verbatim, retrieval, dependencies,
+  vendored paths, related components), and the selection toggle. Non-runnable
+  records show an honest kind card with the official link instead of a fake stage.
 - Multi-selection (M5.4): card checkboxes, "Select all visible", persistent
   `rl.selection.v1` store (stale ids pruned), reorderable selection tray with
   availability flags; selection survives filters, view switches, and reloads.
@@ -42,8 +53,8 @@ Schema: [`docs/SCHEMA.md`](./docs/SCHEMA.md)
   canonical records — selection order, license notices verbatim (e.g. react-bits'
   MIT + Commons Clause), dependency union, local paths vs official retrieval, honest
   skips — with one-click clipboard copy.
-- Hash deep links: `#/component/<id>`, `#/gallery`, `#/prompt` cooperate with the
-  browser's back/forward buttons.
+- Hash deep links: `#/component/<id>`, `#/preview/<id>`, `#/gallery`, `#/prompt`
+  cooperate with the browser's back/forward buttons.
 
 ## Quickstart
 
@@ -66,8 +77,8 @@ npm run verify       # full release gate
 - Canonical data: `catalog/catalog.json` (schema v2 — `docs/SCHEMA.md`)
 - Derived index: `catalog/index.json` (generated)
 - Taxonomy: `taxonomy/themes.json` (6 appearance themes), `taxonomy/categories.json`
-  (22 categories), `taxonomy/aesthetics.json` (12 aesthetics), `taxonomy/attributes.json`
-  (21 attributes), `taxonomy/sources.json` (9 researched sources + access/licensing facts)
+  (24 categories), `taxonomy/aesthetics.json` (12 aesthetics), `taxonomy/attributes.json`
+  (25 attributes), `taxonomy/sources.json` (9 researched sources + access/licensing facts)
 - Entries (33 total — 26 local / 7 external): the six in-app components below,
   20 vendored shadcn/Magic UI items under `catalog/components/{shadcn,magic-ui}/`,
   7 verified external references to react-bits (registry slugs confirmed live).

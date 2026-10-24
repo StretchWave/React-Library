@@ -1,3 +1,5 @@
+// @ts-nocheck
+/* eslint-disable */
 'use client';
 
 import { motion, MotionConfig, type Easing, type MotionStyle, type Transition } from 'motion/react';
