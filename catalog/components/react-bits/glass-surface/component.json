@@ -1,0 +1,28 @@
+{
+  "entryId": "react-bits-glass-surface",
+  "source": "react-bits",
+  "externalId": "GlassSurface",
+  "registryItem": "GlassSurface-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/GlassSurface-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/components/glass-surface",
+  "group": "components",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "GlassSurface.css",
+      "type": "registry:file"
+    },
+    {
+      "path": "GlassSurface.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

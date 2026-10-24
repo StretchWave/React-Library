@@ -1,0 +1,30 @@
+{
+  "entryId": "react-bits-dome-gallery",
+  "source": "react-bits",
+  "externalId": "DomeGallery",
+  "registryItem": "DomeGallery-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/DomeGallery-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/components/dome-gallery",
+  "group": "components",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "DomeGallery.css",
+      "type": "registry:file"
+    },
+    {
+      "path": "DomeGallery.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [
+    "@use-gesture/react@^10.2.27"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

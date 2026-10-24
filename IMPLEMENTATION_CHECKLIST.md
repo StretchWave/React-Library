@@ -317,6 +317,52 @@ Staged per MASTER_SPEC §10 M5. Sources researched & documented in
 - [x] Back-navigation hash coherence: "Back to selection" now returns to
       `#/gallery` instead of leaving `#/prompt` in the URL
 
+## 5.8) M6 — Correction: animation-first discovery (user redirection) 🚧
+
+Goal (user brief): turn React Library into an animation-first discovery tool for
+genuinely interesting animated/interactive React components — real source ingestion,
+a dedicated preview workspace, a visual gallery, preserved multi-selection and the
+master prompt — with honest handling of what can and cannot run in this app.
+
+### M6.1 — Animation-first ingestion ✅ (2026-10-24)
+
+- [x] Verified every curated React Bits registry item LIVE before vendoring
+      (`https://reactbits.dev/r/{Name}-TS-CSS.json`, official shadcn-compatible
+      registry; batch verification — 61/61 resolved, 0 fabricated, 0 skipped)
+- [x] `scripts/ingest-reactbits.mjs` (+ pure helpers in `scripts/lib/ingest.mjs`):
+      fetch → verify shape → vendor `TS-CSS` variant (plain CSS, no Tailwind) →
+      manifest → compose entry with runtime detection; `--write` / dry-run /
+      `--only=` flags; idempotent re-runs replace same-source entries
+- [x] Vendored `catalog/components/react-bits/<slug>/` for all 61 items
+      (57 curated + Lanyard, DomeGallery, Hyperspeed, Iridescence which publish
+      TS-CSS variants too); entries sorted; `catalog/index.json` regenerated
+- [x] Runtime classification is evidence-based: `gsap` 7 · `motion` 6 · `dom` 26 ·
+      `physics` (matter-js) 1 · `webgl` 21 (raw WebGL2/vanilla shader code in the
+      official CSS variants — react-bits rewrote them dependency-free). WebGL
+      vendored for agent delivery but preview stays `source-link` (never
+      advertised as live); `AnimatedList` opted out of live preview (needs the
+      heavy icon packages we do not bundle) via `overrides.live=false`
+- [x] License policy corrected with the source record: react-bits is MIT +
+      Commons Clause v1.0 — application use is permitted, sale/sub-licensing of
+      the source is not; vendoring for catalog previews + agent delivery is in
+      scope with attribution. `taxonomy/sources.json` react-bits updated to
+      `available` with the no-resale limit recorded verbatim
+- [x] Taxonomy growth: categories `motion` + `micro-interactions` (24 total);
+      attributes `gsap`, `motion`, `canvas`, `ogl` (25 total)
+- [x] Schema: `runtime` + `heavy` entry fields (validator enum + docs)
+- [x] MASTER_SPEC §12 amendment (gsap, @gsap/react, motion, matter-js) +
+      M6 milestone + changelog v1.3; AGENTS.md dependency rule + command table
+- [x] package.json: `ingest-reactbits` alias; new runtime deps installed after
+      the amendment: gsap 3.15, @gsap/react 2.1.2, motion 14.6, matter-js 0.20
+- [x] Tests: 10 new node tooling tests for the react-bits helpers (anchored
+      import scanning, runtime classification, entry/manifest composition,
+      replaceEntry upsert semantics, 404 handling) — 64/64 green; app tests
+      updated to the 87-entry reality — 94/94 green; typecheck + build green
+- Catalog truth: **87 entries, all local** (per-source: shadcn 16 · magic-ui 4 ·
+  react-bits 61 · seeded 6). Preview kinds: 45 `local-demo` (6 seeded demos +
+  39 runtime-live react-bits) · 21 `source-link` (react-bits raw-WebGL variants) ·
+  21 official link cards (16 shadcn + 4 magic-ui docs + AnimatedList opt-out)
+
 ## 6) Future work (explicitly not now)
 
 - Catalog JSON Schema file for cross-tool validation

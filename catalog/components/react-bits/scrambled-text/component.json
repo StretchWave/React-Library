@@ -1,0 +1,30 @@
+{
+  "entryId": "react-bits-scrambled-text",
+  "source": "react-bits",
+  "externalId": "ScrambledText",
+  "registryItem": "ScrambledText-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/ScrambledText-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/text-animations/scrambled-text",
+  "group": "text-animations",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "ScrambledText.css",
+      "type": "registry:file"
+    },
+    {
+      "path": "ScrambledText.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [
+    "gsap@^3.13.0"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

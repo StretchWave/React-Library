@@ -1,0 +1,28 @@
+{
+  "entryId": "react-bits-dot-grid",
+  "source": "react-bits",
+  "externalId": "DotGrid",
+  "registryItem": "DotGrid-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/DotGrid-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/backgrounds/dot-grid",
+  "group": "backgrounds",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "DotGrid.css",
+      "type": "registry:file"
+    },
+    {
+      "path": "DotGrid.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

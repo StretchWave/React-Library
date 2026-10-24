@@ -1,0 +1,28 @@
+{
+  "entryId": "react-bits-circular-gallery",
+  "source": "react-bits",
+  "externalId": "CircularGallery",
+  "registryItem": "CircularGallery-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/CircularGallery-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/components/circular-gallery",
+  "group": "components",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "CircularGallery.css",
+      "type": "registry:file"
+    },
+    {
+      "path": "CircularGallery.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

@@ -1,0 +1,28 @@
+{
+  "entryId": "react-bits-gradient-text",
+  "source": "react-bits",
+  "externalId": "GradientText",
+  "registryItem": "GradientText-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/GradientText-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/text-animations/gradient-text",
+  "group": "text-animations",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "GradientText.css",
+      "type": "registry:file"
+    },
+    {
+      "path": "GradientText.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

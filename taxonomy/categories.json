@@ -23,6 +23,8 @@
     { "id": "3d-webgl", "label": "3D & WebGL", "description": "3D and WebGL-driven elements." },
     { "id": "scroll-animations", "label": "Scroll Animations", "description": "Scroll-triggered reveals and effects." },
     { "id": "page-sections", "label": "Page Sections", "description": "Reusable marketing or app sections." },
-    { "id": "page-layouts", "label": "Page Layouts", "description": "Complete page layouts." }
+    { "id": "page-layouts", "label": "Page Layouts", "description": "Complete page layouts." },
+    { "id": "motion", "label": "Motion", "description": "Motion and scroll-driven animation primitives." },
+    { "id": "micro-interactions", "label": "Micro Interactions", "description": "Small interactive feedback effects." }
   ]
 }

@@ -1,0 +1,30 @@
+{
+  "entryId": "react-bits-rotating-text",
+  "source": "react-bits",
+  "externalId": "RotatingText",
+  "registryItem": "RotatingText-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/RotatingText-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/text-animations/rotating-text",
+  "group": "text-animations",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "RotatingText.css",
+      "type": "registry:file"
+    },
+    {
+      "path": "RotatingText.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [
+    "motion@^12.23.12"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

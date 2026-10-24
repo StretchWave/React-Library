@@ -1,0 +1,31 @@
+{
+  "entryId": "react-bits-elastic-slider",
+  "source": "react-bits",
+  "externalId": "ElasticSlider",
+  "registryItem": "ElasticSlider-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/ElasticSlider-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/components/elastic-slider",
+  "group": "components",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "ElasticSlider.css",
+      "type": "registry:file"
+    },
+    {
+      "path": "ElasticSlider.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [
+    "@hugeicons/react@^1.1.10",
+    "@hugeicons/core-free-icons@^4.3.3"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

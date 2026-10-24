@@ -344,6 +344,40 @@ Staged; see `IMPLEMENTATION_CHECKLIST.md` §5.x for per-stage status.
 6. **M5.6 Validation + release** — schema/ingestion/selection/prompt/clipboard tests;
    `npm run verify` full flagless gate remains the release gate; docs match reality.
 
+### M6 — Correction: animation-first discovery (2026-10-24, in progress)
+
+User correction on top of M5: turn the app into an animation-first discovery tool for
+genuinely interesting React UI components, with a real preview workspace and honest
+preview-class handling. Staged; see `IMPLEMENTATION_CHECKLIST.md` §6.x.
+
+1. **M6.1 Animation-first ingestion** — React Bits (MIT + Commons Clause v1.0) items
+   vendored from the official registry (`https://reactbits.dev/r/{Name}-TS-CSS.json`,
+   official channel). Commons Clause bars selling/sub-licensing the component source;
+   application use is permitted, so vendoring for catalog previews and agent delivery
+   is in scope with attribution in every entry. Items whose vendored variant is raw
+   WebGL/three.js are vendored for the target project, but their previews stay
+   `source-link` (official demo) — never advertised as live. 3D showcases without a
+   plain-CSS variant stay external-reference entries. Taxonomy growth: categories
+   `motion`, `micro-interactions`; attributes `gsap`, `motion`, `canvas`, `ogl`;
+   entry fields `runtime` (preview engine class), `heavy` (workspace-only auto-play).
+2. **M6.2 Preview workspace** — dedicated `#/preview/<id>` route: big live canvas for
+   entries whose vendored implementation runs in this app (runtime `dom`, `gsap`,
+   `motion`, `physics`), with replay, viewport widths, background modes, per-entry
+   property controls, source/dependency/retrieval/license info, related components,
+   and the selection toggle. Non-runnable previews show their honest kind plus the
+   official link button. Untrusted-code policy: vendored component code runs only
+   through reviewed per-entry showcase wrappers in `src/catalog/showcases/`; the app
+   never executes arbitrary ingested code.
+3. **M6.3 Visual gallery** — preview-first cards with on-demand play (Intersection
+   Observer), a global motion toggle, heavy entries gated behind the workspace, and
+   honest source-link/external cards for non-runnable previews.
+4. **M6.4 App runtime for animation** — `gsap`, `@gsap/react`, `motion`, `matter-js`
+   added (§12 amendment) to run the vendored live components; a small `cn` shim at
+   `src/lib/cn.ts` provides the `@/lib/utils` helper surface for vendored sources.
+   three.js/OGL are deliberately not bundled.
+5. **M6.5 Tests, docs, release** — metadata/lookup tests, workspace/gallery/prompt
+   app tests, README/checklist/spec sync, full flagless `npm run verify`.
+
 ## 11) Verification gates
 
 ```text
@@ -371,10 +405,16 @@ npm run verify
 | `vitest`, `jsdom`, `@testing-library/react` | dev | App-side testing. |
 | `@testing-library/dom` | dev | Mandatory peer of `@testing-library/react` v16 (npm auto-installed). *Amendment 2026-10-24.* |
 | *(none)* test-Runner for Node script tooling | dev | `node:test` is built-in — zero deps. |
+| `gsap`, `@gsap/react` | runtime | Animation engine for vendored React Bits previews (declared by those sources). *Amendment 2026-10-24, M6.4.* |
+| `motion` | runtime | Framer Motion class API via `motion/react`, used by vendored sources. *Amendment 2026-10-24, M6.4.* |
+| `matter-js` | runtime | 2D physics for vendored physics-based previews (e.g. Falling Text). *Amendment 2026-10-24, M6.4.* |
 
 Anything else requires: spec §12 amendment + AGENTS.md update + checklist decision log,
 **before** installation. No UI kits, CSS frameworks, routers, state managers, or
-center-block libs of any kind.
+center-block libs of any kind. Animation engines are allowed **only** because
+M6 previews render officially-vendored component sources that declare them;
+`src/catalog/showcases/` must not pull in further engines (three.js/OGL remain
+excluded) without a new §12 amendment.
 
 ## 13) Placeholder policy
 
@@ -402,3 +442,7 @@ masquerades as working. When done, status flips to *working* with the evidence
 - **v1.2 — 2026-10-24:** M5 milestone added (real ingestion, gallery, multi-selection,
   master prompt generation); §5.4 extended with schema v2 taxonomies
   (aesthetics/attributes/sources) and v2 entry fields.
+- **v1.3 — 2026-10-24:** M6 milestone added (animation-first correction: React Bits
+  ingestion, preview workspace, visual gallery, prompt/status extensions); §12
+  amended to allow the animation runtimes (`gsap`, `@gsap/react`, `motion`,
+  `matter-js`) and entry fields `runtime`/`heavy`.

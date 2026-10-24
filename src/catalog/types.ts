@@ -73,6 +73,13 @@ export interface CatalogEntry {
   aesthetics?: string[];
   attributes?: string[];
   syncedAt?: string;
+  // --- M6 correction: animation runtime of a vendored component's preview
+  // engine ("css" | "dom" | "gsap" | "motion" | "physics" | "webgl" |
+  // "tailwind" | "three"); absent for classic in-app demo entries.
+  runtime?: string;
+  // --- M6 correction: expensive preview — workspace-only auto-play; gallery
+  // cards render a placeholder until the preview workspace opens it.
+  heavy?: boolean;
 }
 
 /** True entry type, applying the "absent means local" default. */

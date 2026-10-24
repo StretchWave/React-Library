@@ -70,6 +70,12 @@ const ENTRY_FIELDS = new Set([
   "aesthetics",
   "attributes",
   "syncedAt",
+  // --- M6 correction: animation runtime of a vendored component (preview engine
+  // selector): "css" | "dom" | "gsap" | "motion" | "webgl" | "tailwind" | "three"
+  "runtime",
+  // --- M6 correction: expensive preview (workspace-only auto-play; gallery
+  // cards render a placeholder until the user opens the preview workspace).
+  "heavy",
 ]);
 
 const TOP_LEVEL_FIELDS = new Set(["schemaVersion", "meta", "entries"]);
@@ -322,6 +328,10 @@ export function validateCatalog(catalog, taxonomies, { root = repoRoot(), checkL
 
     if (!isSlugValue(id)) {
       errors.push(`${label}: invalid id slug (got "${str(id)}")`);
+    }
+    const RUNTIMES = new Set(["css", "dom", "gsap", "motion", "physics", "webgl", "tailwind", "three"]);
+    if ("runtime" in entry && !RUNTIMES.has(String(entry.runtime))) {
+      errors.push(`${label}: 'runtime' must be one of ${[...RUNTIMES].join(", ")}`);
     }
     if (entryIds.has(id)) errors.push(`${label}: duplicate id "${id}"`);
     if (id) entryIds.add(id);

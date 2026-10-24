@@ -95,7 +95,7 @@ describe("App (M2 component browser)", () => {
   it("filters by query from the search box", () => {
     renderApp();
     fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "tabs" } });
-    expect(screen.getByRole("status").textContent).toContain("2 of 33 components");
+    expect(screen.getByRole("status").textContent).toContain("2 of 87 components");
     expect(entryItem("TabSheet")).toBeTruthy();
     expect(screen.queryByRole("button", { name: /^Alert\b/ })).toBeNull();
   });
@@ -103,14 +103,14 @@ describe("App (M2 component browser)", () => {
   it("filters by category via the taxonomy-driven select", () => {
     renderApp();
     fireEvent.change(screen.getByLabelText("Category"), { target: { value: "inputs" } });
-    expect(screen.getByRole("status").textContent).toContain("3 of 33 components");
+    expect(screen.getByRole("status").textContent).toContain("5 of 87 components");
     expect(screen.getByRole("button", { name: /^TextInput\b/ })).toBeTruthy();
   });
 
   it("filters by theme via the taxonomy-driven select", () => {
     renderApp();
     fireEvent.change(screen.getByLabelText("Filter by theme"), { target: { value: "retro-terminal" } });
-    expect(screen.getByRole("status").textContent).toContain("33 of 33 components");
+    expect(screen.getByRole("status").textContent).toContain("87 of 87 components");
   });
 
   it("shows the filter empty state and restores on Reset filters", () => {
@@ -118,7 +118,7 @@ describe("App (M2 component browser)", () => {
     fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "zzz-no-match" } });
     expect(screen.getByText(/No components match/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Reset filters" }));
-    expect(screen.getByRole("status").textContent).toBe("33 components");
+    expect(screen.getByRole("status").textContent).toBe("87 components");
     expect(entryItem("Button")).toBeTruthy();
   });
 
@@ -187,8 +187,9 @@ describe("FilterBar (M2)", () => {
 
   it("exposes labeled category and theme selects", () => {
     render(<FilterBar {...defaultProps()} />);
-    // 1 "All categories" + 22 taxonomy categories (extended set since catalog v2)
-    expect((screen.getByLabelText("Category") as HTMLSelectElement).options.length).toBe(23);
+    // 1 "All categories" + 24 taxonomy categories (extended set since catalog v2,
+    // + motion & micro-interactions added for the M6 animation-first correction)
+    expect((screen.getByLabelText("Category") as HTMLSelectElement).options.length).toBe(25);
     // 1 "All themes" + 6 application appearance themes
     expect((screen.getByLabelText("Filter by theme") as HTMLSelectElement).options.length).toBe(7);
     // M5.3: 1 all + 12 aesthetics, 1 + 9 sources, 3 availability options
@@ -262,13 +263,13 @@ describe("App (M5.3 gallery)", () => {
     renderApp();
     fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
     const grid = screen.getByRole("list", { name: /component gallery/i });
-    expect(grid.querySelectorAll("li[data-entry-id]").length).toBe(33);
+    expect(grid.querySelectorAll("li[data-entry-id]").length).toBe(87);
     // Seeded six render the vetted live demo; ingested tailwind items link out.
     expect(document.querySelector('li[data-preview-kind="local-demo"][data-entry-id="button"]')).toBeTruthy();
     const official = screen.getAllByRole("link", { name: /Open official preview/ });
-    expect(official.length).toBe(20); // 16 shadcn + 4 Magic UI official doc pages
+    expect(official.length).toBe(21); // 16 shadcn + 4 Magic UI doc pages + 1 react-bits opt-out (AnimatedList)
     expect(official.some((link) => (link.getAttribute("href") ?? "").includes("ui.shadcn.com"))).toBe(true);
-    expect(screen.getAllByRole("link", { name: /View at source/ }).length).toBe(7);
+    expect(screen.getAllByRole("link", { name: /View at source/ }).length).toBe(21); // raw-WebGL react-bits variants (vendored, official demo only)
   });
 
   it("supports source filtering inside the gallery view", () => {
@@ -277,11 +278,13 @@ describe("App (M5.3 gallery)", () => {
     fireEvent.change(screen.getByLabelText("Filter by source library"), {
       target: { value: "react-bits" },
     });
-    expect(screen.getByRole("status").textContent).toContain("7 of 33 entries");
-    const externalChips = screen
-      .getAllByText("external reference")
-      .filter((chip) => chip.className === "type-chip");
-    expect(externalChips.length).toBe(7);
+    expect(screen.getByRole("status").textContent).toContain("61 of 87 entries");
+    // React Bits items are all vendored (local) now; honest preview kinds remain:
+    // runnable ones will become live (runtime recorded), raw-WebGL ones stay links.
+    expect(document.querySelector('li[data-preview-kind="source-link"][data-entry-id="react-bits-fluid-glass"]')).toBeTruthy();
+    expect(
+      document.querySelectorAll('li[data-preview-kind="local-demo"][data-entry-id^="react-bits-"]').length,
+    ).toBe(39); // 39 runtime-live vendored items (dom/gsap/motion/physics, minus one opt-out)
   });
 
   it("the #/gallery deep link opens the gallery and filters persist across views", () => {
@@ -291,7 +294,7 @@ describe("App (M5.3 gallery)", () => {
     fireEvent.change(screen.getByLabelText("Search components"), {
       target: { value: "pattern" },
     });
-    expect(screen.getByRole("status").textContent).toContain("2 of 33 entries");
+    expect(screen.getByRole("status").textContent).toContain("2 of 87 entries");
     fireEvent.click(screen.getByRole("button", { name: "Browser" }));
     expect((screen.getByLabelText("Search components") as HTMLInputElement).value).toBe("pattern");
   });
@@ -333,12 +336,12 @@ describe("App (M5.4 multi-selection)", () => {
       target: { value: "react-bits" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Select all visible results" }));
-    expect(trayCount()).toBe("7");
+    expect(trayCount()).toBe("61");
     // Selection must survive filter/search changes (spec M5.4).
     fireEvent.change(screen.getByLabelText("Filter by source library"), { target: { value: "" } });
     fireEvent.change(screen.getByLabelText("Catalog availability"), { target: { value: "local" } });
-    expect(trayCount()).toBe("7");
-    expect(screen.getByRole("status").textContent).toContain("26 of 33 entries");
+    expect(trayCount()).toBe("61");
+    expect(screen.getByRole("status").textContent).toContain("87 of 87 entries");
     fireEvent.click(screen.getByRole("button", { name: "Clear all" }));
     expect(trayCount()).toBe("0");
   });
@@ -380,7 +383,7 @@ describe("App (M5.4 multi-selection)", () => {
     fireEvent.click(entryItem("Button"));
     fireEvent.click(screen.getByRole("checkbox", { name: "Select Button for the master prompt" }));
     // The selection count chip in the header reflects browser-view selections.
-    expect(screen.getByText(/^26 local · 7 external · 1 selected$/)).toBeTruthy();
+    expect(screen.getByText(/^87 local · 0 external · 1 selected$/)).toBeTruthy();
   });
 
   it("generate master prompt opens the prompt view with the selection intact", () => {
@@ -406,7 +409,7 @@ describe("App (M5.4 multi-selection)", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Generate master prompt" }));
     const promptEl = screen.getByLabelText("Generated master prompt");
-    expect(promptEl.textContent).toContain("- Official retrieval (use exactly): npx shadcn@latest add");
+    expect(promptEl.textContent).toContain("- Official retrieval (alternative channel): npx shadcn@latest add");
     expect(promptEl.textContent).toContain("Commons Clause");
   });
 

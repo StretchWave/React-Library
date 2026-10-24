@@ -1,0 +1,26 @@
+{
+  "entryId": "react-bits-decrypted-text",
+  "source": "react-bits",
+  "externalId": "DecryptedText",
+  "registryItem": "DecryptedText-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/DecryptedText-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/text-animations/decrypted-text",
+  "group": "text-animations",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "DecryptedText.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [
+    "motion@^12.23.12"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

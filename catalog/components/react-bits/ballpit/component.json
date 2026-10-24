@@ -1,0 +1,24 @@
+{
+  "entryId": "react-bits-ballpit",
+  "source": "react-bits",
+  "externalId": "Ballpit",
+  "registryItem": "Ballpit-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/Ballpit-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/backgrounds/ballpit",
+  "group": "backgrounds",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "Ballpit.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

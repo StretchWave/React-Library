@@ -230,21 +230,34 @@ test("index: deterministic shape and counts", () => {
   assert.deepEqual(a, b);
   assert.equal(a.schemaVersion, 2);
   assert.deepEqual(a.counts, {
-    entries: 33,
+    entries: 87,
     themes: 6,
-    categories: 22,
+    categories: 24,
     aesthetics: 12,
     sources: 9,
-    byEntryType: { local: 26, external: 7 },
-    bySource: { shadcn: 16, "magic-ui": 4, "react-bits": 7 },
+    byEntryType: { local: 87, external: 0 },
+    bySource: { shadcn: 16, "magic-ui": 4, "react-bits": 61 },
   });
   assert.equal(a.generator, "scripts/generate-index.mjs");
-  assert.equal(a.entries.length, 33);
+  assert.equal(a.entries.length, 87);
   assert.equal(a.entries[0].id, "alert");
   assert.equal(a.entries[a.entries.length - 1].id, "text-input");
   assert.ok(a.entries.some((entry) => entry.id === "shadcn-button"));
   assert.ok(a.entries.some((entry) => entry.id === "magic-ui-dot-pattern"));
-  assert.ok(a.entries.some((entry) => entry.id === "react-bits-split-text" && entry.entryType === "external"));
+  assert.ok(
+    a.entries.some(
+      (entry) =>
+        entry.id === "react-bits-split-text" &&
+        entry.entryType === "local" &&
+        entry.runtime === "gsap" &&
+        entry.preview.type === "local-demo",
+    ),
+  );
+  assert.ok(
+    a.entries.some(
+      (entry) => entry.id === "react-bits-fluid-glass" && entry.runtime === "webgl" && entry.preview.type === "source-link",
+    ),
+  );
   assert.deepEqual(a.taxonomies.categories.slice(0, 6), ["buttons", "inputs", "layout", "display", "feedback", "navigation"]);
   assert.deepEqual(a.taxonomies.aesthetics, [
     "professional", "casual", "minimal", "luxury", "cyberpunk", "retro-synthwave",

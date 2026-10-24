@@ -75,7 +75,7 @@ test("lookup without arguments is a usage error", () => {
 test("generate writes the index; validate --check-index accepts it", () => {
   const generated = run("scripts/generate-index.mjs");
   assert.equal(generated.status, 0, generated.stderr);
-  assert.ok(generated.stdout.includes("33 entries"));
+  assert.ok(generated.stdout.includes("87 entries"));
 
   const validated = run("scripts/validate-catalog.mjs", ["--check-index"]);
   assert.equal(validated.status, 0, validated.stdout);

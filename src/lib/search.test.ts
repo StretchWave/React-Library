@@ -48,10 +48,16 @@ describe("searchEntries (app side)", () => {
   });
 
   it("applies the v2 filters (aesthetic, source, attribute, entryType)", () => {
-    const external = searchEntries(entries, "", { entryType: "external" });
-    expect(external).toHaveLength(7);
-    expect(external.every((entry) => (entry.source ?? "").startsWith("react-bits"))).toBe(true);
-    expect(searchEntries(entries, "", { source: "react-bits" })).toEqual(external);
+    // With the M6 correction every React Bits item got vendored (local), so the
+    // real catalog has no external references left; assert that honestly.
+    const externals = searchEntries(entries, "", { entryType: "external" });
+    expect(externals).toHaveLength(0);
+    // React Bits source filter → the 61 vendored items, all local entries.
+    const reactBits = searchEntries(entries, "", { source: "react-bits" });
+    expect(reactBits).toHaveLength(61);
+    expect(reactBits.every((entry) => (entry.source ?? "").startsWith("react-bits") && entry.entryType === "local")).toBe(
+      true,
+    );
     expect(searchEntries(entries, "", { source: "shadcn" })).toHaveLength(16);
     expect(searchEntries(entries, "", { aesthetic: "minimal" }).length).toBeGreaterThan(0);
     expect(searchEntries(entries, "", { attribute: "particles" })).toEqual([]);

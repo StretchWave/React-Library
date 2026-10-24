@@ -1,0 +1,30 @@
+{
+  "entryId": "react-bits-text-type",
+  "source": "react-bits",
+  "externalId": "TextType",
+  "registryItem": "TextType-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/TextType-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/text-animations/text-type",
+  "group": "text-animations",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "TextType.css",
+      "type": "registry:file"
+    },
+    {
+      "path": "TextType.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [
+    "gsap@^3.13.0"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

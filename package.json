@@ -14,6 +14,7 @@
     "test": "node --test \"tests/*.test.mjs\"",
     "ingest-shadcn": "node scripts/ingest-shadcn.mjs",
     "ingest-magicui": "node scripts/ingest-magicui.mjs",
+    "ingest-reactbits": "node scripts/ingest-reactbits.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
@@ -33,6 +34,10 @@
     "vitest": "^5.0.5"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
+    "gsap": "^3.15.0",
+    "matter-js": "^0.20.0",
+    "motion": "^14.6.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   }

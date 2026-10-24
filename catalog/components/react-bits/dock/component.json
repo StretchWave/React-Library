@@ -1,0 +1,30 @@
+{
+  "entryId": "react-bits-dock",
+  "source": "react-bits",
+  "externalId": "Dock",
+  "registryItem": "Dock-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/Dock-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/components/dock",
+  "group": "components",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "Dock.css",
+      "type": "registry:file"
+    },
+    {
+      "path": "Dock.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [
+    "react-dom@^19.0.0"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

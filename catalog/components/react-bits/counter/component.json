@@ -1,0 +1,28 @@
+{
+  "entryId": "react-bits-counter",
+  "source": "react-bits",
+  "externalId": "Counter",
+  "registryItem": "Counter-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/Counter-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/components/counter",
+  "group": "components",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "Counter.css",
+      "type": "registry:file"
+    },
+    {
+      "path": "Counter.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

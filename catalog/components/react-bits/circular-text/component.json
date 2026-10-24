@@ -1,0 +1,30 @@
+{
+  "entryId": "react-bits-circular-text",
+  "source": "react-bits",
+  "externalId": "CircularText",
+  "registryItem": "CircularText-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/CircularText-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/text-animations/circular-text",
+  "group": "text-animations",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "CircularText.css",
+      "type": "registry:file"
+    },
+    {
+      "path": "CircularText.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [
+    "motion@^12.23.12"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

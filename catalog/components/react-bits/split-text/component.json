@@ -1,0 +1,27 @@
+{
+  "entryId": "react-bits-split-text",
+  "source": "react-bits",
+  "externalId": "SplitText",
+  "registryItem": "SplitText-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/SplitText-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/text-animations/split-text",
+  "group": "text-animations",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "SplitText.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [
+    "gsap@^3.13.0",
+    "@gsap/react@^2.1.2"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

@@ -1,6 +1,7 @@
 // Master-prompt builder tests (M5.5). Facts in the generated prompt must be
 // traceable to the canonical records — verified against the real catalog.
 import { describe, expect, it } from "vitest";
+import type { CatalogEntry } from "../catalog/types";
 import { entries, findEntry } from "../catalog/client";
 import { buildMasterPrompt } from "./prompt";
 
@@ -38,13 +39,44 @@ describe("buildMasterPrompt (M5.5)", () => {
     }
   });
 
-  it("surfaces the Commons Clause notice verbatim and never fabricates paths for reference-only entries", () => {
+  it("carries the Commons Clause notice verbatim into vendored react-bits sections", () => {
     const entry = findEntry("react-bits-split-text")!;
     const prompt = buildMasterPrompt(["react-bits-split-text"], FULL_ENTRIES);
-    expect(prompt).toContain("external reference");
-    expect(prompt).toContain(`- Official retrieval (use exactly): ${entry.retrieval}`);
+    expect(entry.entryType).toBe("local");
+    expect(entry.runtime).toBe("gsap");
+    expect(prompt).toContain("Split Text (React Bits) (react-bits-split-text) — local");
+    expect(prompt).toContain(`- Manifest: ${entry.manifest}`);
+    expect(prompt).toContain(`- Implementation files (copy verbatim): ${entry.implementation?.join(", ")}`);
+    expect(prompt).toContain(`- Official retrieval (alternative channel): ${entry.retrieval}`);
     expect(prompt).toContain(`notice: ${entry.license?.note}`);
-    // A reference-only entry must not acquire local paths in the prompt.
+    expect(prompt).toContain("- Requires in the target project: gsap");
+    expect(prompt).toContain("- Preview: live in the React Library preview workspace (runtime: gsap)");
+  });
+
+  it("never fabricates paths for external-reference records (synthetic catalog)", () => {
+    const externalEntry = {
+      id: "synthetic-ext",
+      name: "Synthetic Ext",
+      summary: "s",
+      category: "display",
+      themes: [],
+      aliases: [],
+      tags: [],
+      status: "stable",
+      version: "1.0.0",
+      addedDate: "2026-10-24",
+      externalDependencies: [],
+      props: [],
+      entryType: "external",
+      source: "aceternity",
+      sourceUrl: "https://example.test/a",
+      retrieval: "official channel only",
+      license: { spdx: "Custom", note: "no redistribution permitted" },
+    } as unknown as CatalogEntry;
+    const prompt = buildMasterPrompt(["synthetic-ext"], [externalEntry]);
+    expect(prompt).toContain("Synthetic Ext (synthetic-ext) — external reference");
+    expect(prompt).toContain("- Official retrieval (use exactly): official channel only");
+    expect(prompt).toContain("- Preview: external only — rendered demo runs outside this app:");
     expect(prompt).not.toContain("- Source path in this repo:");
     expect(prompt).not.toContain("- Manifest:");
   });

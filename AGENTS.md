@@ -12,10 +12,10 @@ Where docs disagree, `MASTER_SPEC.md` wins.
 2. **`catalog/catalog.json` is canonical.** `catalog/index.json` is generated — never
    hand-edit it; run `npm run generate` after any data change.
 3. **No new dependencies** without first amending `MASTER_SPEC.md` §12, this file, and
-   the checklist. The allowed set is exactly §12 (runtime `react`/`react-dom`; dev
-   toolchain incl. `@testing-library/dom`, the mandatory peer of
-   `@testing-library/react` v16). Test-only `node:test` suites in `tests/` must stay
-   zero-dependency.
+   the checklist. The allowed set is exactly §12 (runtime `react`/`react-dom` plus the
+   M6 animation runtimes `gsap`, `@gsap/react`, `motion`, `matter-js`; dev toolchain
+   incl. `@testing-library/dom`, the mandatory peer of `@testing-library/react` v16).
+   Test-only `node:test` suites in `tests/` must stay zero-dependency.
 4. **Components style with `--rl-*` variables only** (see §Theming rules). No hex/rgb
    literals in `src/components/**/*.css`; `tests/css-theming.test.mjs` (M2+) enforces it.
 5. **Honest status.** Unimplemented = placeholder, registered in
@@ -33,6 +33,7 @@ Where docs disagree, `MASTER_SPEC.md` wins.
 | `npm run dev` / `build` / `preview` / `typecheck` | App toolchain (M1+). |
 | `npm run test:app` | Vitest suites for the app (M1+). |
 | `npm run ingest-shadcn` / `npm run ingest-magicui` | Re-run the official-registry ingestion adapters (M5). Dry-run default; `--write` vendors files + merges entries idempotently. |
+| `npm run ingest-reactbits` | React Bits animation-first ingestion adapter (M6): vendors the official `TS-CSS` variant of curated items and composes entries. Dry-run default; `--write` vendors + updates; `--only=slug,...` narrows the run. |
 | `npm run verify` | Full release gate (M1+). Since M3 the link checks run everywhere — component files exist. |
 
 > PowerShell: pass CLI flags with `npm run x -- --flag`, lookup args with

@@ -47,7 +47,7 @@ describe("PromptStudio", () => {
     await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
     const text = writeText.mock.calls[0]![0] as string;
     expect(text).toContain("# Master prompt — React Library component build");
-    expect(text).toContain("npx shadcn@latest add @react-bits/SplitText");
+    expect(text).toContain("npx shadcn@latest add https://reactbits.dev/r/SplitText-TS-CSS.json");
     expect(screen.getByText("Copied ✓")).toBeTruthy();
 
     // The raw prompt text is readable in the studio itself.

@@ -1,0 +1,32 @@
+{
+  "entryId": "react-bits-masonry",
+  "source": "react-bits",
+  "externalId": "Masonry",
+  "registryItem": "Masonry-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/Masonry-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/components/masonry",
+  "group": "components",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "Masonry.css",
+      "type": "registry:file"
+    },
+    {
+      "path": "Masonry.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [
+    "react-dom@^19.0.0",
+    "@hugeicons/react@^1.1.10",
+    "@hugeicons/core-free-icons@^4.3.3"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

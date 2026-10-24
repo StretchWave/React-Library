@@ -63,12 +63,12 @@
       "name": "React Bits",
       "url": "https://reactbits.dev/",
       "repo": "https://github.com/DavidHDev/react-bits",
-      "accessMethod": "official-docs",
-      "status": "reference-only",
+      "accessMethod": "official-registry",
+      "status": "available",
       "license": "MIT + Commons Clause v1.0 (LICENSE.md verified 2026-10-24)",
       "auth": "none",
-      "limit": "Commons Clause forbids selling, sublicensing, or redistributing the components themselves - alone, bundled, or ported.",
-      "notes": "215+ animated components. Use in applications is permitted, but a component catalog redistributing the files would cross the Commons Clause restriction, so this catalog stores metadata, official demo links, and retrieval instructions only; the receiving agent fetches code from the official source."
+      "limit": "Commons Clause forbids selling, sublicensing, or redistributing the components themselves - alone, bundled, or ported. Application use is permitted.",
+      "notes": "Animation-first library (~230 components across text-animations/animations/components/backgrounds/micro). Official shadcn-compatible registry verified live at https://reactbits.dev/r/{Name}-{variant}.json with variants TS-CSS, TS-TW, JS-CSS, JS-TW per item. Vendoring policy (M6 correction): the TS-CSS variant is vendored for catalog previews and agent delivery - this is application use, not sale - with attribution and the no-resale clause recorded in every entry. Components whose variant is raw WebGL/Three.js are vendored but never advertised as live in this app's preview; official demo links stay attached."
     },
     {
       "id": "aceternity",

@@ -1,0 +1,26 @@
+{
+  "entryId": "react-bits-fade-content",
+  "source": "react-bits",
+  "externalId": "FadeContent",
+  "registryItem": "FadeContent-TS-CSS",
+  "registryVariant": "TS-CSS",
+  "registryUrl": "https://reactbits.dev/r/FadeContent-TS-CSS.json",
+  "docsUrl": "https://reactbits.dev/animations/fade-content",
+  "group": "animations",
+  "type": "registry:component",
+  "files": [
+    {
+      "path": "FadeContent.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": [
+    "gsap@^3.13.0"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
+  },
+  "fetchedAt": "2026-10-24"
+}

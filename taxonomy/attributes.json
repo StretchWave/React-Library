@@ -22,6 +22,10 @@
     { "id": "css", "label": "Plain CSS", "group": "tech" },
     { "id": "tailwind", "label": "Tailwind", "group": "tech" },
     { "id": "threejs", "label": "Three.js", "group": "tech" },
-    { "id": "webgl", "label": "WebGL", "group": "tech" }
+    { "id": "webgl", "label": "WebGL", "group": "tech" },
+    { "id": "gsap", "label": "GSAP", "group": "tech" },
+    { "id": "motion", "label": "Motion / Framer Motion", "group": "tech" },
+    { "id": "canvas", "label": "Canvas 2D", "group": "tech" },
+    { "id": "ogl", "label": "OGL (WebGL helper)", "group": "tech" }
   ]
 }

@@ -18,7 +18,12 @@ const RULES: string[] = [
   "For entries marked `external reference`, use ONLY the official retrieval instructions shown; never fabricate local paths for them.",
   "Respect every license notice verbatim — components whose license forbids redistribution must be consumed through the official channel, not vendored.",
   "Verify any single record at any time with: npm run lookup -- <id> --json",
+  "Declare where each selected component is used in the target project (which page/section it belongs to) and wire real responsive behavior: fluid sizing, safe wrap/scroll, and touch targets that work without hover-only interactions.",
+  "Keep the target project's design constraints coherent: match the recorded aesthetics/attributes of each component to the surrounding theme, and honor prefers-reduced-motion where the component animates continuously.",
+  "After integration, verify every component: no console errors, correct behavior at 375/768/1280 viewport widths, and the attribution/license notices intact in the shipped code.",
 ];
+
+const WORKSPACE_PREVIEW: string = "live in the React Library preview workspace";
 
 function licenseLine(entry: CatalogEntry): string | null {
   const license = entry.license;
@@ -57,6 +62,34 @@ function externalSection(entry: CatalogEntry): string[] {
   return lines;
 }
 
+/** Honest preview status derived from the record (mirrors the gallery rules:
+ *  local-demo = runnable in the app's preview workspace; anything else names
+ *  its limitation and the official URL). Records without a `preview` object
+ *  resolve through their entry type: locals run in-app, externals do not. */
+function previewLine(entry: CatalogEntry): string {
+  const kind = entry.preview?.type;
+  if (!kind) {
+    if (entryTypeOf(entry) === "external") {
+      return `- Preview: external only — rendered demo runs outside this app: ${entry.sourceUrl ?? "URL not recorded"}`;
+    }
+    return `- Preview: ${WORKSPACE_PREVIEW} (vetted in-app demo)`;
+  }
+  switch (kind) {
+    case "local-demo": {
+      const runtime = entry.runtime ? ` (runtime: ${entry.runtime})` : "";
+      return `- Preview: ${WORKSPACE_PREVIEW}${runtime}`;
+    }
+    case "external":
+      return `- Preview: external only — rendered demo runs outside this app: ${entry.preview?.url ?? "URL not recorded"}`;
+    case "source-link":
+      return `- Preview: vendored code is not runnable in this app — official demo only: ${entry.preview?.url ?? entry.sourceUrl ?? "URL not recorded"}`;
+    case "static":
+      return `- Preview: static resource — ${entry.preview?.url ?? "URL not recorded"}`;
+    default:
+      return "- Preview: none recorded for this entry yet";
+  }
+}
+
 function entrySection(entry: CatalogEntry, position: number): string[] {
   const type = entryTypeOf(entry);
   const lines: string[] = [
@@ -66,6 +99,10 @@ function entrySection(entry: CatalogEntry, position: number): string[] {
   ];
   if (entry.description) lines.push(`- Description: ${entry.description}`);
   lines.push(...(type === "external" ? externalSection(entry) : localPathsSection(entry)));
+  lines.push(previewLine(entry));
+  if (entry.heavy) {
+    lines.push(`- Preview budget: heavy — let the user open it explicitly instead of auto-playing it.`);
+  }
   const license = licenseLine(entry);
   if (license) lines.push(`- License terms: ${license}`);
   if ((entry.dependencies ?? []).length > 0) {
