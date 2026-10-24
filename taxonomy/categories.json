@@ -1,12 +1,28 @@
 {
-  "schemaVersion": 1,
-  "description": "Canonical component categories. Entries in catalog/catalog.json must use categories from this list.",
+  "schemaVersion": 2,
+  "description": "Canonical component categories. Entries in catalog/catalog.json must use categories from this list. The original six broad buckets are kept first for the built-in library components; the extended set supports ingested granular elements (M5).",
   "categories": [
     { "id": "buttons", "label": "Buttons", "description": "Pressable action triggers." },
     { "id": "inputs", "label": "Inputs", "description": "Form controls that accept user input." },
-    { "id": "layout", "label": "Layout", "description": "Containers and structural building blocks." },
+    { "id": "layout", "label": "Layout", "description": "Cards, containers, and structural building blocks." },
     { "id": "display", "label": "Display", "description": "Static informational elements." },
-    { "id": "feedback", "label": "Feedback", "description": "Messages about system or user state." },
-    { "id": "navigation", "label": "Navigation", "description": "Controls for moving between views or panels." }
+    { "id": "feedback", "label": "Feedback", "description": "Messages about system or user state (alerts and feedback)." },
+    { "id": "navigation", "label": "Navigation", "description": "Controls for moving between views or panels." },
+    { "id": "tabs", "label": "Tabs", "description": "Tabbed switchers and panel sets." },
+    { "id": "tooltips", "label": "Tooltips", "description": "Tooltips and popovers." },
+    { "id": "modals", "label": "Modals", "description": "Modals and dialogs." },
+    { "id": "hero-sections", "label": "Hero Sections", "description": "Top-of-page hero blocks." },
+    { "id": "pricing-sections", "label": "Pricing Sections", "description": "Pricing tables and comparison blocks." },
+    { "id": "footers", "label": "Footers", "description": "Page footers." },
+    { "id": "backgrounds", "label": "Backgrounds", "description": "Animated or decorative backgrounds." },
+    { "id": "gradients", "label": "Gradients", "description": "Gradient and blend effects." },
+    { "id": "text-effects", "label": "Text Effects", "description": "Animated and stylized text." },
+    { "id": "loaders", "label": "Loaders", "description": "Spinners and loading indicators." },
+    { "id": "cursors", "label": "Cursors", "description": "Custom and follow cursors." },
+    { "id": "charts", "label": "Charts", "description": "Charts and data visualization." },
+    { "id": "3d-webgl", "label": "3D & WebGL", "description": "3D and WebGL-driven elements." },
+    { "id": "scroll-animations", "label": "Scroll Animations", "description": "Scroll-triggered reveals and effects." },
+    { "id": "page-sections", "label": "Page Sections", "description": "Reusable marketing or app sections." },
+    { "id": "page-layouts", "label": "Page Layouts", "description": "Complete page layouts." }
   ]
 }

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 2,
+  "description": "Independent component attributes, grouped into appearance / motion / tech facets. An entry may carry many attributes at once (e.g. dark + gradient + animated + tailwind). Ids are referenced in catalog entries and enforced by the validator.",
+  "attributes": [
+    { "id": "dark", "label": "Dark", "group": "appearance" },
+    { "id": "light", "label": "Light", "group": "appearance" },
+    { "id": "neon", "label": "Neon", "group": "appearance" },
+    { "id": "monochrome", "label": "Monochrome", "group": "appearance" },
+    { "id": "glassmorphism", "label": "Glassmorphism", "group": "appearance" },
+    { "id": "gradient", "label": "Gradient", "group": "appearance" },
+    { "id": "rounded", "label": "Rounded", "group": "appearance" },
+    { "id": "sharp", "label": "Sharp", "group": "appearance" },
+    { "id": "organic", "label": "Organic shapes", "group": "appearance" },
+    { "id": "geometric", "label": "Geometric shapes", "group": "appearance" },
+    { "id": "static", "label": "Static", "group": "motion" },
+    { "id": "animated", "label": "Animated", "group": "motion" },
+    { "id": "scroll-driven", "label": "Scroll-driven", "group": "motion" },
+    { "id": "particles", "label": "Particle effects", "group": "motion" },
+    { "id": "3d", "label": "3D / depth", "group": "motion" },
+    { "id": "react", "label": "React", "group": "tech" },
+    { "id": "typescript", "label": "TypeScript", "group": "tech" },
+    { "id": "css", "label": "Plain CSS", "group": "tech" },
+    { "id": "tailwind", "label": "Tailwind", "group": "tech" },
+    { "id": "threejs", "label": "Three.js", "group": "tech" },
+    { "id": "webgl", "label": "WebGL", "group": "tech" }
+  ]
+}

@@ -135,7 +135,7 @@ Detailed reference with examples: `docs/SCHEMA.md`. Summary:
 
 ### 5.4 Taxonomy files
 
-- `taxonomy/categories.json` → `{ "schemaVersion": 1, "categories": [{ "id", "label", "description?" }] }` (ids unique slugs).
+- `taxonomy/categories.json` → `{ "schemaVersion": 2, "categories": [{ "id", "label", "description?" }] }` (ids unique slugs). The original six buckets are retained; the M5 extended set adds granular component categories (tabs, tooltips, modals, hero-sections, pricing-sections, footers, backgrounds, gradients, text-effects, loaders, cursors, charts, 3d-webgl, scroll-animations, page-sections, page-layouts).
 - `taxonomy/themes.json` → `{ "schemaVersion": 1, "themes": [{ "id", "label", "base", "description", "tokens" }] }`
   - `base`: `"light"` | `"dark"`.
   - `tokens`: map of CSS-variable name → value string. It **must** define all nine
@@ -147,6 +147,23 @@ Detailed reference with examples: `docs/SCHEMA.md`. Summary:
   - Common optional tokens: `--rl-shadow`, `--rl-focus` (an `outline` shorthand),
     `--rl-backdrop` (glass blur). Components must treat every optional token as
     optional with a sane inline fallback.
+- **v2 (M5)** — three more canonical taxonomies (see `docs/SCHEMA.md` §v2 for the full
+  field rules):
+  - `taxonomy/aesthetics.json` — component *aesthetic* classifications
+    (`{ id, label }`). These describe the visual style of cataloged components and are
+    deliberately **distinct from the application appearance themes**, which style the
+    React Library app itself.
+  - `taxonomy/attributes.json` — independent attributes grouped into
+    `appearance | motion | tech` facets; entries may carry many at once.
+  - `taxonomy/sources.json` — the component source registry: `{ id, name, url, repo?,
+    accessMethod, status ∈ available|partial|reference-only|requires-auth|unavailable,
+    license, auth?, limit?, notes }`. An entry `source` must exist here; per-source
+    entry counts are derived into `catalog/index.json` only.
+- **v2 entry fields** (all optional; absent ⇒ legacy `local` entry): `entryType`,
+  `source`, `sourceUrl`, `externalId`, `retrieval`, `preview`, `localDir`, `manifest`,
+  `implementation`, `dependencies`, `license`, `aesthetics`, `attributes`, `syncedAt`.
+  External entries must not declare `localDir`/`manifest`/`implementation` — the
+  validator errors when a non-redistributable source is given fabricated local paths.
 
 ### 5.5 Schema evolution
 
@@ -299,6 +316,34 @@ library, no UI kit, no CSS framework.
 SSR, Storybook, npm publishing, per-theme alternate component layouts, i18n, visual
 regression by screenshot, component-level CSS variants decoupled from themes.
 
+### M5 — Real component ingestion, visual preview gallery, multi-selection,
+### master prompt generation (2026-10-24, in progress)
+
+Staged; see `IMPLEMENTATION_CHECKLIST.md` §5.x for per-stage status.
+
+1. **M5.1 Schema + source research** — catalog schema v2 (local/external model,
+   aesthetics/attributes/sources taxonomies, preview + license + provenance fields);
+   research-based source registry with verified access methods and licensing
+   (`taxonomy/sources.json`); validator, generator, lookup CLI, tests extended
+   together.
+2. **M5.2 Real ingestion** — adapters/curators that retrieve source data only
+   through officially supported channels; populate real verified entries across
+   categories and aesthetic themes; store local implementations only where the
+   license/permitted-use check passes; everything else is `reference-only` metadata
+   with official retrieval instructions.
+3. **M5.3 Gallery + previews** — component card grid with aesthetic/source/type
+   filters; honest preview modes (`local-demo | static | external | source-link |
+   none`); untrusted ingested code is never executed in the main app context.
+4. **M5.4 Multi-selection** — stable-id selection with accessible controls,
+   select-all-visible, clear-all, a selection tray, persistence across filters and
+   refreshes, and unavailable/missing-metadata detection.
+5. **M5.5 Master prompt generation** — target-project settings; prompt assembled
+   from canonical records only (exact local paths for local entries; official
+   retrieval instructions for external ones); editable preview + clipboard copy with
+   fallback.
+6. **M5.6 Validation + release** — schema/ingestion/selection/prompt/clipboard tests;
+   `npm run verify` full flagless gate remains the release gate; docs match reality.
+
 ## 11) Verification gates
 
 ```text
@@ -354,3 +399,6 @@ masquerades as working. When done, status flips to *working* with the evidence
   draft); established foundations-first milestone plan.
 - **v1.1 — 2026-10-24:** §12 amended to add `@testing-library/dom` (mandatory peer of
   `@testing-library/react` v16, npm auto-installed). No other changes; M4 complete.
+- **v1.2 — 2026-10-24:** M5 milestone added (real ingestion, gallery, multi-selection,
+  master prompt generation); §5.4 extended with schema v2 taxonomies
+  (aesthetics/attributes/sources) and v2 entry fields.

@@ -51,6 +51,12 @@ test("lookup rejects unknown filters with exit code 2", () => {
   assert.equal(badTheme.status, 2);
   const badCategory = run("scripts/lookup.mjs", ["button", "--category", "not-a-category"]);
   assert.equal(badCategory.status, 2);
+  const badAesthetic = run("scripts/lookup.mjs", ["button", "--aesthetic", "not-an-aesthetic"]);
+  assert.equal(badAesthetic.status, 2);
+  const badSource = run("scripts/lookup.mjs", ["button", "--source", "not-a-source"]);
+  assert.equal(badSource.status, 2);
+  const badType = run("scripts/lookup.mjs", ["button", "--type", "hologram"]);
+  assert.equal(badType.status, 2);
 });
 
 test("lookup without arguments is a usage error", () => {

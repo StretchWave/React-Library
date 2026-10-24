@@ -172,7 +172,9 @@ describe("FilterBar (M2)", () => {
 
   it("exposes labeled category and theme selects", () => {
     render(<FilterBar {...defaultProps()} />);
-    expect((screen.getByLabelText("Category") as HTMLSelectElement).options.length).toBe(7);
+    // 1 "All categories" + 22 taxonomy categories (extended set since catalog v2)
+    expect((screen.getByLabelText("Category") as HTMLSelectElement).options.length).toBe(23);
+    // 1 "All themes" + 6 application appearance themes
     expect((screen.getByLabelText("Filter by theme") as HTMLSelectElement).options.length).toBe(7);
   });
 });

@@ -36,10 +36,10 @@ try {
   fail(error.message);
 }
 
-const { catalog, themes, categories } = loaded;
+const { catalog, themes, categories, aesthetics, attributes, sources } = loaded;
 
 // Validate taxonomies first so category/theme references resolve against full sets.
-const taxonomyResult = validateTaxonomy(themes, categories);
+const taxonomyResult = validateTaxonomy(themes, categories, { aesthetics, attributes, sources });
 errors.push(...taxonomyResult.errors);
 warnings.push(...taxonomyResult.warnings);
 
@@ -51,7 +51,14 @@ const categoriesDocForEntries = taxonomyResult.errors.length === 0
   : { categories: [] };
 
 const entryOptions = { root, checkLinks: !skipLinks };
-const catalogResult = validateCatalog(catalog, { themes: themesDocForEntries, categories: categoriesDocForEntries }, entryOptions);
+const entryTaxonomies = {
+  themes: themesDocForEntries,
+  categories: categoriesDocForEntries,
+  aesthetics: { aesthetics: [] },
+  attributes: { attributes: [] },
+  sources: { sources: [] },
+};
+const catalogResult = validateCatalog(catalog, entryTaxonomies, entryOptions);
 errors.push(...catalogResult.errors);
 warnings.push(...catalogResult.warnings);
 
@@ -74,7 +81,7 @@ if (checkIndex) {
       errors.push(`catalog/index.json is not valid JSON: ${error.message}`);
     }
     if (stored) {
-      const derived = buildIndex(catalog, themes, categories, "STAMP");
+      const derived = buildIndex(catalog, themes, categories, { aesthetics, attributes, sources }, "STAMP");
       delete derived.generatedAt;
       if (JSON.stringify(derived) !== JSON.stringify(stored)) {
         errors.push("catalog/index.json is stale or divergent - run 'npm run generate'");
@@ -87,7 +94,7 @@ if (errors.length > 0) {
   console.log(`Catalog invalid: ${errors.length} error(s)${skipLinks ? " (link checks skipped)" : ""}`);
   for (const error of errors.sort()) console.log(`  ✗ ${error}`);
 } else {
-  const counts = `entries ${catalog.entries.length}, themes ${themes.themes.length}, categories ${categories.categories.length}`;
+  const counts = `entries ${catalog.entries.length}, themes ${themes.themes.length}, categories ${categories.categories.length}, aesthetics ${(aesthetics.aesthetics || []).length}, sources ${(sources.sources || []).length}`;
   console.log(
     `Catalog valid — ${counts}${checkIndex ? ", index up to date" : ""}${skipLinks ? " (link checks skipped)" : ""}`,
   );

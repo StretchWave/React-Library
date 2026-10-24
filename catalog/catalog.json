@@ -1,8 +1,8 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "meta": {
     "title": "React Library catalog",
-    "description": "Canonical, hand-maintained component catalog. catalog/index.json is derived - run 'npm run generate' after editing this file; never hand-edit the index."
+    "description": "Canonical, hand-maintained component catalog. schema v2 adds optional multi-source, aesthetic, preview and provenance fields (docs/SCHEMA.md §v2); absent fields default to a legacy 'local' entry. catalog/index.json is derived - run 'npm run generate' after editing this file; never hand-edit the index."
   },
   "entries": [
     {

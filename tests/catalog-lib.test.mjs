@@ -17,7 +17,13 @@ import {
 const ROOT = repoRoot();
 const seed = loadCatalog(ROOT);
 const seedEntries = seed.catalog.entries;
-const taxonomies = { themes: seed.themes, categories: seed.categories };
+const taxonomies = {
+  themes: seed.themes,
+  categories: seed.categories,
+  aesthetics: seed.aesthetics,
+  attributes: seed.attributes,
+  sources: seed.sources,
+};
 
 /** Full-valid entry template for targeted rule-testing. */
 function mkEntry(overrides = {}) {
@@ -38,12 +44,30 @@ function mkEntry(overrides = {}) {
   };
 }
 
+/** Valid external-entry template (external entries carry stricter v2 rules). */
+function mkExternal(overrides = {}) {
+  return mkEntry({
+    id: "sample-ext",
+    entryType: "external",
+    source: "shadcn",
+    sourceUrl: "https://ui.shadcn.com/r/example.json",
+    externalId: "example",
+    retrieval: "npx shadcn@latest add https://ui.shadcn.com/r/example.json",
+    license: { spdx: "MIT", note: "Per-component check required." },
+    ...overrides,
+  });
+}
+
 function validate(entries, opts = {}) {
-  return validateCatalog({ schemaVersion: 1, entries }, taxonomies, opts);
+  return validateCatalog({ schemaVersion: 2, entries }, taxonomies, opts);
 }
 
 test("seed catalog and taxonomies validate cleanly", () => {
-  const taxonomyResult = validateTaxonomy(seed.themes, seed.categories);
+  const taxonomyResult = validateTaxonomy(seed.themes, seed.categories, {
+    aesthetics: seed.aesthetics,
+    attributes: seed.attributes,
+    sources: seed.sources,
+  });
   assert.deepEqual(taxonomyResult.errors, []);
   const result = validateCatalog(seed.catalog, taxonomies, { checkLinks: false });
   assert.deepEqual(result.errors, []);
@@ -95,9 +119,9 @@ test("an alias may not collide with any entry id", () => {
 });
 
 test("schema, status, version and date rules", () => {
-  const { catalog: bad } = { catalog: { schemaVersion: 2, entries: [mkEntry({ status: "wip", version: "1.0", addedDate: "10-24-2026" })] } };
+  const { catalog: bad } = { catalog: { schemaVersion: 1, entries: [mkEntry({ status: "wip", version: "1.0", addedDate: "10-24-2026" })] } };
   const { errors } = validateCatalog(bad, taxonomies, { checkLinks: false });
-  assert.ok(errors.some((message) => message.includes("'schemaVersion' must be 1")));
+  assert.ok(errors.some((message) => message.includes("'schemaVersion' must be 2")));
   assert.ok(errors.some((message) => message.includes("'status' must be one of")));
   assert.ok(errors.some((message) => message.includes("'version' must be valid semver")));
   assert.ok(errors.some((message) => message.includes("'addedDate' must be YYYY-MM-DD")));
@@ -135,7 +159,7 @@ test("link existence: present files pass, missing files error (fs)", () => {
     mkdirSync(path.join(tmp, "src"), { recursive: true });
     writeFileSync(path.join(tmp, "src", "exists.tsx"), "export default () => null;\n");
     const catalog = {
-      schemaVersion: 1,
+      schemaVersion: 2,
       entries: [mkEntry({ links: { source: "src/exists.tsx", demo: "src/missing.tsx" } })],
     };
     const { errors } = validateCatalog(catalog, taxonomies, { root: tmp, checkLinks: true });
@@ -180,19 +204,64 @@ test("search: category and theme filters", () => {
   assert.deepEqual(searchEntries(seedEntries, "btn", { category: "display" }), []);
 });
 
+test("search: v2 filters (aesthetic, source, attribute, entryType)", () => {
+  const entries = [
+    mkEntry({ id: "aaa", aesthetics: ["cyberpunk", "gaming"], attributes: ["dark", "tailwind"], source: "shadcn" }),
+    mkEntry({ id: "bbb", aliases: ["b2"], entryType: "external", aesthetics: ["minimal"], attributes: ["static", "css"], source: "react-bits" }),
+  ];
+  assert.deepEqual(searchEntries(entries, "", { aesthetic: "cyberpunk" }).map((e) => e.id), ["aaa"]);
+  assert.deepEqual(searchEntries(entries, "", { source: "react-bits" }).map((e) => e.id), ["bbb"]);
+  assert.deepEqual(searchEntries(entries, "", { attribute: "tailwind" }).map((e) => e.id), ["aaa"]);
+  assert.deepEqual(searchEntries(entries, "", { entryType: "external" }).map((e) => e.id), ["bbb"]);
+  assert.deepEqual(searchEntries(entries, "", { entryType: "local" }).map((e) => e.id), ["aaa"]);
+  assert.deepEqual(searchEntries(entries, "", { aesthetic: "nope" }), []);
+  // aesthetics rank in text search (below legacy signals but present)
+  assert.deepEqual(searchEntries(entries, "cyberpunk").map((e) => e.id), ["aaa"]);
+});
+
 test("index: deterministic shape and counts", () => {
-  const a = buildIndex(seed.catalog, seed.themes, seed.categories, "2026-10-24T00:00:00.000Z");
-  const b = buildIndex(seed.catalog, seed.themes, seed.categories, "2027-01-01T00:00:00.000Z");
+  const extras = { aesthetics: seed.aesthetics, attributes: seed.attributes, sources: seed.sources };
+  const a = buildIndex(seed.catalog, seed.themes, seed.categories, extras, "2026-10-24T00:00:00.000Z");
+  const b = buildIndex(seed.catalog, seed.themes, seed.categories, extras, "2027-01-01T00:00:00.000Z");
   delete a.generatedAt;
   delete b.generatedAt;
   assert.deepEqual(a, b);
-  assert.deepEqual(a.counts, { entries: 6, themes: 6, categories: 6 });
+  assert.equal(a.schemaVersion, 2);
+  assert.deepEqual(a.counts, {
+    entries: 6,
+    themes: 6,
+    categories: 22,
+    aesthetics: 12,
+    sources: 9,
+    byEntryType: { local: 6, external: 0 },
+    bySource: {},
+  });
   assert.equal(a.generator, "scripts/generate-index.mjs");
   assert.deepEqual(
     a.entries.map((entry) => entry.id),
     ["alert", "badge", "button", "card", "tabs", "text-input"],
   );
-  assert.deepEqual(a.taxonomies.categories, ["buttons", "inputs", "layout", "display", "feedback", "navigation"]);
+  assert.deepEqual(a.taxonomies.categories.slice(0, 6), ["buttons", "inputs", "layout", "display", "feedback", "navigation"]);
+  assert.deepEqual(a.taxonomies.aesthetics, [
+    "professional", "casual", "minimal", "luxury", "cyberpunk", "retro-synthwave",
+    "brutalist", "organic", "futuristic", "gaming", "editorial", "playful",
+  ]);
+  assert.ok(a.taxonomies.sources.some((source) => source.id === "shadcn" && source.status === "available"));
+});
+
+test("index: counts external entries and per-source tally", () => {
+  const catalog = {
+    schemaVersion: 2,
+    entries: [
+      mkEntry({ id: "a-local", source: "shadcn", aesthetics: ["minimal"], attributes: ["tailwind"] }),
+      mkExternal({ id: "b-ext", source: "react-bits", aesthetics: ["cyberpunk"], attributes: ["animated"] }),
+      mkEntry({ id: "c-local", source: "shadcn" }),
+    ],
+  };
+  const extras = { aesthetics: seed.aesthetics, attributes: seed.attributes, sources: seed.sources };
+  const index = buildIndex(catalog, seed.themes, seed.categories, extras, "STAMP");
+  assert.deepEqual(index.counts.byEntryType, { local: 2, external: 1 });
+  assert.deepEqual(index.counts.bySource, { shadcn: 2, "react-bits": 1 });
 });
 
 test("formatEntryText renders dashes for missing links", () => {
@@ -202,4 +271,122 @@ test("formatEntryText renders dashes for missing links", () => {
   const seeded = formatEntryText(seedEntries.find((entry) => entry.id === "button"));
   assert.ok(seeded.includes("src/components/Button/Button.tsx"));
   assert.ok(seeded.includes("Props (4):"));
+});
+
+// --- v2 (M5): local/external model, aesthetics, attributes, source, preview, license
+
+test("external entries require source, sourceUrl, retrieval and license", () => {
+  const { errors } = validate([mkExternal({ source: undefined, sourceUrl: undefined, retrieval: undefined, license: undefined })]);
+  assert.ok(errors.some((message) => message.includes("'source' is required for external entries")));
+  assert.ok(errors.some((message) => message.includes("'sourceUrl' (http(s)) is required for external entries")));
+  assert.ok(errors.some((message) => message.includes("'retrieval' is required for external entries")));
+  assert.ok(errors.some((message) => message.includes("'license' is required for external entries")));
+});
+
+test("external entries must not declare local paths", () => {
+  const { errors } = validate([mkExternal({ localDir: "catalog/components/x", manifest: "catalog/components/x/component.json", implementation: ["catalog/components/x/example.tsx"] })]);
+  assert.ok(errors.some((message) => message.includes("must not declare local implementation paths")));
+});
+
+test("absent entryType defaults to local (legacy v1 entries stay valid)", () => {
+  const { errors } = validate([mkEntry({ source: "shadcn" })]);
+  assert.deepEqual(errors.filter((message) => message.includes("required for external")), []);
+});
+
+test("entry source must exist in the sources taxonomy", () => {
+  const { errors } = validate([mkEntry({ source: "not-a-source" })]);
+  assert.ok(errors.some((message) => message.includes('source "not-a-source" is not in the sources taxonomy')));
+});
+
+test("aesthetics and attributes must reference taxonomy ids", () => {
+  const { errors } = validate([mkEntry({ aesthetics: ["cyberpunk", "nope"], attributes: ["dark", "also-nope"] })]);
+  assert.ok(errors.some((message) => message.includes('aesthetic "nope" is not in the aesthetics taxonomy')));
+  assert.ok(errors.some((message) => message.includes('attribute "also-nope" is not in the attributes taxonomy')));
+  const ok = validate([mkEntry({ aesthetics: ["cyberpunk"], attributes: ["dark"] })]);
+  assert.deepEqual(ok.errors, []);
+});
+
+test("sourceUrl must be an absolute http(s) URL", () => {
+  const { errors } = validate([mkExternal({ sourceUrl: "not a url" })]);
+  assert.ok(errors.some((message) => message.includes("'sourceUrl' must be an absolute http(s) URL")));
+});
+
+test("preview rules: url for external/static/source-link; none requires a note", () => {
+  const missingUrl = validate([mkEntry({ preview: { type: "external" } })]);
+  assert.ok(missingUrl.errors.some((message) => message.includes('requires an http(s) \'url\'')));
+  const badNone = validate([mkEntry({ preview: { type: "none" } })]);
+  assert.ok(badNone.errors.some((message) => message.includes("requires a 'note'")));
+  const badType = validate([mkEntry({ preview: { type: "hologram" } })]);
+  assert.ok(badType.errors.some((message) => message.includes("preview 'type' must be one of")));
+  const ok = validate([mkEntry({ preview: { type: "none", note: "No reuse-safe visual reference verified yet." } })]);
+  assert.deepEqual(ok.errors, []);
+});
+
+test("license structure rules", () => {
+  const badSpdx = validate([mkExternal({ license: { spdx: "not a spdx!" } })]);
+  assert.ok(badSpdx.errors.some((message) => message.includes("SPDX-like id")));
+  const unknownKey = validate([mkExternal({ license: { spdx: "MIT", clause: "nope" } })]);
+  assert.ok(unknownKey.warnings.some((message) => message.includes('unknown license key "clause"')));
+});
+
+test("dependencies rules: shape, duplicates, react implicit", () => {
+  const { errors } = validate([mkEntry({
+    dependencies: [
+      "not-an-object",
+      { name: "framer-motion" },
+      { name: "framer-motion", reason: "dup" },
+      { name: "react" },
+    ].filter((d) => typeof d === "object"),
+  })]);
+  // The string is filtered out, so expect duplicate + implicit errors.
+  assert.ok(errors.some((message) => message.includes('duplicate dependency "framer-motion"')));
+  assert.ok(errors.some((message) => message.includes('"react" is implicit')));
+});
+
+test("local paths (localDir/manifest/implementation) are existence-checked (fs)", () => {
+  const tmp = mkdtempSync(path.join(tmpdir(), "rl-catalog-v2-"));
+  try {
+    mkdirSync(path.join(tmp, "catalog", "components", "demo"), { recursive: true });
+    writeFileSync(path.join(tmp, "catalog", "components", "demo", "component.json"), "{}\n");
+    writeFileSync(path.join(tmp, "catalog", "components", "demo", "example.tsx"), "export default () => null;\n");
+    const base = "catalog/components/demo";
+    const ok = validate([mkEntry({ localDir: base, manifest: `${base}/component.json`, implementation: [`${base}/example.tsx`] })], { root: tmp, checkLinks: true });
+    assert.deepEqual(ok.errors, []);
+    const bad = validate([mkEntry({ localDir: base, manifest: `${base}/nope.json`, implementation: [`${base}/nope.tsx`] })], { root: tmp, checkLinks: true });
+    assert.ok(bad.errors.some((message) => message.includes("nope.json")));
+    assert.ok(bad.errors.some((message) => message.includes("nope.tsx")));
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test("sources taxonomy: duplicate ids and bad status are errors", () => {
+  const cloned = structuredClone(seed.sources);
+  cloned.sources[1] = { ...cloned.sources[0], status: "nope" };
+  const { errors } = validateTaxonomy(seed.themes, seed.categories, { sources: cloned });
+  assert.ok(errors.some((message) => message.includes("duplicate source id")));
+  assert.ok(errors.some((message) => message.includes("'status' must be one of")));
+});
+
+test("aesthetics taxonomy: duplicate ids are errors", () => {
+  const cloned = structuredClone(seed.aesthetics);
+  cloned.aesthetics[1] = { ...cloned.aesthetics[0] };
+  const { errors } = validateTaxonomy(seed.themes, seed.categories, { aesthetics: cloned });
+  assert.ok(errors.some((message) => message.includes("duplicate aesthetic id")));
+});
+
+test("formatEntryText surfaces v2 provenance for external entries", () => {
+  const text = formatEntryText(mkExternal({
+    preview: { type: "external", url: "https://example.com/demo" },
+    aesthetics: ["cyberpunk"],
+    attributes: ["dark", "animated"],
+  }));
+  assert.ok(text.includes("Type: external"));
+  assert.ok(text.includes("Library source: shadcn (https://ui.shadcn.com"));
+  assert.ok(text.includes("License:"));
+  assert.ok(text.includes("External ID: example"));
+  assert.ok(text.includes("Retrieval: npx shadcn@latest add"));
+  assert.ok(text.includes("Preview: external https://example.com/demo"));
+  assert.ok(text.includes("Aesthetics: cyberpunk"));
+  assert.ok(text.includes("Attributes: dark, animated"));
 });

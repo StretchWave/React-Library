@@ -4,11 +4,15 @@
 import path from "node:path";
 import { accessSync, readFileSync, writeFileSync } from "node:fs";
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const STATUSES = ["stable", "beta", "experimental", "deprecated"];
+export const ENTRY_TYPES = ["local", "external"];
+export const PREVIEW_TYPES = ["local-demo", "static", "external", "source-link", "none"];
 export const THEME_BASES = ["light", "dark"];
 export const LINK_KEYS = ["source", "demo", "docs"];
+/** Independent attribute facets (taxonomy/attributes.json). */
+export const ATTRIBUTE_GROUPS = ["appearance", "motion", "tech"];
 
 /** The nine tokens every theme must define (MASTER_SPEC.md §5.4). */
 export const CANONICAL_TOKENS = [
@@ -50,6 +54,22 @@ const ENTRY_FIELDS = new Set([
   "links",
   "a11yNotes",
   "usedFrom",
+  // --- v2 (M5): multi-source, aesthetic, preview and provenance fields. All
+  // optional so schema-v1 entries stay valid; see docs/SCHEMA.md "v2".
+  "entryType",
+  "source",
+  "sourceUrl",
+  "externalId",
+  "retrieval",
+  "preview",
+  "localDir",
+  "manifest",
+  "implementation",
+  "dependencies",
+  "license",
+  "aesthetics",
+  "attributes",
+  "syncedAt",
 ]);
 
 const TOP_LEVEL_FIELDS = new Set(["schemaVersion", "meta", "entries"]);
@@ -73,23 +93,29 @@ function readJsonFileSync(file, label) {
   }
 }
 
-/** Loads catalog + both taxonomy docs. Synchronous; throws on missing/invalid JSON. */
+/** Loads catalog + all taxonomy docs. Synchronous; throws on missing/invalid JSON. */
 export function loadCatalog(root = repoRoot()) {
   const paths = {
     root,
     catalog: path.join(root, "catalog", "catalog.json"),
     themes: path.join(root, "taxonomy", "themes.json"),
     categories: path.join(root, "taxonomy", "categories.json"),
+    aesthetics: path.join(root, "taxonomy", "aesthetics.json"),
+    attributes: path.join(root, "taxonomy", "attributes.json"),
+    sources: path.join(root, "taxonomy", "sources.json"),
   };
   return {
     catalog: readJsonFileSync(paths.catalog, "catalog"),
     themes: readJsonFileSync(paths.themes, "theme taxonomy"),
     categories: readJsonFileSync(paths.categories, "category taxonomy"),
+    aesthetics: readJsonFileSync(paths.aesthetics, "aesthetic taxonomy"),
+    attributes: readJsonFileSync(paths.attributes, "attribute taxonomy"),
+    sources: readJsonFileSync(paths.sources, "sources taxonomy"),
     paths,
   };
 }
 
-export function validateTaxonomy(themesDoc, categoriesDoc) {
+export function validateTaxonomy(themesDoc, categoriesDoc, extras = {}) {
   const errors = [];
   const warnings = [];
 
@@ -161,6 +187,90 @@ export function validateTaxonomy(themesDoc, categoriesDoc) {
     });
   }
 
+  // --- v2 taxonomies: aesthetics, attributes, sources (optional args for compat).
+  const aesthetics = extras.aesthetics && extras.aesthetics.aesthetics;
+  if (extras.aesthetics) {
+    if (!Array.isArray(aesthetics) || aesthetics.length === 0) {
+      errors.push("taxonomy/aesthetics.json: 'aesthetics' must be a non-empty array");
+    } else {
+      const seen = new Set();
+      aesthetics.forEach((aesthetic, i) => {
+        const where = `taxonomy/aesthetics.json aesthetics[${i}]`;
+        if (!isPlainObject(aesthetic)) {
+          errors.push(`${where}: aesthetic must be an object`);
+          return;
+        }
+        if (!isSlugValue(aesthetic.id)) errors.push(`${where}: invalid id slug "${str(aesthetic.id)}"`);
+        if (seen.has(aesthetic.id)) errors.push(`${where}: duplicate aesthetic id "${aesthetic.id}"`);
+        seen.add(aesthetic.id);
+        if (!isNonEmptyString(aesthetic.label)) errors.push(`${where}: 'label' must be a non-empty string`);
+      });
+    }
+  }
+
+  const attributes = extras.attributes && extras.attributes.attributes;
+  if (extras.attributes) {
+    if (!Array.isArray(attributes) || attributes.length === 0) {
+      errors.push("taxonomy/attributes.json: 'attributes' must be a non-empty array");
+    } else {
+      const seen = new Set();
+      attributes.forEach((attribute, i) => {
+        const where = `taxonomy/attributes.json attributes[${i}]`;
+        if (!isPlainObject(attribute)) {
+          errors.push(`${where}: attribute must be an object`);
+          return;
+        }
+        if (!isSlugValue(attribute.id)) errors.push(`${where}: invalid id slug "${str(attribute.id)}"`);
+        if (seen.has(attribute.id)) errors.push(`${where}: duplicate attribute id "${attribute.id}"`);
+        seen.add(attribute.id);
+        if (!isNonEmptyString(attribute.label)) errors.push(`${where}: 'label' must be a non-empty string`);
+        if ("group" in attribute && !ATTRIBUTE_GROUPS.includes(attribute.group)) {
+          errors.push(`${where}: 'group' must be one of ${ATTRIBUTE_GROUPS.join(" | ")}`);
+        }
+      });
+    }
+  }
+
+  const sources = extras.sources && extras.sources.sources;
+  if (extras.sources) {
+    const knownStatuses = Array.isArray(extras.sources.statuses) ? extras.sources.statuses : SOURCE_STATUSES;
+    if (!Array.isArray(sources) || sources.length === 0) {
+      errors.push("taxonomy/sources.json: 'sources' must be a non-empty array");
+    } else {
+      const seen = new Set();
+      sources.forEach((source, i) => {
+        const where = `taxonomy/sources.json sources[${i}]`;
+        if (!isPlainObject(source)) {
+          errors.push(`${where}: source must be an object`);
+          return;
+        }
+        const label = `source ${str(source.id) || `#${i}`}`;
+        if (!isSlugValue(source.id)) errors.push(`${where}: invalid id slug "${str(source.id)}"`);
+        if (seen.has(source.id)) errors.push(`${where}: duplicate source id "${source.id}"`);
+        seen.add(source.id);
+        if (!isNonEmptyString(source.name)) errors.push(`${label}: 'name' must be a non-empty string`);
+        if (!isHttpUrl(source.url)) errors.push(`${label}: 'url' must be an http(s) URL (got "${str(source.url)}")`);
+        if ("repo" in source && source.repo !== null && !isHttpUrl(source.repo)) {
+          errors.push(`${label}: 'repo' must be http(s) or null when present`);
+        }
+        if (!knownStatuses.includes(source.status)) {
+          errors.push(`${label}: 'status' must be one of ${knownStatuses.join(" | ")} (got "${str(source.status)}")`);
+        }
+        if (!isNonEmptyString(source.license)) errors.push(`${label}: 'license' must be a non-empty string`);
+        if (!isNonEmptyString(source.notes)) errors.push(`${label}: 'notes' must be a non-empty string`);
+        if ("limit" in source && source.limit !== null && !isNonEmptyString(source.limit)) {
+          errors.push(`${label}: 'limit' must be a non-empty string or null when present`);
+        }
+        if ("auth" in source && source.auth !== null && !isNonEmptyString(source.auth)) {
+          errors.push(`${label}: 'auth' must be a non-empty string or null when present`);
+        }
+        if ("evaluatedAt" in extras.sources && !/^\d{4}-\d{2}-\d{2}$/.test(str(extras.sources.evaluatedAt))) {
+          errors.push("taxonomy/sources.json: 'evaluatedAt' must be YYYY-MM-DD when present");
+        }
+      });
+    }
+  }
+
   return { errors, warnings };
 }
 
@@ -169,7 +279,6 @@ export function validateTaxonomy(themesDoc, categoriesDoc) {
 export function validateCatalog(catalog, taxonomies, { root = repoRoot(), checkLinks = true } = {}) {
   const errors = [];
   const warnings = [];
-
   if (!isPlainObject(catalog)) {
     errors.push("catalog: top level must be an object");
     return { errors, warnings };
@@ -190,6 +299,10 @@ export function validateCatalog(catalog, taxonomies, { root = repoRoot(), checkL
   const themeIds = new Set((taxonomies.themes && taxonomies.themes.themes || []).map((t) => t.id));
   const categoryIds = new Set((taxonomies.categories && taxonomies.categories.categories || []).map((c) => c.id));
   const themeLabel = (id) => (themeIds.has(id) ? `theme "${id}"` : `unknown theme "${id}"`);
+  // v2 taxonomies: enforced only when provided; legacy callers may omit them.
+  const aestheticIds = new Set((taxonomies.aesthetics && taxonomies.aesthetics.aesthetics || []).map((a) => a.id));
+  const attributeIds = new Set((taxonomies.attributes && taxonomies.attributes.attributes || []).map((a) => a.id));
+  const sourceIds = new Set((taxonomies.sources && taxonomies.sources.sources || []).map((s) => s.id));
 
   const entryIds = new Set();
   const aliasOwners = new Map();
@@ -354,6 +467,189 @@ export function validateCatalog(catalog, taxonomies, { root = repoRoot(), checkL
       }
     }
 
+    // --- v2 fields (M5). Absent v2 fields default to a legacy "local" entry.
+    const entryType = entry.entryType ?? "local";
+    if ("entryType" in entry && !ENTRY_TYPES.includes(entry.entryType)) {
+      errors.push(`${label}: 'entryType' must be one of ${ENTRY_TYPES.join(" | ")} (got "${str(entry.entryType)}")`);
+    }
+
+    if (entryType === "external") {
+      // External entries carry metadata + retrieval instructions only; fabricating
+      // a local file path for code we were not permitted to store is prohibited.
+      if (!isNonEmptyString(entry.source)) errors.push(`${label}: 'source' is required for external entries`);
+      if (!isHttpUrl(entry.sourceUrl)) errors.push(`${label}: 'sourceUrl' (http(s)) is required for external entries`);
+      if (!isNonEmptyString(entry.retrieval)) errors.push(`${label}: 'retrieval' is required for external entries`);
+      if (!isPlainObject(entry.license)) {
+        errors.push(`${label}: 'license' is required for external entries (state the reuse terms)`);
+      }
+      if (entry.localDir || entry.manifest || entry.implementation) {
+        errors.push(`${label}: external entries must not declare local implementation paths (localDir/manifest/implementation)`);
+      }
+    }
+
+    if ("source" in entry && entry.source != null) {
+      if (!isNonEmptyString(entry.source)) {
+        errors.push(`${label}: 'source' must be a non-empty string when present`);
+      } else if (sourceIds.size > 0 && !sourceIds.has(entry.source)) {
+        errors.push(`${label}: source "${entry.source}" is not in the sources taxonomy (taxonomy/sources.json)`);
+      }
+    }
+    if ("sourceUrl" in entry && entry.sourceUrl != null && !isHttpUrl(entry.sourceUrl)) {
+      errors.push(`${label}: 'sourceUrl' must be an absolute http(s) URL (got "${str(entry.sourceUrl)}")`);
+    }
+    if ("externalId" in entry && !isNonEmptyString(entry.externalId)) {
+      errors.push(`${label}: 'externalId' must be a non-empty string when present`);
+    }
+    if ("retrieval" in entry && !isNonEmptyString(entry.retrieval)) {
+      errors.push(`${label}: 'retrieval' must be a non-empty string when present`);
+    }
+    if ("syncedAt" in entry && !/^\d{4}-\d{2}-\d{2}$/.test(str(entry.syncedAt))) {
+      errors.push(`${label}: 'syncedAt' must be YYYY-MM-DD when present`);
+    }
+
+    if ("localDir" in entry) {
+      if (!isNonEmptyString(entry.localDir)) {
+        errors.push(`${label}: 'localDir' must be a non-empty string when present`);
+      } else {
+        if (entry.localDir.includes("\\")) warnings.push(`${label}: 'localDir' should use POSIX separators (${entry.localDir})`);
+        if (checkLinks) {
+          try {
+            accessSync(path.resolve(root, entry.localDir));
+          } catch {
+            errors.push(`${label}: 'localDir' points to a missing directory (${entry.localDir})`);
+          }
+        }
+      }
+    }
+    if ("manifest" in entry) {
+      if (!isNonEmptyString(entry.manifest)) {
+        errors.push(`${label}: 'manifest' must be a non-empty string when present`);
+      } else if (checkLinks) {
+        try {
+          accessSync(path.resolve(root, entry.manifest));
+        } catch {
+          errors.push(`${label}: 'manifest' points to a missing file (${entry.manifest})`);
+        }
+      }
+    }
+    if ("implementation" in entry) {
+      if (!Array.isArray(entry.implementation)) {
+        errors.push(`${label}: 'implementation' must be an array of file paths`);
+      } else {
+        for (const file of entry.implementation) {
+          if (!isNonEmptyString(file)) {
+            errors.push(`${label}: implementation entries must be non-empty strings (got ${str(file)})`);
+            continue;
+          }
+          if (!checkLinks) continue;
+          try {
+            accessSync(path.resolve(root, file));
+          } catch {
+            errors.push(`${label}: implementation points to a missing file (${file})`);
+          }
+        }
+      }
+    }
+
+    if ("preview" in entry) {
+      const preview = entry.preview;
+      if (!isPlainObject(preview)) {
+        errors.push(`${label}: 'preview' must be an object ({ type, url, note })`);
+      } else {
+        if (!PREVIEW_TYPES.includes(preview.type)) {
+          errors.push(`${label}: preview 'type' must be one of ${PREVIEW_TYPES.join(" | ")} (got "${str(preview.type)}")`);
+        }
+        const needsUrl = ["static", "external", "source-link"].includes(preview.type);
+        if (needsUrl && !isHttpUrl(preview.url)) {
+          errors.push(`${label}: preview type "${preview.type}" requires an http(s) 'url'`);
+        }
+        if (preview.type === "none" && !isNonEmptyString(preview.note)) {
+          errors.push(`${label}: preview type "none" requires a 'note' explaining why honestly`);
+        }
+        if ("url" in preview && preview.url != null && !isHttpUrl(preview.url)) {
+          errors.push(`${label}: preview 'url' must be an absolute http(s) URL (got "${str(preview.url)}")`);
+        }
+        if ("note" in preview && preview.note != null && !isNonEmptyString(preview.note)) {
+          errors.push(`${label}: preview 'note' must be a non-empty string when present`);
+        }
+      }
+    }
+
+    const license = entry.license;
+    if ("license" in entry) {
+      if (!isPlainObject(license)) {
+        errors.push(`${label}: 'license' must be an object ({ spdx, attribution, note, url })`);
+      } else {
+        for (const key of Object.keys(license)) {
+          if (!["spdx", "attribution", "note", "url"].includes(key)) {
+            warnings.push(`${label}: unknown license key "${key}" (known: spdx, attribution, note, url)`);
+          }
+        }
+        if ("spdx" in license && !/^[A-Za-z0-9.+-]+$/.test(str(license.spdx))) {
+          errors.push(`${label}: license 'spdx' must be an SPDX-like id (got "${str(license.spdx)}")`);
+        }
+        for (const key of ["attribution", "note"]) {
+          if (key in license && license[key] != null && !isNonEmptyString(license[key])) {
+            errors.push(`${label}: license '${key}' must be a non-empty string when present`);
+          }
+        }
+        if ("url" in license && license.url != null && !isHttpUrl(license.url)) {
+          errors.push(`${label}: license 'url' must be an absolute http(s) URL`);
+        }
+      }
+    }
+
+    if ("dependencies" in entry) {
+      const deps2 = entry.dependencies;
+      if (!Array.isArray(deps2)) {
+        errors.push(`${label}: 'dependencies' must be an array of { name, reason }`);
+      } else {
+        const depNames = new Set();
+        deps2.forEach((dep, depIndex) => {
+          const depAt = `${label} dependencies[${depIndex}]`;
+          if (!isPlainObject(dep)) {
+            errors.push(`${depAt}: dependency must be an object`);
+            return;
+          }
+          if (!isNonEmptyString(dep.name)) {
+            errors.push(`${depAt}: 'name' must be a non-empty string`);
+          } else {
+            if (dep.name === "react" || dep.name === "react-dom") {
+              errors.push(`${depAt}: "${dep.name}" is implicit and must not be listed`);
+            }
+            if (depNames.has(dep.name)) errors.push(`${depAt}: duplicate dependency "${dep.name}"`);
+            depNames.add(dep.name);
+          }
+          if ("reason" in dep && dep.reason != null && !isNonEmptyString(dep.reason)) {
+            errors.push(`${depAt}: 'reason' must be a non-empty string when present`);
+          }
+        });
+      }
+    }
+
+    if ("aesthetics" in entry) {
+      if (!Array.isArray(entry.aesthetics)) {
+        errors.push(`${label}: 'aesthetics' must be an array of taxonomy aesthetic ids`);
+      } else if (aestheticIds.size > 0) {
+        for (const aesthetic of entry.aesthetics) {
+          if (!isNonEmptyString(aesthetic) || !aestheticIds.has(aesthetic)) {
+            errors.push(`${label}: aesthetic "${str(aesthetic)}" is not in the aesthetics taxonomy (taxonomy/aesthetics.json)`);
+          }
+        }
+      }
+    }
+    if ("attributes" in entry) {
+      if (!Array.isArray(entry.attributes)) {
+        errors.push(`${label}: 'attributes' must be an array of taxonomy attribute ids`);
+      } else if (attributeIds.size > 0) {
+        for (const attribute of entry.attributes) {
+          if (!isNonEmptyString(attribute) || !attributeIds.has(attribute)) {
+            errors.push(`${label}: attribute "${str(attribute)}" is not in the attributes taxonomy (taxonomy/attributes.json)`);
+          }
+        }
+      }
+    }
+
     if (prevId && prevId > id) {
       errors.push(`${label}: entries must be sorted by id ("${prevId}" appears before "${id}")`);
     }
@@ -369,12 +665,17 @@ export function validateCatalog(catalog, taxonomies, { root = repoRoot(), checkL
   return { errors, warnings };
 }
 
-/** Ranked search: exact id > exact alias > id-prefix/id-substring > name > summary > tags > aliases. */
-export function searchEntries(entries, query, { theme, category } = {}) {
+/** Ranked search: exact id > exact alias > id-prefix/id-substring > name > summary > tags > aliases.
+ *  v2: optional filters aesthetic/source/attribute/entryType; aesthetics/attributes/source also rank in text search. */
+export function searchEntries(entries, query, { theme, category, aesthetic, source, attribute, entryType } = {}) {
   const all = [...entries].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   const filtered = all.filter((entry) => {
     if (theme && !entry.themes.includes(theme)) return false;
     if (category && entry.category !== category) return false;
+    if (aesthetic && !(entry.aesthetics || []).includes(aesthetic)) return false;
+    if (attribute && !(entry.attributes || []).includes(attribute)) return false;
+    if (source && entry.source !== source) return false;
+    if (entryType && (entry.entryType ?? "local") !== entryType) return false;
     return true;
   });
   const q = String(query ?? "").trim().toLowerCase();
@@ -391,6 +692,9 @@ export function searchEntries(entries, query, { theme, category } = {}) {
     else if (entry.summary.toLowerCase().includes(q)) score = 35;
     else if (entry.tags.some((t) => t.includes(q))) score = 25;
     else if (entry.aliases.some((a) => a.includes(q))) score = 20;
+    else if ((entry.aesthetics || []).some((a) => a.includes(q))) score = 15;
+    else if ((entry.attributes || []).some((a) => a.includes(q))) score = 12;
+    else if (String(entry.source ?? "").includes(q)) score = 10;
     else continue;
     scored.push({ score, entry });
   }
@@ -398,22 +702,39 @@ export function searchEntries(entries, query, { theme, category } = {}) {
   return scored.map((s) => s.entry);
 }
 
-/** Builds the derived agent-readable index (MASTER_SPEC.md §8.3). */
-export function buildIndex(catalog, themesDoc, categoriesDoc, generatedAt) {
+/** Builds the derived agent-readable index (MASTER_SPEC.md §8.3). v2 adds
+ *  aesthetic/attribute/source taxonomies and local/external counts. */
+export function buildIndex(catalog, themesDoc, categoriesDoc, extras, generatedAt) {
+  const entries = catalog.entries;
+  const sourcesList = (extras.sources && extras.sources.sources) || [];
+  const byEntryType = { local: 0, external: 0 };
+  const bySource = {};
+  for (const entry of entries) {
+    if ((entry.entryType ?? "local") === "external") byEntryType.external += 1;
+    else byEntryType.local += 1;
+    if (entry.source) bySource[entry.source] = (bySource[entry.source] ?? 0) + 1;
+  }
   return {
     schemaVersion: SCHEMA_VERSION,
     generatedAt,
     generator: "scripts/generate-index.mjs",
     counts: {
-      entries: catalog.entries.length,
+      entries: entries.length,
       themes: themesDoc.themes.length,
       categories: categoriesDoc.categories.length,
+      aesthetics: (extras.aesthetics && extras.aesthetics.aesthetics || []).length,
+      sources: sourcesList.length,
+      byEntryType,
+      bySource,
     },
     taxonomies: {
       themes: themesDoc.themes.map((t) => t.id),
       categories: categoriesDoc.categories.map((c) => c.id),
+      aesthetics: (extras.aesthetics && extras.aesthetics.aesthetics || []).map((a) => a.id),
+      attributes: (extras.attributes && extras.attributes.attributes || []).map((a) => a.id),
+      sources: sourcesList.map((s) => ({ id: s.id, name: s.name, status: s.status, url: s.url })),
     },
-    entries: structuredClone(catalog.entries),
+    entries: structuredClone(entries),
   };
 }
 
@@ -430,17 +751,38 @@ export function indexPath(root = repoRoot()) {
 /** Human-readable block for lookup CLI (MASTER_SPEC.md §8.2). */
 export function formatEntryText(entry) {
   const dash = "—";
+  const entryType = entry.entryType ?? "local";
   const lines = [];
   lines.push(`${entry.name} (${entry.id}) v${entry.version} — ${entry.status} — added ${entry.addedDate}`);
   lines.push(`Category: ${entry.category}`);
+  lines.push(`Type: ${entryType}`);
   lines.push(`Summary: ${entry.summary}`);
   if (entry.description) lines.push(`Description: ${entry.description}`);
   lines.push(`Themes: ${entry.themes.join(", ")}`);
+  if (Array.isArray(entry.aesthetics) && entry.aesthetics.length > 0) {
+    lines.push(`Aesthetics: ${entry.aesthetics.join(", ")}`);
+  }
+  if (Array.isArray(entry.attributes) && entry.attributes.length > 0) {
+    lines.push(`Attributes: ${entry.attributes.join(", ")}`);
+  }
+  if (entry.source) {
+    lines.push(`Library source: ${entry.source}${entry.sourceUrl ? ` (${entry.sourceUrl})` : ""}`);
+  }
+  const licenseText = licenseSummary(entry.license);
+  if (licenseText) lines.push(`License: ${licenseText}`);
+  if (entry.externalId) lines.push(`External ID: ${entry.externalId}`);
+  if (entry.retrieval) lines.push(`Retrieval: ${entry.retrieval}`);
+  if (entry.localDir) lines.push(`Local dir: ${entry.localDir}`);
+  if (entry.manifest) lines.push(`Manifest: ${entry.manifest}`);
+  if (Array.isArray(entry.implementation) && entry.implementation.length > 0) {
+    lines.push(`Implementation: ${entry.implementation.join(", ")}`);
+  }
+  if (entry.preview) lines.push(`Preview: ${describePreview(entry.preview)}`);
   lines.push(`Aliases: ${entry.aliases.length ? entry.aliases.join(", ") : dash}`);
   lines.push(`Tags: ${entry.tags.length ? entry.tags.join(", ") : dash}`);
   const links = entry.links ?? {};
-  lines.push(`Source: ${links.source ?? dash}`);
-  lines.push(`Demo: ${links.demo ?? dash}`);
+  if (entryType === "local") lines.push(`Source: ${links.source ?? dash}`);
+  if (links.demo) lines.push(`Demo: ${links.demo}`);
   if (links.docs) lines.push(`Docs: ${links.docs}`);
   const props = entry.props ?? [];
   if (props.length === 0) {
@@ -461,6 +803,20 @@ export function formatEntryText(entry) {
   return lines.join("\n");
 }
 
+function licenseSummary(license) {
+  if (!isPlainObject(license)) return "";
+  const parts = [];
+  if (license.spdx) parts.push(`SPDX ${license.spdx}`);
+  if (license.note) parts.push(license.note);
+  return parts.join(" — ");
+}
+
+function describePreview(preview) {
+  const u = preview.url ? ` ${preview.url}` : "";
+  const n = preview.note ? ` — ${preview.note}` : "";
+  return `${preview.type}${u}${n}`;
+}
+
 function isPlainObject(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -469,6 +825,9 @@ function isNonEmptyString(value) {
 }
 function isSlugValue(value) {
   return typeof value === "string" && SLUG_RE.test(value);
+}
+function isHttpUrl(value) {
+  return typeof value === "string" && /^https?:\/\/\S+$/i.test(value);
 }
 function str(value) {
   return typeof value === "string" ? value : String(value);

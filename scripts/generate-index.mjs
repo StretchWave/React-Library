@@ -23,13 +23,19 @@ try {
   process.exit(1);
 }
 
-const { catalog, themes, categories } = loaded;
-const taxonomyResult = validateTaxonomy(themes, categories);
+const { catalog, themes, categories, aesthetics, attributes, sources } = loaded;
+const taxonomyResult = validateTaxonomy(themes, categories, { aesthetics, attributes, sources });
 const themesDocForEntries = taxonomyResult.errors.length === 0 ? themes : { themes: [] };
 const categoriesDocForEntries = taxonomyResult.errors.length === 0 ? categories : { categories: [] };
 const catalogResult = validateCatalog(
   catalog,
-  { themes: themesDocForEntries, categories: categoriesDocForEntries },
+  {
+    themes: themesDocForEntries,
+    categories: categoriesDocForEntries,
+    aesthetics: { aesthetics: [] },
+    attributes: { attributes: [] },
+    sources: { sources: [] },
+  },
   { root, checkLinks: !skipLinks },
 );
 
@@ -41,12 +47,14 @@ if (errors.length > 0) {
 }
 
 const generatedAt = new Date().toISOString();
-const index = buildIndex(catalog, themes, categories, generatedAt);
+const index = buildIndex(catalog, themes, categories, { aesthetics, attributes, sources }, generatedAt);
 const file = writeIndex(root, index);
 
 const counts = index.counts;
 const rel = path.relative(root, file).replace(/\\/g, "/");
 console.log(
   `Wrote ${rel} — ` +
-    `${counts.entries} entries, ${counts.themes} themes, ${counts.categories} categories (generatedAt ${generatedAt})`,
+    `${counts.entries} entries (${counts.byEntryType.local} local / ${counts.byEntryType.external} external), ` +
+    `${counts.themes} themes, ${counts.categories} categories, ` +
+    `${counts.aesthetics} aesthetics, ${counts.sources} sources (generatedAt ${generatedAt})`,
 );

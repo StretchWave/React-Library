@@ -46,6 +46,7 @@ Where docs disagree, `MASTER_SPEC.md` wins.
 | `IMPLEMENTATION_CHECKLIST.md` | Progress + decision log + placeholders | Update every work session. |
 | `docs/SCHEMA.md` | Schema reference | Update when schema changes. |
 | `taxonomy/*.json` | Canonical enums | Update (then `npm run generate`). |
+| `catalog/components/**` | Ingested third-party component code + manifests (M5) | Written by ingestion adapters, not by hand. |
 | `catalog/catalog.json` | Canonical catalog | Update (then `npm run generate`). |
 | `catalog/index.json` | Derived index | Never — generated. |
 | `scripts/lib/catalog.mjs` | Shared tooling library | Keep 100% dependency-free. |
@@ -89,6 +90,14 @@ Exit codes: `0` found · `1` no match · `2` unknown filter id · `64` usage err
 `{ query, count, matches }`). Text mode prints the formatted record block.
 
 ## Theming rules (library code)
+
+**Two separate theme systems (M5+).** Do not conflate them anywhere in code or UI copy:
+
+1. **Application appearance themes** — the six `--rl-*` token themes in
+   `taxonomy/themes.json` styling this React Library app itself.
+2. **Component aesthetic classifications** — `taxonomy/aesthetics.json` entries that
+   classify the *visual style of cataloged components*; plus independent attributes
+   in `taxonomy/attributes.json` and the source registry `taxonomy/sources.json`.
 
 - Themes live **only** in `taxonomy/themes.json`. Required tokens:
   `--rl-surface, --rl-surface-alt, --rl-text, --rl-text-muted, --rl-accent,

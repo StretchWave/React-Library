@@ -1,11 +1,18 @@
 {
-  "schemaVersion": 1,
-  "generatedAt": "2026-10-24T13:06:21.234Z",
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-24T13:42:58.618Z",
   "generator": "scripts/generate-index.mjs",
   "counts": {
     "entries": 6,
     "themes": 6,
-    "categories": 6
+    "categories": 22,
+    "aesthetics": 12,
+    "sources": 9,
+    "byEntryType": {
+      "local": 6,
+      "external": 0
+    },
+    "bySource": {}
   },
   "taxonomies": {
     "themes": [
@@ -22,7 +29,116 @@
       "layout",
       "display",
       "feedback",
-      "navigation"
+      "navigation",
+      "tabs",
+      "tooltips",
+      "modals",
+      "hero-sections",
+      "pricing-sections",
+      "footers",
+      "backgrounds",
+      "gradients",
+      "text-effects",
+      "loaders",
+      "cursors",
+      "charts",
+      "3d-webgl",
+      "scroll-animations",
+      "page-sections",
+      "page-layouts"
+    ],
+    "aesthetics": [
+      "professional",
+      "casual",
+      "minimal",
+      "luxury",
+      "cyberpunk",
+      "retro-synthwave",
+      "brutalist",
+      "organic",
+      "futuristic",
+      "gaming",
+      "editorial",
+      "playful"
+    ],
+    "attributes": [
+      "dark",
+      "light",
+      "neon",
+      "monochrome",
+      "glassmorphism",
+      "gradient",
+      "rounded",
+      "sharp",
+      "organic",
+      "geometric",
+      "static",
+      "animated",
+      "scroll-driven",
+      "particles",
+      "3d",
+      "react",
+      "typescript",
+      "css",
+      "tailwind",
+      "threejs",
+      "webgl"
+    ],
+    "sources": [
+      {
+        "id": "shadcn",
+        "name": "shadcn/ui",
+        "status": "available",
+        "url": "https://ui.shadcn.com/"
+      },
+      {
+        "id": "magic-ui",
+        "name": "Magic UI",
+        "status": "available",
+        "url": "https://magicui.design/"
+      },
+      {
+        "id": "uiverse",
+        "name": "Uiverse",
+        "status": "available",
+        "url": "https://uiverse.io/"
+      },
+      {
+        "id": "hyperui",
+        "name": "HyperUI",
+        "status": "available",
+        "url": "https://hyperui.dev/"
+      },
+      {
+        "id": "react-bits",
+        "name": "React Bits",
+        "status": "reference-only",
+        "url": "https://reactbits.dev/"
+      },
+      {
+        "id": "aceternity",
+        "name": "Aceternity UI",
+        "status": "reference-only",
+        "url": "https://ui.aceternity.com/"
+      },
+      {
+        "id": "21st-dev",
+        "name": "21st.dev",
+        "status": "partial",
+        "url": "https://21st.dev/"
+      },
+      {
+        "id": "originkit",
+        "name": "Originkit",
+        "status": "partial",
+        "url": "https://www.originkit.dev/"
+      },
+      {
+        "id": "pryzm",
+        "name": "Pryzm",
+        "status": "reference-only",
+        "url": "https://pryzm.design/"
+      }
     ]
   },
   "entries": [

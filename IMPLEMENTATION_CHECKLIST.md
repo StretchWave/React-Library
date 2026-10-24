@@ -12,6 +12,7 @@ Status legend: **[x] done (verified)** · **[~] partial** · **[ ] pending** ·
 | M2 Component browser | ✅ done | 20/20 app tests + 32/32 node tests; dev-server walkthrough: search → "1 of 6 components" → TextInput detail fully rendered (screenshot) |
 | M3 Theme engine + previews + components | ✅ done | verify full-chain green **without --skip-links** (32/32 node, 50/50 app, typecheck, build); browser-verified: Midnight Glass scope restyles app + chat-free preview (screenshot) |
 | M4 Advanced interactions | ✅ done | verify full-chain green **flagless** (32/32 node, 54/54 app, typecheck, build); browser-verified: `#/component/tabs` deep link, copy-usage "Copied ✓" feedback, TabSheet ←/→/Home/End roving focus + selection-follows-focus (screenshot) |
+| M5 Real ingestion + gallery + selection + master prompt | 🚧 M5.1 done — schema v2 + 9-source registry researched; M5.2–M5.6 pending | schema v2 gate green (47/47 node, 54/54 app, typecheck, build); sources verified via official registry/live LICENSE fetches (see decision log) |
 
 Placeholders: none. (TabSheet arrow-key navigation shipped in M4 — catalog `a11yNotes`
 and description updated at v0.3.0; `--skip-links` was removed at M3.)
@@ -45,6 +46,26 @@ and description updated at v0.3.0; `--skip-links` was removed at M3.)
 - 2026-10-24 — `@testing-library/dom` appears as a direct devDependency because it is a
   mandatory peer of `@testing-library/react` v16 (npm auto-installed it); spec §12
   amended accordingly. Otherwise the dependency set matches §12 exactly.
+- 2026-10-24 — **M5.1 schema v2 shipped** (all new fields optional; the six original
+  entries stay valid untouched): `entryType local|external`, `source`, `sourceUrl`,
+  `externalId`, `retrieval`, `preview`, `localDir`, `manifest`, `implementation`,
+  `dependencies`, `license`, `aesthetics`, `attributes`, `syncedAt`; new taxonomies
+  aesthetics/attributes/sources; 16 new categories (22 total); lookup CLI gained
+  `--aesthetic/--source/--type` (exit-2 contract preserved); no new dependencies.
+- 2026-10-24 — **Source licensing decisions (M5.1 research, verified 2026-10-24):**
+  react-bits is **MIT + Commons Clause v1.0** (raw LICENSE.md fetched): free to use in
+  applications, but redistributing the components themselves is forbidden →
+  **reference-only** (metadata + official retrieval; no vendored code). Aceternity's
+  own license bars source redistribution → **reference-only**. shadcn/ui (MIT;
+  registry JSON verified live), Magic UI (MIT; shadcn-registry compatible), Uiverse
+  (MIT; community attribution respected), HyperUI (MIT; repo-retrieval, no API) →
+  **available** for hand-curated local vendoring. 21st.dev and Originkit →
+  **partial** (per-creator/per-component license verification required). Pryzm →
+  **reference-only** (generator studio; gallery is a remix reference, not a code
+  registry). All recorded in `taxonomy/sources.json`.
+- 2026-10-24 — The two theme systems stay strictly separate: application appearance
+  themes (6, `--rl-*` tokens, unchanged) vs component aesthetic classifications
+  (`taxonomy/aesthetics.json`, new). UI copy must not conflate them.
 
 ## 1) Foundations — agent-first base (milestone complete ✅)
 
@@ -153,6 +174,40 @@ M4 evidence recap: `npm run verify` → catalog valid (6/6/6, index up to date) 
 restored TabSheet selection; Copy usage → "Copied ✓"; ArrowRight → Accessibility panel,
 End → API, Home → Overview, ArrowLeft from first wraps to API — all while rendered in
 Midnight Glass (screenshot recorded).
+
+## 5.5) M5 — Real component ingestion, visual preview gallery, multi-selection, master prompt generation 🚧
+
+Staged per MASTER_SPEC §10 M5. Sources researched & documented in
+`taxonomy/sources.json` (evaluatedAt 2026-10-24).
+
+### M5.1 — Schema and source research ✅
+- [x] Repository + spec inspected; baseline `npm run verify` green at `1623f89`
+- [x] Catalog schema v2: local/external entry model + optional
+      aesthetic/preview/license/provenance fields (validator-enforced; external
+      entries cannot declare local paths)
+- [x] `taxonomy/aesthetics.json` — 12 aesthetic classifications (stable ids, friendly labels)
+- [x] `taxonomy/attributes.json` — grouped independent attributes (appearance/motion/tech, 21 ids)
+- [x] `taxonomy/sources.json` — 9 sources with verified access method, status,
+      license, auth + limits (shadcn registry JSON fetched live; react-bits LICENSE.md
+      fetched raw; others checked against official pages/repos)
+- [x] `taxonomy/categories.json` extended with 16 granular categories (22 total)
+- [x] Index v2 (`counts.byEntryType`/`bySource`, taxonomy listings); lookup filters
+      `--aesthetic/--source/--type`; `formatEntryText` shows provenance
+- [x] App-side mirror (types/client/search) kept in parity
+- [x] Node tests 47/47 (+15 new); app tests 54/54; full `npm run verify` green
+- Evidence: `npm run verify` output recorded below; index regenerated
+  (6 entries, 22 categories, 12 aesthetics, 9 sources).
+
+### M5.2 — Real catalog ingestion ⏳
+- [ ] Adapter foundations retrieval-only via officially supported channels
+- [ ] Populate real verified entries (local vendoring only where license permits; reference-only entries for react-bits/aceternity/pryzm/21st/originkit defaults)
+- [ ] Manifests (`component.json`) + previews per source permissions
+- [ ] Source status/sync metadata updated from actual runs
+
+### M5.3 — Gallery and visual previews ⏳
+### M5.4 — Multi-selection ⏳
+### M5.5 — Master prompt generation ⏳
+### M5.6 — Validation and release ⏳
 
 ## 6) Future work (explicitly not now)
 

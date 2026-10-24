@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 2,
+  "evaluatedAt": "2026-10-24",
+  "description": "Registry of component sources with their verified access methods and licensing facts (researched 2026-10-24). Statuses: available = code may be stored locally under a permissive license via an official channel; partial = usable with per-entry caveats; reference-only = metadata + official retrieval only, redistribution not permitted; requires-auth = credentials needed; unavailable = unusable. Entry counts are derived, not stored here - see catalog/index.json.",
+  "statuses": [
+    "available",
+    "partial",
+    "reference-only",
+    "requires-auth",
+    "unavailable"
+  ],
+  "sources": [
+    {
+      "id": "shadcn",
+      "name": "shadcn/ui",
+      "url": "https://ui.shadcn.com/",
+      "repo": "https://github.com/shadcn-ui/ui",
+      "accessMethod": "official-registry",
+      "status": "available",
+      "license": "MIT",
+      "auth": "none",
+      "limit": null,
+      "notes": "Open registry JSON verified live at https://ui.shadcn.com/r/styles/[style]/[item].json (registry-item schema). Official CLI: npx shadcn@latest add <registry-url>. Copy-paste is the distribution model, so vendoring selected items locally is permitted with attribution. Tailwind-based; components render in the app only via source-link fallback previews."
+    },
+    {
+      "id": "magic-ui",
+      "name": "Magic UI",
+      "url": "https://magicui.design/",
+      "repo": "https://github.com/magicuidesign/magicui",
+      "accessMethod": "official-registry",
+      "status": "available",
+      "license": "MIT",
+      "auth": "none",
+      "limit": null,
+      "notes": "150+ animated components, shadcn-registry compatible (retrieve via the shadcn CLI with Magic UI registry URLs). MIT; vendoring selected items locally is permitted. Tailwind + Motion based."
+    },
+    {
+      "id": "uiverse",
+      "name": "Uiverse",
+      "url": "https://uiverse.io/",
+      "repo": "https://github.com/uiverse-io/galaxy",
+      "accessMethod": "repo-curated",
+      "status": "available",
+      "license": "MIT (community-made; keep per-element author attribution)",
+      "auth": "none",
+      "limit": "Fair-use policy restricts automated/bulk mirroring - hand-curate individual elements",
+      "notes": "Community-built elements in HTML/CSS/Tailwind/React. Galaxy repo states all elements are MIT-licensed. Ingested elements are hand-curated with author attribution and are previewable in-app as sandboxed CSS demos."
+    },
+    {
+      "id": "hyperui",
+      "name": "HyperUI",
+      "url": "https://hyperui.dev/",
+      "repo": "https://github.com/markmead/hyperui",
+      "accessMethod": "repo-vendored",
+      "status": "available",
+      "license": "MIT",
+      "auth": "none",
+      "limit": null,
+      "notes": "Free Tailwind CSS v4 components for marketing/ecommerce/app UI. No registry API - retrieve from the official repo or the copy-paste site. Tailwind-based; app previews use source-link fallback."
+    },
+    {
+      "id": "react-bits",
+      "name": "React Bits",
+      "url": "https://reactbits.dev/",
+      "repo": "https://github.com/DavidHDev/react-bits",
+      "accessMethod": "official-docs",
+      "status": "reference-only",
+      "license": "MIT + Commons Clause v1.0 (LICENSE.md verified 2026-10-24)",
+      "auth": "none",
+      "limit": "Commons Clause forbids selling, sublicensing, or redistributing the components themselves - alone, bundled, or ported.",
+      "notes": "215+ animated components. Use in applications is permitted, but a component catalog redistributing the files would cross the Commons Clause restriction, so this catalog stores metadata, official demo links, and retrieval instructions only; the receiving agent fetches code from the official source."
+    },
+    {
+      "id": "aceternity",
+      "name": "Aceternity UI",
+      "url": "https://ui.aceternity.com/",
+      "repo": null,
+      "accessMethod": "official-docs",
+      "status": "reference-only",
+      "license": "Custom free license; source redistribution forbidden (licence page + third-party summaries)",
+      "auth": "none to browse; Pro tier is paid",
+      "limit": "No local storage or redistribution of source; third-party components within items may carry other licenses.",
+      "notes": "200+ animated Tailwind + Motion components. Catalog keeps reference metadata and official links; the agent must copy from the official source directly."
+    },
+    {
+      "id": "21st-dev",
+      "name": "21st.dev",
+      "url": "https://21st.dev/",
+      "repo": null,
+      "accessMethod": "official-registry",
+      "status": "partial",
+      "license": "varies per component/creator - verify per entry",
+      "auth": "optional (account needed only to publish)",
+      "limit": "Per-creator licensing; their terms forbid redistributing code from libraries that prohibit it.",
+      "notes": "Community registry of React components. Default to reference-only entries with the official component URL as the retrieval instruction; ingest locally only when the creator's license is verified permissive."
+    },
+    {
+      "id": "originkit",
+      "name": "Originkit",
+      "url": "https://www.originkit.dev/",
+      "repo": null,
+      "accessMethod": "mcp",
+      "status": "partial",
+      "license": "custom free tier - verify per component",
+      "auth": "none to browse",
+      "limit": "~50 free animated components; copy limits on the free tier; full catalogue is a paid upgrade.",
+      "notes": "Animated React/Framer components with an official MCP server for browsing/import (community-published gateway exists). Reference-first; ingest locally only if the per-component license is verified permissive."
+    },
+    {
+      "id": "pryzm",
+      "name": "Pryzm",
+      "url": "https://pryzm.design/",
+      "repo": null,
+      "accessMethod": "official-docs",
+      "status": "reference-only",
+      "license": "generator tool - exports belong to the user; gallery looks are remix references",
+      "auth": "none",
+      "limit": "No component code registry; visual gallery is for remixing, not redistribution.",
+      "notes": "Background/gradient/texture studio with a curated gallery. Use as background and gradient references; the agent recreates looks via the official studio or its exports instead of vendoring gallery assets."
+    }
+  ]
+}
