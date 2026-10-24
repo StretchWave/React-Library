@@ -1,0 +1,24 @@
+{
+  "entryId": "magic-ui-border-beam",
+  "source": "magic-ui",
+  "externalId": "border-beam",
+  "registryItem": "border-beam",
+  "registryUrl": "https://magicui.design/r/border-beam.json",
+  "docsUrl": "https://magicui.design/docs/components/border-beam",
+  "type": "registry:ui",
+  "files": [
+    {
+      "path": "border-beam.tsx",
+      "type": "registry:ui"
+    }
+  ],
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "Vendored from the official Magic UI registry; keep the original copyright notice."
+  },
+  "fetchedAt": "2026-10-24"
+}

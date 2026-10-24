@@ -1,0 +1,26 @@
+{
+  "entryId": "shadcn-tooltip",
+  "source": "shadcn",
+  "externalId": "tooltip",
+  "registryItem": "tooltip",
+  "registryStyle": "new-york-v4",
+  "registryUrl": "https://ui.shadcn.com/r/styles/new-york-v4/tooltip.json",
+  "docsUrl": "https://ui.shadcn.com/docs/components/tooltip",
+  "type": "registry:ui",
+  "files": [
+    {
+      "path": "tooltip.tsx",
+      "type": "registry:ui"
+    }
+  ],
+  "dependencies": [
+    "cn",
+    "radix-ui"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+  },
+  "fetchedAt": "2026-10-24"
+}

@@ -38,12 +38,20 @@ function defaultProps(overrides: Partial<FilterBarProps> = {}): FilterBarProps {
   };
 }
 
+/** Exact accessible-name anchor for an original catalog entry row
+ *  (e.g. "Button stable"), disambiguating from ingested duplicates such as
+ *  "Button (shadcn) stable" that share the seeded names as prefixes. */
+const STATUS_GROUP = "stable|beta|experimental|deprecated";
+function entryItem(name: string) {
+  return screen.getByRole("button", { name: new RegExp(`^${name} (${STATUS_GROUP})$`) });
+}
+
 describe("App (M1 skeleton)", () => {
   it("renders every canonical catalog entry name", () => {
     renderApp();
     expect(screen.getByText("React Library")).toBeTruthy();
     for (const name of ENTRY_NAMES) {
-      expect(screen.getByRole("button", { name: new RegExp(`^${name}\\b`) })).toBeTruthy();
+      expect(entryItem(name)).toBeTruthy();
     }
   });
 
@@ -54,22 +62,22 @@ describe("App (M1 skeleton)", () => {
 
   it("updates the detail pane when an entry is selected", () => {
     renderApp();
-    fireEvent.click(screen.getByRole("button", { name: /^Card\b/ }));
+    fireEvent.click(entryItem("Card"));
     expect(screen.getAllByRole("heading", { level: 2, name: "Card" }).length).toBeGreaterThan(0);
     expect(screen.getAllByText("Themed surface container that groups related content.").length).toBeGreaterThan(0);
   });
 
   it("switches detail when another entry is selected", () => {
     renderApp();
-    fireEvent.click(screen.getByRole("button", { name: /^Card\b/ }));
-    fireEvent.click(screen.getByRole("button", { name: /^Alert\b/ }));
+    fireEvent.click(entryItem("Card"));
+    fireEvent.click(entryItem("Alert"));
     expect(screen.getAllByRole("heading", { level: 2, name: "Alert" }).length).toBeGreaterThan(0);
     expect(screen.queryByRole("heading", { name: "Card" })).toBeNull();
   });
 
   it("marks the selected entry with aria-current", () => {
     renderApp();
-    const before = screen.getByRole("button", { name: /^Button\b/ });
+    const before = entryItem("Button");
     expect(before.getAttribute("aria-current")).toBeNull();
     fireEvent.click(before);
     expect(before.getAttribute("aria-current")).toBe("true");
@@ -80,22 +88,22 @@ describe("App (M2 component browser)", () => {
   it("filters by query from the search box", () => {
     renderApp();
     fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "tabs" } });
-    expect(screen.getByRole("status").textContent).toContain("1 of 6 components");
-    expect(screen.getByRole("button", { name: /^TabSheet\b/ })).toBeTruthy();
+    expect(screen.getByRole("status").textContent).toContain("2 of 33 components");
+    expect(entryItem("TabSheet")).toBeTruthy();
     expect(screen.queryByRole("button", { name: /^Alert\b/ })).toBeNull();
   });
 
   it("filters by category via the taxonomy-driven select", () => {
     renderApp();
     fireEvent.change(screen.getByLabelText("Category"), { target: { value: "inputs" } });
-    expect(screen.getByRole("status").textContent).toContain("1 of 6 components");
+    expect(screen.getByRole("status").textContent).toContain("3 of 33 components");
     expect(screen.getByRole("button", { name: /^TextInput\b/ })).toBeTruthy();
   });
 
   it("filters by theme via the taxonomy-driven select", () => {
     renderApp();
     fireEvent.change(screen.getByLabelText("Filter by theme"), { target: { value: "retro-terminal" } });
-    expect(screen.getByRole("status").textContent).toContain("6 of 6 components");
+    expect(screen.getByRole("status").textContent).toContain("33 of 33 components");
   });
 
   it("shows the filter empty state and restores on Reset filters", () => {
@@ -103,8 +111,8 @@ describe("App (M2 component browser)", () => {
     fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "zzz-no-match" } });
     expect(screen.getByText(/No components match/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Reset filters" }));
-    expect(screen.getByRole("status").textContent).toBe("6 components");
-    expect(screen.getByRole("button", { name: /^Button\b/ })).toBeTruthy();
+    expect(screen.getByRole("status").textContent).toBe("33 components");
+    expect(entryItem("Button")).toBeTruthy();
   });
 
   it('the "/" shortcut focuses search; Escape clears the query', () => {
@@ -121,9 +129,9 @@ describe("App (M2 component browser)", () => {
   it("keeps list, detail, and filter state independent when selecting an entry", () => {
     renderApp();
     fireEvent.change(screen.getByLabelText("Category"), { target: { value: "display" } });
-    fireEvent.click(screen.getByRole("button", { name: /^Badge\b/ }));
+    fireEvent.click(entryItem("Badge"));
     expect(screen.getAllByRole("heading", { level: 2, name: "Badge" }).length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: /^Badge\b/ }).getAttribute("aria-current")).toBe("true");
+    expect(entryItem("Badge").getAttribute("aria-current")).toBe("true");
   });
 });
 
@@ -148,10 +156,10 @@ describe("App (M3 theme engine + live preview)", () => {
 
   it("renders the live preview for the selected entry's demo", () => {
     renderApp();
-    fireEvent.click(screen.getByRole("button", { name: /^Button\b/ }));
+    fireEvent.click(entryItem("Button"));
     expect(screen.getByTestId("live-preview")).toBeTruthy();
     expect(document.querySelector('[data-demo-id="button"]')).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: /^TabSheet\b/ }));
+    fireEvent.click(entryItem("TabSheet"));
     expect(document.querySelector('[data-demo-id="tabs"]')).toBeTruthy();
   });
 
@@ -208,7 +216,7 @@ describe("App (M4 deep links)", () => {
 
   it("selection writes the hash; hash changes drive back/forward selection", async () => {
     renderApp();
-    fireEvent.click(screen.getByRole("button", { name: /^Alert\b/ }));
+    fireEvent.click(entryItem("Alert"));
     expect(window.location.hash).toBe("#/component/alert");
     expect(
       screen.getAllByRole("heading", { level: 2, name: "Alert" }).length,

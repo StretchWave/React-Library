@@ -1,0 +1,26 @@
+{
+  "entryId": "shadcn-dropdown-menu",
+  "source": "shadcn",
+  "externalId": "dropdown-menu",
+  "registryItem": "dropdown-menu",
+  "registryStyle": "new-york-v4",
+  "registryUrl": "https://ui.shadcn.com/r/styles/new-york-v4/dropdown-menu.json",
+  "docsUrl": "https://ui.shadcn.com/docs/components/dropdown-menu",
+  "type": "registry:ui",
+  "files": [
+    {
+      "path": "dropdown-menu.tsx",
+      "type": "registry:ui"
+    }
+  ],
+  "dependencies": [
+    "cn",
+    "radix-ui"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+  },
+  "fetchedAt": "2026-10-24"
+}

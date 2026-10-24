@@ -19,8 +19,15 @@
         "retro-terminal",
         "soft-pastel"
       ],
-      "aliases": ["banner", "notice"],
-      "tags": ["feedback", "message", "status"],
+      "aliases": [
+        "banner",
+        "notice"
+      ],
+      "tags": [
+        "feedback",
+        "message",
+        "status"
+      ],
       "status": "stable",
       "version": "1.0.0",
       "addedDate": "2026-10-24",
@@ -52,7 +59,9 @@
         "demo": "src/components/Alert/AlertDemo.tsx"
       },
       "a11yNotes": "Renders with role=\"alert\" so content is announced when inserted.",
-      "usedFrom": ["src/catalog/demos.ts"]
+      "usedFrom": [
+        "src/catalog/demos.ts"
+      ]
     },
     {
       "id": "badge",
@@ -68,8 +77,15 @@
         "retro-terminal",
         "soft-pastel"
       ],
-      "aliases": ["chip", "label"],
-      "tags": ["label", "metadata", "status"],
+      "aliases": [
+        "chip",
+        "label"
+      ],
+      "tags": [
+        "label",
+        "metadata",
+        "status"
+      ],
       "status": "stable",
       "version": "1.0.0",
       "addedDate": "2026-10-24",
@@ -94,7 +110,9 @@
         "source": "src/components/Badge/Badge.tsx",
         "demo": "src/components/Badge/BadgeDemo.tsx"
       },
-      "usedFrom": ["src/catalog/demos.ts"]
+      "usedFrom": [
+        "src/catalog/demos.ts"
+      ]
     },
     {
       "id": "button",
@@ -110,8 +128,14 @@
         "retro-terminal",
         "soft-pastel"
       ],
-      "aliases": ["btn"],
-      "tags": ["action", "form", "interactive"],
+      "aliases": [
+        "btn"
+      ],
+      "tags": [
+        "action",
+        "form",
+        "interactive"
+      ],
       "status": "stable",
       "version": "1.0.0",
       "addedDate": "2026-10-24",
@@ -150,7 +174,10 @@
         "demo": "src/components/Button/ButtonDemo.tsx"
       },
       "a11yNotes": "Native button semantics; focus ring from theme token --rl-focus.",
-      "usedFrom": ["src/components/browser/DetailPane.tsx", "src/catalog/demos.ts"]
+      "usedFrom": [
+        "src/components/browser/DetailPane.tsx",
+        "src/catalog/demos.ts"
+      ]
     },
     {
       "id": "card",
@@ -166,8 +193,15 @@
         "retro-terminal",
         "soft-pastel"
       ],
-      "aliases": ["panel", "surface"],
-      "tags": ["container", "layout", "surface"],
+      "aliases": [
+        "panel",
+        "surface"
+      ],
+      "tags": [
+        "container",
+        "layout",
+        "surface"
+      ],
       "status": "stable",
       "version": "1.0.0",
       "addedDate": "2026-10-24",
@@ -204,7 +238,1493 @@
         "source": "src/components/Card/Card.tsx",
         "demo": "src/components/Card/CardDemo.tsx"
       },
-      "usedFrom": ["src/components/browser/DetailPane.tsx", "src/catalog/demos.ts"]
+      "usedFrom": [
+        "src/components/browser/DetailPane.tsx",
+        "src/catalog/demos.ts"
+      ]
+    },
+    {
+      "id": "magic-ui-blur-fade",
+      "name": "Blur Fade (Magic UI)",
+      "summary": "Blur Fade: Magic UI animated component, vendored with manifest; integrates via Tailwind in the target project.",
+      "description": "Blur Fade is vendored from the official Magic UI registry (MIT). The component pairs with shadcn/ui and uses Tailwind classes plus the cn() helper; see the recorded dependencies. The React Library app previews it via the official docs since Tailwind is not part of this app's runtime.",
+      "category": "scroll-animations",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "magic-ui",
+        "tailwind",
+        "animation",
+        "scroll",
+        "animations"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "magic-ui",
+      "sourceUrl": "https://magicui.design/docs/components/blur-fade",
+      "externalId": "blur-fade",
+      "retrieval": "npx shadcn@latest add https://magicui.design/r/blur-fade.json (official CLI), or use the vendored files in catalog/components/magic-ui/blur-fade/",
+      "preview": {
+        "type": "external",
+        "url": "https://magicui.design/docs/components/blur-fade"
+      },
+      "localDir": "catalog/components/magic-ui/blur-fade",
+      "manifest": "catalog/components/magic-ui/blur-fade/component.json",
+      "implementation": [
+        "catalog/components/magic-ui/blur-fade/blur-fade.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "motion",
+          "reason": "Animation runtime (components import motion/react)."
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official Magic UI registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "minimal",
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "animated",
+        "scroll-driven"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "magic-ui-border-beam",
+      "name": "Border Beam (Magic UI)",
+      "summary": "Border Beam: Magic UI animated component, vendored with manifest; integrates via Tailwind in the target project.",
+      "description": "Border Beam is vendored from the official Magic UI registry (MIT). The component pairs with shadcn/ui and uses Tailwind classes plus the cn() helper; see the recorded dependencies. The React Library app previews it via the official docs since Tailwind is not part of this app's runtime.",
+      "category": "display",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "magic-ui",
+        "tailwind",
+        "animation",
+        "display"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "magic-ui",
+      "sourceUrl": "https://magicui.design/docs/components/border-beam",
+      "externalId": "border-beam",
+      "retrieval": "npx shadcn@latest add https://magicui.design/r/border-beam.json (official CLI), or use the vendored files in catalog/components/magic-ui/border-beam/",
+      "preview": {
+        "type": "external",
+        "url": "https://magicui.design/docs/components/border-beam"
+      },
+      "localDir": "catalog/components/magic-ui/border-beam",
+      "manifest": "catalog/components/magic-ui/border-beam/component.json",
+      "implementation": [
+        "catalog/components/magic-ui/border-beam/border-beam.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "motion",
+          "reason": "Animation runtime (components import motion/react)."
+        },
+        {
+          "name": "cn",
+          "reason": "shadcn's cn() helper alias (@/lib/utils) used for class merging."
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official Magic UI registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "futuristic",
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "animated",
+        "gradient"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "magic-ui-dot-pattern",
+      "name": "Dot Pattern (Magic UI)",
+      "summary": "Dot Pattern: Magic UI animated component, vendored with manifest; integrates via Tailwind in the target project.",
+      "description": "Dot Pattern is vendored from the official Magic UI registry (MIT). The component pairs with shadcn/ui and uses Tailwind classes plus the cn() helper; see the recorded dependencies. The React Library app previews it via the official docs since Tailwind is not part of this app's runtime.",
+      "category": "backgrounds",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "magic-ui",
+        "tailwind",
+        "animation",
+        "backgrounds"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "magic-ui",
+      "sourceUrl": "https://magicui.design/docs/components/dot-pattern",
+      "externalId": "dot-pattern",
+      "retrieval": "npx shadcn@latest add https://magicui.design/r/dot-pattern.json (official CLI), or use the vendored files in catalog/components/magic-ui/dot-pattern/",
+      "preview": {
+        "type": "external",
+        "url": "https://magicui.design/docs/components/dot-pattern"
+      },
+      "localDir": "catalog/components/magic-ui/dot-pattern",
+      "manifest": "catalog/components/magic-ui/dot-pattern/component.json",
+      "implementation": [
+        "catalog/components/magic-ui/dot-pattern/dot-pattern.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "motion",
+          "reason": "Animation runtime (components import motion/react)."
+        },
+        {
+          "name": "cn",
+          "reason": "shadcn's cn() helper alias (@/lib/utils) used for class merging."
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official Magic UI registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "minimal",
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "static",
+        "geometric"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "magic-ui-word-rotate",
+      "name": "Word Rotate (Magic UI)",
+      "summary": "Word Rotate: Magic UI animated component, vendored with manifest; integrates via Tailwind in the target project.",
+      "description": "Word Rotate is vendored from the official Magic UI registry (MIT). The component pairs with shadcn/ui and uses Tailwind classes plus the cn() helper; see the recorded dependencies. The React Library app previews it via the official docs since Tailwind is not part of this app's runtime.",
+      "category": "text-effects",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "magic-ui",
+        "tailwind",
+        "animation",
+        "text",
+        "effects"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "magic-ui",
+      "sourceUrl": "https://magicui.design/docs/components/word-rotate",
+      "externalId": "word-rotate",
+      "retrieval": "npx shadcn@latest add https://magicui.design/r/word-rotate.json (official CLI), or use the vendored files in catalog/components/magic-ui/word-rotate/",
+      "preview": {
+        "type": "external",
+        "url": "https://magicui.design/docs/components/word-rotate"
+      },
+      "localDir": "catalog/components/magic-ui/word-rotate",
+      "manifest": "catalog/components/magic-ui/word-rotate/component.json",
+      "implementation": [
+        "catalog/components/magic-ui/word-rotate/word-rotate.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "motion",
+          "reason": "Animation runtime (components import motion/react)."
+        },
+        {
+          "name": "cn",
+          "reason": "shadcn's cn() helper alias (@/lib/utils) used for class merging."
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official Magic UI registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "editorial",
+        "minimal"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "animated"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "react-bits-ballpit",
+      "name": "Ballpit (React Bits)",
+      "summary": "Physics ball-pit background from React Bits; reference entry with official registry retrieval.",
+      "description": "Reference to React Bits' Ballpit animated background (official category: Backgrounds). The MIT + Commons Clause license permits using the component in applications but forbids redistributing the components themselves, so this catalog keeps metadata and official retrieval only.",
+      "category": "backgrounds",
+      "themes": ["brutalist-print", "classic-clean", "midnight-glass", "neon-cyberpunk", "retro-terminal", "soft-pastel"],
+      "aliases": [],
+      "tags": ["react-bits", "background", "animation"],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "external",
+      "source": "react-bits",
+      "sourceUrl": "https://reactbits.dev/r/Ballpit-TS-TW.json",
+      "externalId": "Ballpit-TS-TW",
+      "retrieval": "npx shadcn@latest add @react-bits/Ballpit-TS-TW (official registry https://reactbits.dev/r/{name}.json; MCP also supported - https://reactbits.dev/get-started/mcp). Check the returned files' imports for actual dependencies before installing.",
+      "preview": { "type": "source-link", "url": "https://reactbits.dev/c/backgrounds" },
+      "license": { "spdx": "MIT", "note": "MIT + Commons Clause v1.0: sale/sublicense/redistribution of the components themselves is forbidden; use inside an application is permitted." },
+      "aesthetics": ["playful", "futuristic"],
+      "attributes": ["react", "typescript", "tailwind", "animated"]
+    },
+    {
+      "id": "react-bits-circular-gallery",
+      "name": "Circular Gallery (React Bits)",
+      "summary": "Cylindrical image gallery section from React Bits; reference entry with official retrieval.",
+      "description": "Reference to React Bits' Circular Gallery (official category: Components), a looping cylindrical scroll/gallery surface. Metadata-only entry: the Commons Clause forbids this catalog from redistributing the component; agents fetch it from the official registry.",
+      "category": "page-sections",
+      "themes": ["brutalist-print", "classic-clean", "midnight-glass", "neon-cyberpunk", "retro-terminal", "soft-pastel"],
+      "aliases": [],
+      "tags": ["react-bits", "gallery", "animation"],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "external",
+      "source": "react-bits",
+      "sourceUrl": "https://reactbits.dev/r/CircularGallery-TS-TW.json",
+      "externalId": "CircularGallery-TS-TW",
+      "retrieval": "npx shadcn@latest add @react-bits/CircularGallery-TS-TW (official registry https://reactbits.dev/r/{name}.json; MCP also supported - https://reactbits.dev/get-started/mcp). Check imports for actual dependencies before installing.",
+      "preview": { "type": "source-link", "url": "https://reactbits.dev/c/components" },
+      "license": { "spdx": "MIT", "note": "MIT + Commons Clause v1.0: sale/sublicense/redistribution of the components themselves is forbidden; use inside an application is permitted." },
+      "aesthetics": ["editorial", "luxury"],
+      "attributes": ["react", "typescript", "tailwind", "animated"]
+    },
+    {
+      "id": "react-bits-fluid-glass",
+      "name": "Fluid Glass (React Bits)",
+      "summary": "Refractive fluid-glass background from React Bits; reference entry with official retrieval.",
+      "description": "Reference to React Bits' Fluid Glass animated background (official category: Backgrounds, featured on the official hero). Metadata-only: Commons Clause forbids redistribution; use the official registry or MCP retrieval.",
+      "category": "backgrounds",
+      "themes": ["brutalist-print", "classic-clean", "midnight-glass", "neon-cyberpunk", "retro-terminal", "soft-pastel"],
+      "aliases": [],
+      "tags": ["react-bits", "background", "animation"],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "external",
+      "source": "react-bits",
+      "sourceUrl": "https://reactbits.dev/r/FluidGlass-TS-TW.json",
+      "externalId": "FluidGlass-TS-TW",
+      "retrieval": "npx shadcn@latest add @react-bits/FluidGlass-TS-TW (official registry https://reactbits.dev/r/{name}.json; MCP also supported - https://reactbits.dev/get-started/mcp). Check imports for actual dependencies before installing.",
+      "preview": { "type": "source-link", "url": "https://reactbits.dev/c/backgrounds" },
+      "license": { "spdx": "MIT", "note": "MIT + Commons Clause v1.0: sale/sublicense/redistribution of the components themselves is forbidden; use inside an application is permitted." },
+      "aesthetics": ["futuristic", "luxury"],
+      "attributes": ["react", "typescript", "tailwind", "animated", "3d"]
+    },
+    {
+      "id": "react-bits-laser-flow",
+      "name": "Laser Flow (React Bits)",
+      "summary": "Flowing laser-wire background from React Bits; reference entry with official retrieval.",
+      "description": "Reference to React Bits' Laser Flow background (official category: Backgrounds, featured on the official hero). Metadata-only: Commons Clause forbids redistribution; retrieve via the official registry or MCP.",
+      "category": "backgrounds",
+      "themes": ["brutalist-print", "classic-clean", "midnight-glass", "neon-cyberpunk", "retro-terminal", "soft-pastel"],
+      "aliases": [],
+      "tags": ["react-bits", "background", "animation"],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "external",
+      "source": "react-bits",
+      "sourceUrl": "https://reactbits.dev/r/LaserFlow-TS-TW.json",
+      "externalId": "LaserFlow-TS-TW",
+      "retrieval": "npx shadcn@latest add @react-bits/LaserFlow-TS-TW (official registry https://reactbits.dev/r/{name}.json; MCP also supported - https://reactbits.dev/get-started/mcp). Check imports for actual dependencies before installing.",
+      "preview": { "type": "source-link", "url": "https://reactbits.dev/c/backgrounds" },
+      "license": { "spdx": "MIT", "note": "MIT + Commons Clause v1.0: sale/sublicense/redistribution of the components themselves is forbidden; use inside an application is permitted." },
+      "aesthetics": ["cyberpunk", "futuristic"],
+      "attributes": ["react", "typescript", "tailwind", "animated"]
+    },
+    {
+      "id": "react-bits-metallic-paint",
+      "name": "Metallic Paint (React Bits)",
+      "summary": "Interactive metallic-paint canvas background from React Bits; official retrieval only.",
+      "description": "Reference to React Bits' Metallic Paint background (official category: Backgrounds, featured on the official hero). Metadata-only: Commons Clause forbids redistribution; retrieve via the official registry or MCP.",
+      "category": "backgrounds",
+      "themes": ["brutalist-print", "classic-clean", "midnight-glass", "neon-cyberpunk", "retro-terminal", "soft-pastel"],
+      "aliases": [],
+      "tags": ["react-bits", "background", "animation"],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "external",
+      "source": "react-bits",
+      "sourceUrl": "https://reactbits.dev/r/MetallicPaint-TS-TW.json",
+      "externalId": "MetallicPaint-TS-TW",
+      "retrieval": "npx shadcn@latest add @react-bits/MetallicPaint-TS-TW (official registry https://reactbits.dev/r/{name}.json; MCP also supported - https://reactbits.dev/get-started/mcp). Check imports for actual dependencies before installing.",
+      "preview": { "type": "source-link", "url": "https://reactbits.dev/c/backgrounds" },
+      "license": { "spdx": "MIT", "note": "MIT + Commons Clause v1.0: sale/sublicense/redistribution of the components themselves is forbidden; use inside an application is permitted." },
+      "aesthetics": ["futuristic", "luxury"],
+      "attributes": ["react", "typescript", "tailwind", "animated"]
+    },
+    {
+      "id": "react-bits-ribbons",
+      "name": "Ribbons (React Bits)",
+      "summary": "Hover-reactive cursor ribbon background from React Bits; official retrieval only.",
+      "description": "Reference to React Bits' Ribbons cursor-reactive background (official category: Backgrounds; registry item verified live). Metadata-only: Commons Clause forbids redistribution; use the official registry or MCP retrieval.",
+      "category": "backgrounds",
+      "themes": ["brutalist-print", "classic-clean", "midnight-glass", "neon-cyberpunk", "retro-terminal", "soft-pastel"],
+      "aliases": [],
+      "tags": ["react-bits", "background", "cursor"],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "external",
+      "source": "react-bits",
+      "sourceUrl": "https://reactbits.dev/r/Ribbons-TS-TW.json",
+      "externalId": "Ribbons-TS-TW",
+      "retrieval": "npx shadcn@latest add @react-bits/Ribbons-TS-TW (official registry https://reactbits.dev/r/{name}.json; MCP also supported - https://reactbits.dev/get-started/mcp). Check imports for actual dependencies before installing.",
+      "preview": { "type": "source-link", "url": "https://reactbits.dev/c/backgrounds" },
+      "license": { "spdx": "MIT", "note": "MIT + Commons Clause v1.0: sale/sublicense/redistribution of the components themselves is forbidden; use inside an application is permitted." },
+      "aesthetics": ["playful", "casual"],
+      "attributes": ["react", "typescript", "tailwind", "animated"]
+    },
+    {
+      "id": "react-bits-split-text",
+      "name": "Split Text (React Bits)",
+      "summary": "Per-character split text animation from React Bits; reference entry with official retrieval.",
+      "description": "Reference to React Bits' Split Text animation (official category: Text Animations). Ships in four flavors (JS/TS x CSS/Tailwind); the TS+Tailwind register item is the verified canonical id. Metadata-only: Commons Clause forbids redistribution.",
+      "category": "text-effects",
+      "themes": ["brutalist-print", "classic-clean", "midnight-glass", "neon-cyberpunk", "retro-terminal", "soft-pastel"],
+      "aliases": [],
+      "tags": ["react-bits", "text", "animation"],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "external",
+      "source": "react-bits",
+      "sourceUrl": "https://reactbits.dev/r/SplitText-TS-TW.json",
+      "externalId": "SplitText-TS-TW",
+      "retrieval": "npx shadcn@latest add @react-bits/SplitText-TS-TW (official registry https://reactbits.dev/r/{name}.json; MCP also supported - https://reactbits.dev/get-started/mcp). Check imports for actual dependencies before installing.",
+      "preview": { "type": "source-link", "url": "https://reactbits.dev/c/text-animations" },
+      "license": { "spdx": "MIT", "note": "MIT + Commons Clause v1.0: sale/sublicense/redistribution of the components themselves is forbidden; use inside an application is permitted." },
+      "aesthetics": ["editorial", "professional"],
+      "attributes": ["react", "typescript", "tailwind", "animated"]
+    },
+    {
+      "id": "shadcn-accordion",
+      "name": "Accordion (shadcn)",
+      "summary": "Accordion: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Accordion is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "layout",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "layout",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/accordion",
+      "externalId": "accordion",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/accordion.json (official CLI), or use the vendored files in catalog/components/shadcn/accordion/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/accordion"
+      },
+      "localDir": "catalog/components/shadcn/accordion",
+      "manifest": "catalog/components/shadcn/accordion/component.json",
+      "implementation": [
+        "catalog/components/shadcn/accordion/accordion.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        },
+        {
+          "name": "radix-ui"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "animated",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-alert",
+      "name": "Alert (shadcn)",
+      "summary": "Alert: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Alert is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "feedback",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "feedback",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/alert",
+      "externalId": "alert",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/alert.json (official CLI), or use the vendored files in catalog/components/shadcn/alert/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/alert"
+      },
+      "localDir": "catalog/components/shadcn/alert",
+      "manifest": "catalog/components/shadcn/alert/component.json",
+      "implementation": [
+        "catalog/components/shadcn/alert/alert.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "static",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-avatar",
+      "name": "Avatar (shadcn)",
+      "summary": "Avatar: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Avatar is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "display",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "display",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/avatar",
+      "externalId": "avatar",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/avatar.json (official CLI), or use the vendored files in catalog/components/shadcn/avatar/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/avatar"
+      },
+      "localDir": "catalog/components/shadcn/avatar",
+      "manifest": "catalog/components/shadcn/avatar/component.json",
+      "implementation": [
+        "catalog/components/shadcn/avatar/avatar.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        },
+        {
+          "name": "radix-ui"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "static",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-badge",
+      "name": "Badge (shadcn)",
+      "summary": "Badge: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Badge is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "display",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "display",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/badge",
+      "externalId": "badge",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/badge.json (official CLI), or use the vendored files in catalog/components/shadcn/badge/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/badge"
+      },
+      "localDir": "catalog/components/shadcn/badge",
+      "manifest": "catalog/components/shadcn/badge/component.json",
+      "implementation": [
+        "catalog/components/shadcn/badge/badge.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        },
+        {
+          "name": "radix-ui"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional",
+        "minimal"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "static",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-breadcrumb",
+      "name": "Breadcrumb (shadcn)",
+      "summary": "Breadcrumb: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Breadcrumb is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "navigation",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "navigation",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/breadcrumb",
+      "externalId": "breadcrumb",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/breadcrumb.json (official CLI), or use the vendored files in catalog/components/shadcn/breadcrumb/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/breadcrumb"
+      },
+      "localDir": "catalog/components/shadcn/breadcrumb",
+      "manifest": "catalog/components/shadcn/breadcrumb/component.json",
+      "implementation": [
+        "catalog/components/shadcn/breadcrumb/breadcrumb.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        },
+        {
+          "name": "radix-ui"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "static",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-button",
+      "name": "Button (shadcn)",
+      "summary": "Button: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Button is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "buttons",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "buttons",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/button",
+      "externalId": "button",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/button.json (official CLI), or use the vendored files in catalog/components/shadcn/button/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/button"
+      },
+      "localDir": "catalog/components/shadcn/button",
+      "manifest": "catalog/components/shadcn/button/component.json",
+      "implementation": [
+        "catalog/components/shadcn/button/button.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        },
+        {
+          "name": "radix-ui"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "static",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-card",
+      "name": "Card (shadcn)",
+      "summary": "Card: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Card is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "layout",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "layout",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/card",
+      "externalId": "card",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/card.json (official CLI), or use the vendored files in catalog/components/shadcn/card/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/card"
+      },
+      "localDir": "catalog/components/shadcn/card",
+      "manifest": "catalog/components/shadcn/card/component.json",
+      "implementation": [
+        "catalog/components/shadcn/card/card.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "static",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-dialog",
+      "name": "Dialog (shadcn)",
+      "summary": "Dialog: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Dialog is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "modals",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "modals",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/dialog",
+      "externalId": "dialog",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/dialog.json (official CLI), or use the vendored files in catalog/components/shadcn/dialog/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/dialog"
+      },
+      "localDir": "catalog/components/shadcn/dialog",
+      "manifest": "catalog/components/shadcn/dialog/component.json",
+      "implementation": [
+        "catalog/components/shadcn/dialog/dialog.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        },
+        {
+          "name": "radix-ui"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "animated",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-dropdown-menu",
+      "name": "Dropdown Menu (shadcn)",
+      "summary": "Dropdown Menu: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Dropdown Menu is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "navigation",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "navigation",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/dropdown-menu",
+      "externalId": "dropdown-menu",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/dropdown-menu.json (official CLI), or use the vendored files in catalog/components/shadcn/dropdown-menu/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/dropdown-menu"
+      },
+      "localDir": "catalog/components/shadcn/dropdown-menu",
+      "manifest": "catalog/components/shadcn/dropdown-menu/component.json",
+      "implementation": [
+        "catalog/components/shadcn/dropdown-menu/dropdown-menu.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        },
+        {
+          "name": "radix-ui"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "animated",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-input",
+      "name": "Input (shadcn)",
+      "summary": "Input: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Input is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "inputs",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "inputs",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/input",
+      "externalId": "input",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/input.json (official CLI), or use the vendored files in catalog/components/shadcn/input/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/input"
+      },
+      "localDir": "catalog/components/shadcn/input",
+      "manifest": "catalog/components/shadcn/input/component.json",
+      "implementation": [
+        "catalog/components/shadcn/input/input.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "static",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-progress",
+      "name": "Progress (shadcn)",
+      "summary": "Progress: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Progress is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "loaders",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "loaders",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/progress",
+      "externalId": "progress",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/progress.json (official CLI), or use the vendored files in catalog/components/shadcn/progress/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/progress"
+      },
+      "localDir": "catalog/components/shadcn/progress",
+      "manifest": "catalog/components/shadcn/progress/component.json",
+      "implementation": [
+        "catalog/components/shadcn/progress/progress.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        },
+        {
+          "name": "radix-ui"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "animated",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-skeleton",
+      "name": "Skeleton (shadcn)",
+      "summary": "Skeleton: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Skeleton is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "loaders",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "loaders",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/skeleton",
+      "externalId": "skeleton",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/skeleton.json (official CLI), or use the vendored files in catalog/components/shadcn/skeleton/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/skeleton"
+      },
+      "localDir": "catalog/components/shadcn/skeleton",
+      "manifest": "catalog/components/shadcn/skeleton/component.json",
+      "implementation": [
+        "catalog/components/shadcn/skeleton/skeleton.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "animated",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-switch",
+      "name": "Switch (shadcn)",
+      "summary": "Switch: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Switch is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "inputs",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "inputs",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/switch",
+      "externalId": "switch",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/switch.json (official CLI), or use the vendored files in catalog/components/shadcn/switch/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/switch"
+      },
+      "localDir": "catalog/components/shadcn/switch",
+      "manifest": "catalog/components/shadcn/switch/component.json",
+      "implementation": [
+        "catalog/components/shadcn/switch/switch.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        },
+        {
+          "name": "radix-ui"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "animated",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-table",
+      "name": "Table (shadcn)",
+      "summary": "Table: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Table is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "layout",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "layout",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/table",
+      "externalId": "table",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/table.json (official CLI), or use the vendored files in catalog/components/shadcn/table/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/table"
+      },
+      "localDir": "catalog/components/shadcn/table",
+      "manifest": "catalog/components/shadcn/table/component.json",
+      "implementation": [
+        "catalog/components/shadcn/table/table.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "static",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-tabs",
+      "name": "Tabs (shadcn)",
+      "summary": "Tabs: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Tabs is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "tabs",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "tabs",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/tabs",
+      "externalId": "tabs",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/tabs.json (official CLI), or use the vendored files in catalog/components/shadcn/tabs/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/tabs"
+      },
+      "localDir": "catalog/components/shadcn/tabs",
+      "manifest": "catalog/components/shadcn/tabs/component.json",
+      "implementation": [
+        "catalog/components/shadcn/tabs/tabs.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        },
+        {
+          "name": "radix-ui"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "animated",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
+    },
+    {
+      "id": "shadcn-tooltip",
+      "name": "Tooltip (shadcn)",
+      "summary": "Tooltip: accessible shadcn/ui React + Tailwind component, vendored with manifest for the target project.",
+      "description": "Tooltip is vendored from the official shadcn/ui registry (MIT). The manifest records its registry dependencies and file layout; the target project integrates it through Tailwind with its own design tokens. The React Library app previews it via the official docs, since Tailwind is not part of this app's runtime.",
+      "category": "tooltips",
+      "themes": [
+        "brutalist-print",
+        "classic-clean",
+        "midnight-glass",
+        "neon-cyberpunk",
+        "retro-terminal",
+        "soft-pastel"
+      ],
+      "aliases": [],
+      "tags": [
+        "shadcn",
+        "tailwind",
+        "tooltips",
+        "vendored"
+      ],
+      "status": "stable",
+      "version": "0.1.0",
+      "addedDate": "2026-10-24",
+      "externalDependencies": [],
+      "props": [],
+      "entryType": "local",
+      "source": "shadcn",
+      "sourceUrl": "https://ui.shadcn.com/docs/components/tooltip",
+      "externalId": "tooltip",
+      "retrieval": "npx shadcn@latest add https://ui.shadcn.com/r/styles/new-york-v4/tooltip.json (official CLI), or use the vendored files in catalog/components/shadcn/tooltip/",
+      "preview": {
+        "type": "external",
+        "url": "https://ui.shadcn.com/docs/components/tooltip"
+      },
+      "localDir": "catalog/components/shadcn/tooltip",
+      "manifest": "catalog/components/shadcn/tooltip/component.json",
+      "implementation": [
+        "catalog/components/shadcn/tooltip/tooltip.tsx"
+      ],
+      "dependencies": [
+        {
+          "name": "cn"
+        },
+        {
+          "name": "radix-ui"
+        }
+      ],
+      "license": {
+        "spdx": "MIT",
+        "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+      },
+      "aesthetics": [
+        "professional"
+      ],
+      "attributes": [
+        "react",
+        "typescript",
+        "tailwind",
+        "light",
+        "dark",
+        "animated",
+        "rounded"
+      ],
+      "syncedAt": "2026-10-24"
     },
     {
       "id": "tabs",
@@ -220,8 +1740,14 @@
         "retro-terminal",
         "soft-pastel"
       ],
-      "aliases": ["tab-group", "tabstrip"],
-      "tags": ["navigation", "structure"],
+      "aliases": [
+        "tab-group",
+        "tabstrip"
+      ],
+      "tags": [
+        "navigation",
+        "structure"
+      ],
       "status": "beta",
       "version": "0.3.0",
       "addedDate": "2026-10-24",
@@ -245,7 +1771,9 @@
         "demo": "src/components/TabSheet/TabSheetDemo.tsx"
       },
       "a11yNotes": "role=tablist/tab/tabpanel wiring; arrow-key navigation with roving tabindex and selection-follows-focus.",
-      "usedFrom": ["src/catalog/demos.ts"]
+      "usedFrom": [
+        "src/catalog/demos.ts"
+      ]
     },
     {
       "id": "text-input",
@@ -261,8 +1789,14 @@
         "retro-terminal",
         "soft-pastel"
       ],
-      "aliases": ["input", "textfield"],
-      "tags": ["control", "form"],
+      "aliases": [
+        "input",
+        "textfield"
+      ],
+      "tags": [
+        "control",
+        "form"
+      ],
       "status": "stable",
       "version": "1.0.0",
       "addedDate": "2026-10-24",
@@ -311,7 +1845,9 @@
         "demo": "src/components/TextInput/TextInputDemo.tsx"
       },
       "a11yNotes": "Label is programmatically bound; helper text links via aria-describedby; invalid sets aria-invalid.",
-      "usedFrom": ["src/catalog/demos.ts"]
+      "usedFrom": [
+        "src/catalog/demos.ts"
+      ]
     }
   ]
 }

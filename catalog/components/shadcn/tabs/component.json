@@ -1,0 +1,26 @@
+{
+  "entryId": "shadcn-tabs",
+  "source": "shadcn",
+  "externalId": "tabs",
+  "registryItem": "tabs",
+  "registryStyle": "new-york-v4",
+  "registryUrl": "https://ui.shadcn.com/r/styles/new-york-v4/tabs.json",
+  "docsUrl": "https://ui.shadcn.com/docs/components/tabs",
+  "type": "registry:ui",
+  "files": [
+    {
+      "path": "tabs.tsx",
+      "type": "registry:ui"
+    }
+  ],
+  "dependencies": [
+    "cn",
+    "radix-ui"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+  },
+  "fetchedAt": "2026-10-24"
+}

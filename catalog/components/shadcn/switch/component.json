@@ -1,0 +1,26 @@
+{
+  "entryId": "shadcn-switch",
+  "source": "shadcn",
+  "externalId": "switch",
+  "registryItem": "switch",
+  "registryStyle": "new-york-v4",
+  "registryUrl": "https://ui.shadcn.com/r/styles/new-york-v4/switch.json",
+  "docsUrl": "https://ui.shadcn.com/docs/components/switch",
+  "type": "registry:ui",
+  "files": [
+    {
+      "path": "switch.tsx",
+      "type": "registry:ui"
+    }
+  ],
+  "dependencies": [
+    "cn",
+    "radix-ui"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+  },
+  "fetchedAt": "2026-10-24"
+}

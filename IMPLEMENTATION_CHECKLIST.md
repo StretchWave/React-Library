@@ -12,7 +12,7 @@ Status legend: **[x] done (verified)** · **[~] partial** · **[ ] pending** ·
 | M2 Component browser | ✅ done | 20/20 app tests + 32/32 node tests; dev-server walkthrough: search → "1 of 6 components" → TextInput detail fully rendered (screenshot) |
 | M3 Theme engine + previews + components | ✅ done | verify full-chain green **without --skip-links** (32/32 node, 50/50 app, typecheck, build); browser-verified: Midnight Glass scope restyles app + chat-free preview (screenshot) |
 | M4 Advanced interactions | ✅ done | verify full-chain green **flagless** (32/32 node, 54/54 app, typecheck, build); browser-verified: `#/component/tabs` deep link, copy-usage "Copied ✓" feedback, TabSheet ←/→/Home/End roving focus + selection-follows-focus (screenshot) |
-| M5 Real ingestion + gallery + selection + master prompt | 🚧 M5.1 done — schema v2 + 9-source registry researched; M5.2–M5.6 pending | schema v2 gate green (47/47 node, 54/54 app, typecheck, build); sources verified via official registry/live LICENSE fetches (see decision log) |
+| M5 Real ingestion + gallery + selection + master prompt | 🚧 M5.1 + M5.2 done — schema v2; catalog 6 → 33 real entries (26 local / 7 external); M5.3–M5.6 pending | verify green: 55/55 node (+9 ingest), 56/56 app, typecheck, build (300.02 kB js); react-bits/aceternity/pryzm → reference-only per license research |
 
 Placeholders: none. (TabSheet arrow-key navigation shipped in M4 — catalog `a11yNotes`
 and description updated at v0.3.0; `--skip-links` was removed at M3.)
@@ -198,11 +198,28 @@ Staged per MASTER_SPEC §10 M5. Sources researched & documented in
 - Evidence: `npm run verify` output recorded below; index regenerated
   (6 entries, 22 categories, 12 aesthetics, 9 sources).
 
-### M5.2 — Real catalog ingestion ⏳
-- [ ] Adapter foundations retrieval-only via officially supported channels
-- [ ] Populate real verified entries (local vendoring only where license permits; reference-only entries for react-bits/aceternity/pryzm/21st/originkit defaults)
-- [ ] Manifests (`component.json`) + previews per source permissions
-- [ ] Source status/sync metadata updated from actual runs
+### M5.2 — Real catalog ingestion ✅
+- [x] Ingestion adapters (zero-dependency, official channels only):
+      `scripts/ingest-shadcn.mjs` + `scripts/ingest-magicui.mjs` over
+      `scripts/lib/ingest.mjs` (fetch → vendor files → `component.json` manifest →
+      sorted-id merge into `catalog/catalog.json`, never overwriting)
+- [x] 16 shadcn/ui items vendored from the official registry
+      (`ui.shadcn.com/r/styles/new-york-v4/*.json`, verified live): button, badge,
+      card, alert, input, switch, accordion, tabs, dialog, tooltip, skeleton,
+      progress, avatar, breadcrumb, dropdown-menu, table
+- [x] 4 Magic UI items vendored (`magicui.design/r/*.json`, verified live):
+      dot-pattern, word-rotate, blur-fade, border-beam — dependency detection from
+      the vendored file body (motion, cn)
+- [x] 7 react-bits reference-only entries (registry slugs verified 200 live:
+      SplitText, Ballpit, FluidGlass, MetallicPaint, CircularGallery, LaserFlow,
+      Ribbons; one dead slug GooeyText-404 honestly skipped) — Commons-Clause-aware
+      license notes, no fabricated local paths
+- [x] Catalog grew 6 → **33 real entries (26 local / 7 external)**; full validate
+      with existence checks passes; index regenerated (`counts.bySource`:
+      shadcn 16, magic-ui 4, react-bits 7)
+- [x] +9 tooling tests (ingest composition/merge/provenance); app-side parity
+      tests updated to the populated-catalog reality
+- [ ] UI reporting of counts → M5.3 (gallery)
 
 ### M5.3 — Gallery and visual previews ⏳
 ### M5.4 — Multi-selection ⏳

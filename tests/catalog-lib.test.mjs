@@ -184,21 +184,23 @@ test("search: exact alias inside unknown query stays ranked first", () => {
 
 test("search: empty query returns every entry sorted by id", () => {
   const matches = searchEntries(seedEntries, "");
-  assert.deepEqual(
-    matches.map((entry) => entry.id),
-    ["alert", "badge", "button", "card", "tabs", "text-input"],
-  );
+  assert.equal(matches.length, seedEntries.length);
+  const ids = matches.map((entry) => entry.id);
+  for (const legacy of ["alert", "badge", "button", "card", "tabs", "text-input"]) {
+    assert.ok(ids.includes(legacy));
+  }
+  for (let i = 1; i < ids.length; i += 1) {
+    assert.ok(ids[i - 1] < ids[i], "entries must come back sorted by id");
+  }
+  assert.equal(ids.includes("shadcn-button"), true);
+  assert.equal(ids.includes("react-bits-split-text"), true);
 });
 
 test("search: category and theme filters", () => {
-  assert.deepEqual(
-    searchEntries(seedEntries, "", { category: "buttons" }).map((entry) => entry.id),
-    ["button"],
-  );
-  assert.deepEqual(
-    searchEntries(seedEntries, "", { category: "display" }).map((entry) => entry.id),
-    ["badge"],
-  );
+  const buttons = searchEntries(seedEntries, "", { category: "buttons" }).map((entry) => entry.id);
+  assert.ok(buttons.includes("button") && buttons.includes("shadcn-button"));
+  const display = searchEntries(seedEntries, "", { category: "display" }).map((entry) => entry.id);
+  assert.ok(display.includes("badge") && display.includes("magic-ui-border-beam"));
   const pastel = searchEntries(seedEntries, "", { theme: "soft-pastel" });
   assert.equal(pastel.length, seedEntries.length);
   assert.deepEqual(searchEntries(seedEntries, "btn", { category: "display" }), []);
@@ -228,19 +230,21 @@ test("index: deterministic shape and counts", () => {
   assert.deepEqual(a, b);
   assert.equal(a.schemaVersion, 2);
   assert.deepEqual(a.counts, {
-    entries: 6,
+    entries: 33,
     themes: 6,
     categories: 22,
     aesthetics: 12,
     sources: 9,
-    byEntryType: { local: 6, external: 0 },
-    bySource: {},
+    byEntryType: { local: 26, external: 7 },
+    bySource: { shadcn: 16, "magic-ui": 4, "react-bits": 7 },
   });
   assert.equal(a.generator, "scripts/generate-index.mjs");
-  assert.deepEqual(
-    a.entries.map((entry) => entry.id),
-    ["alert", "badge", "button", "card", "tabs", "text-input"],
-  );
+  assert.equal(a.entries.length, 33);
+  assert.equal(a.entries[0].id, "alert");
+  assert.equal(a.entries[a.entries.length - 1].id, "text-input");
+  assert.ok(a.entries.some((entry) => entry.id === "shadcn-button"));
+  assert.ok(a.entries.some((entry) => entry.id === "magic-ui-dot-pattern"));
+  assert.ok(a.entries.some((entry) => entry.id === "react-bits-split-text" && entry.entryType === "external"));
   assert.deepEqual(a.taxonomies.categories.slice(0, 6), ["buttons", "inputs", "layout", "display", "feedback", "navigation"]);
   assert.deepEqual(a.taxonomies.aesthetics, [
     "professional", "casual", "minimal", "luxury", "cyberpunk", "retro-synthwave",

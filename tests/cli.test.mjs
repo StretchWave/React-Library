@@ -11,11 +11,18 @@ function run(script, args = []) {
 }
 
 test("lookup finds an exact id and emits pure JSON", () => {
-  const result = run("scripts/lookup.mjs", ["button", "--json"]);
+  const result = run("scripts/lookup.mjs", ["text-input", "--json"]);
   assert.equal(result.status, 0);
   const parsed = JSON.parse(result.stdout);
-  assert.equal(parsed.id, "button");
-  assert.equal(parsed.name, "Button");
+  assert.equal(parsed.id, "text-input");
+  assert.equal(parsed.name, "TextInput");
+
+  // Ambiguous queries fall back to the ranked candidates JSON.
+  const ambiguous = run("scripts/lookup.mjs", ["button", "--json"]);
+  assert.equal(ambiguous.status, 0);
+  const candidates = JSON.parse(ambiguous.stdout);
+  assert.ok(candidates.count >= 2);
+  assert.equal(candidates.matches[0].id, "button");
 });
 
 test("lookup exits 1 for unknown queries", () => {
@@ -40,10 +47,10 @@ test("lookup --list honors category filters", () => {
 });
 
 test("lookup renders the human text block", () => {
-  const result = run("scripts/lookup.mjs", ["tabs"]);
+  const result = run("scripts/lookup.mjs", ["text-input"]);
   assert.equal(result.status, 0);
-  assert.ok(result.stdout.includes("TabSheet (tabs)"));
-  assert.ok(result.stdout.includes("beta"));
+  assert.ok(result.stdout.includes("TextInput (text-input)"));
+  assert.ok(result.stdout.includes("stable"));
 });
 
 test("lookup rejects unknown filters with exit code 2", () => {
@@ -68,7 +75,7 @@ test("lookup without arguments is a usage error", () => {
 test("generate writes the index; validate --check-index accepts it", () => {
   const generated = run("scripts/generate-index.mjs");
   assert.equal(generated.status, 0, generated.stderr);
-  assert.ok(generated.stdout.includes("6 entries"));
+  assert.ok(generated.stdout.includes("33 entries"));
 
   const validated = run("scripts/validate-catalog.mjs", ["--check-index"]);
   assert.equal(validated.status, 0, validated.stdout);

@@ -1,0 +1,26 @@
+{
+  "entryId": "shadcn-progress",
+  "source": "shadcn",
+  "externalId": "progress",
+  "registryItem": "progress",
+  "registryStyle": "new-york-v4",
+  "registryUrl": "https://ui.shadcn.com/r/styles/new-york-v4/progress.json",
+  "docsUrl": "https://ui.shadcn.com/docs/components/progress",
+  "type": "registry:ui",
+  "files": [
+    {
+      "path": "progress.tsx",
+      "type": "registry:ui"
+    }
+  ],
+  "dependencies": [
+    "cn",
+    "radix-ui"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+  },
+  "fetchedAt": "2026-10-24"
+}

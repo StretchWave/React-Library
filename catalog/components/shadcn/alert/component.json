@@ -1,0 +1,25 @@
+{
+  "entryId": "shadcn-alert",
+  "source": "shadcn",
+  "externalId": "alert",
+  "registryItem": "alert",
+  "registryStyle": "new-york-v4",
+  "registryUrl": "https://ui.shadcn.com/r/styles/new-york-v4/alert.json",
+  "docsUrl": "https://ui.shadcn.com/docs/components/alert",
+  "type": "registry:ui",
+  "files": [
+    {
+      "path": "alert.tsx",
+      "type": "registry:ui"
+    }
+  ],
+  "dependencies": [
+    "cn"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+  },
+  "fetchedAt": "2026-10-24"
+}

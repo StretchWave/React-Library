@@ -1,0 +1,26 @@
+{
+  "entryId": "shadcn-badge",
+  "source": "shadcn",
+  "externalId": "badge",
+  "registryItem": "badge",
+  "registryStyle": "new-york-v4",
+  "registryUrl": "https://ui.shadcn.com/r/styles/new-york-v4/badge.json",
+  "docsUrl": "https://ui.shadcn.com/docs/components/badge",
+  "type": "registry:ui",
+  "files": [
+    {
+      "path": "badge.tsx",
+      "type": "registry:ui"
+    }
+  ],
+  "dependencies": [
+    "cn",
+    "radix-ui"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+  },
+  "fetchedAt": "2026-10-24"
+}

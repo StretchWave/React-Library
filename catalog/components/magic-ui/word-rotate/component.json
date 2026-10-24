@@ -1,0 +1,24 @@
+{
+  "entryId": "magic-ui-word-rotate",
+  "source": "magic-ui",
+  "externalId": "word-rotate",
+  "registryItem": "word-rotate",
+  "registryUrl": "https://magicui.design/r/word-rotate.json",
+  "docsUrl": "https://magicui.design/docs/components/word-rotate",
+  "type": "registry:ui",
+  "files": [
+    {
+      "path": "word-rotate.tsx",
+      "type": "registry:ui"
+    }
+  ],
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "Vendored from the official Magic UI registry; keep the original copyright notice."
+  },
+  "fetchedAt": "2026-10-24"
+}

@@ -1,0 +1,26 @@
+{
+  "entryId": "shadcn-dialog",
+  "source": "shadcn",
+  "externalId": "dialog",
+  "registryItem": "dialog",
+  "registryStyle": "new-york-v4",
+  "registryUrl": "https://ui.shadcn.com/r/styles/new-york-v4/dialog.json",
+  "docsUrl": "https://ui.shadcn.com/docs/components/dialog",
+  "type": "registry:ui",
+  "files": [
+    {
+      "path": "dialog.tsx",
+      "type": "registry:ui"
+    }
+  ],
+  "dependencies": [
+    "cn",
+    "radix-ui"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+  },
+  "fetchedAt": "2026-10-24"
+}

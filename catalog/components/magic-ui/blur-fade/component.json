@@ -1,0 +1,24 @@
+{
+  "entryId": "magic-ui-blur-fade",
+  "source": "magic-ui",
+  "externalId": "blur-fade",
+  "registryItem": "blur-fade",
+  "registryUrl": "https://magicui.design/r/blur-fade.json",
+  "docsUrl": "https://magicui.design/docs/components/blur-fade",
+  "type": "registry:ui",
+  "files": [
+    {
+      "path": "blur-fade.tsx",
+      "type": "registry:ui"
+    }
+  ],
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "Vendored from the official Magic UI registry; keep the original copyright notice."
+  },
+  "fetchedAt": "2026-10-24"
+}

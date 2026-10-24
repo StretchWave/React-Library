@@ -1,0 +1,25 @@
+{
+  "entryId": "shadcn-table",
+  "source": "shadcn",
+  "externalId": "table",
+  "registryItem": "table",
+  "registryStyle": "new-york-v4",
+  "registryUrl": "https://ui.shadcn.com/r/styles/new-york-v4/table.json",
+  "docsUrl": "https://ui.shadcn.com/docs/components/table",
+  "type": "registry:ui",
+  "files": [
+    {
+      "path": "table.tsx",
+      "type": "registry:ui"
+    }
+  ],
+  "dependencies": [
+    "cn"
+  ],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "Vendored from the official shadcn/ui registry; keep the original copyright notice."
+  },
+  "fetchedAt": "2026-10-24"
+}

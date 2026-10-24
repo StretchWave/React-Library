@@ -1,0 +1,22 @@
+{
+  "entryId": "magic-ui-dot-pattern",
+  "source": "magic-ui",
+  "externalId": "dot-pattern",
+  "registryItem": "dot-pattern",
+  "registryUrl": "https://magicui.design/r/dot-pattern.json",
+  "docsUrl": "https://magicui.design/docs/components/dot-pattern",
+  "type": "registry:ui",
+  "files": [
+    {
+      "path": "dot-pattern.tsx",
+      "type": "registry:ui"
+    }
+  ],
+  "dependencies": [],
+  "registryDependencies": [],
+  "license": {
+    "spdx": "MIT",
+    "note": "Vendored from the official Magic UI registry; keep the original copyright notice."
+  },
+  "fetchedAt": "2026-10-24"
+}
