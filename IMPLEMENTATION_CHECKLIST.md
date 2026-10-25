@@ -90,6 +90,14 @@ and description updated at v0.3.0; `--skip-links` was removed at M3.)
 - 2026-10-24 — The two theme systems stay strictly separate: application appearance
   themes (6, `--rl-*` tokens, unchanged) vs component aesthetic classifications
   (`taxonomy/aesthetics.json`, new). UI copy must not conflate them.
+- 2026-10-25 — **M7.1 behavior classification design:** behaviors ship as a
+  taxonomy/behaviors.json *behavior* system (entry `behaviors` arrays), not as a
+  new category — categories classify what a component is, behaviors classify what
+  its animation responds to; the two must not compete. `auto`/`static` are kept as
+  first-class ids so the filter can exclude them explicitly. All behavior ids
+  validate against the taxonomy (validator hole closed this milestone); every entry
+  carries at least one behavior. Behavior labels drive the preview stage's
+  interaction cue — the cue describes verified input only (no invented interactions).
 
 ## 1) Foundations — agent-first base (milestone complete ✅)
 
@@ -484,6 +492,47 @@ data-theme` scope
   **65 `local-demo`** (61 react-bits + 4 Magic UI) + 6 seeded entries resolving
   via the vetted demos = **71 runnable live previews** (23 heavy) ·
   **16 `external`** (official doc pages) · 0 `source-link` remaining
+
+## 5.9) M7.1 — Minimal gallery + interaction taxonomy + immersive stage ✅
+
+- [x] Minimal gallery: every ordinary card shows exactly three elements — preview,
+      name, checkbox. Metadata (summary, source chips, status, kind chips) stays in
+      the preview rail/detail pane; dead card CSS removed. Covered by
+      `App (M7.1 minimal gallery + behaviors)` tests.
+- [x] Spacious layout: previews 14rem (224px) at rest / 16rem (256px) on large
+      desktops, grid min column 18rem, gutters 1.4rem, quiet card chrome.
+- [x] Interactive animation taxonomy: `taxonomy/behaviors.json` (12 behaviors), all
+      87 entries classified from verified showcase implementations (44 entries carry
+      multiple behaviors); `--behavior` lookup filter; "Interaction" filter select in
+      browser + gallery; index `taxonomies.behaviors`; cursor/hover/click/draggable/
+      scroll/gesture/3D/text/nav/stateful/auto/static — aesthetics stay independent.
+- [x] Validator integrity fix: entry `behaviors`/`aesthetics`/`attributes`/`sources`
+      validated against the real taxonomy sets (previously behaviors validated against
+      an empty set, letting the undocumented `interactive-nav` slip past silently);
+      `interactive-nav` added to the taxonomy (1 new behavior id).
+- [x] Immersive stage: behavior chips in the info rail + behavior-derived interaction
+      cue under the stage (capped at two cues; classified from `entry.behaviors`).
+- [x] Tests: catalog-lib (taxonomy membership, multi-behavior filtering, full
+      coverage), cli (`--behavior` list/JSON/multi-behavior), App (card minimality,
+      checkbox isolation, open action, behavior filter counts, rail behavior chips +
+      interaction cue); FilterBar option counts updated (13 interaction options).
+- [x] Gate + build size: `npm run verify` green (50/50 node tests, 110/110 app
+      tests, typecheck, build). Main bundle 439.26 kB / 102.52 kB gzip
+      (M7 baseline 435.48 / 101.51 — +3.8 kB from behavior chips, cue logic, and
+      behavior filter); showcase chunk unchanged and still lazy
+      (1,740.89 kB / 541.31 gzip); workspace chunk 12.60 kB.
+- [x] Visual QA (browser, HMR dev server): 1440×900 gallery — three-element cards,
+      subdued unchecked checkboxes, 14rem previews, spacious 1.4rem gutters;
+      `#/preview/react-bits-magnet` — stage-first canvas with the "Cursor-reactive"
+      behavior chip in the rail and the cue "Move the pointer across the stage — the
+      effect follows the cursor." under the stage; 390×844 mobile — toolbar wraps,
+      workspace full-bleed, tray compact; live checkbox/isolation check: toggling the
+      Alert checkbox keeps `#/gallery`, clicking the card overlay navigates to
+      `#/preview/alert`; live behavior filter check: Interaction=cursor-reactive →
+      "13 of 87 entries". Evidence: `screenshots/m71-gallery-1440.png`,
+      `screenshots/m71-workspace-magnet-1440.png`, `screenshots/m71-gallery-390-mobile.png`,
+      `screenshots/m71-workspace-alert-390-mobile.png`,
+      `screenshots/m71-gallery-1280-laptop.png`.
 
 ## 6) Future work (explicitly not now)
 

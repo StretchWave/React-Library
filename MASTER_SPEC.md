@@ -159,11 +159,23 @@ Detailed reference with examples: `docs/SCHEMA.md`. Summary:
     accessMethod, status ∈ available|partial|reference-only|requires-auth|unavailable,
     license, auth?, limit?, notes }`. An entry `source` must exist here; per-source
     entry counts are derived into `catalog/index.json` only.
+- **v2.1 (M7.1)** — `taxonomy/behaviors.json` — canonical *interaction behaviors*
+  (`{ id, label, description? }`): `auto`, `cursor-reactive`, `hover`, `click`,
+  `draggable`, `scroll`, `gesture`, `interactive-3d`, `interactive-text`,
+  `interactive-nav`, `stateful`, `static`. Behaviors classify **what user input drives
+  the animation**, aesthetics classify **how it looks** — the two systems stay
+  independent (a cursor effect can also be cyberpunk). Classification rule: an
+  animation that plays with no user input is `auto`; only components that respond to
+  pointer, keyboard, drag, scroll, gesture or state changes carry the matching
+  interactive behavior. Entries store behavior ids in the optional `behaviors` array
+  (validator-enforced against this file; every entry carries at least one). Filtered
+  by the app's "Interaction" select and by `npm run lookup -- --behavior <id>`; listed
+  in `catalog/index.json` `taxonomies.behaviors`.
 - **v2 entry fields** (all optional; absent ⇒ legacy `local` entry): `entryType`,
   `source`, `sourceUrl`, `externalId`, `retrieval`, `preview`, `localDir`, `manifest`,
-  `implementation`, `dependencies`, `license`, `aesthetics`, `attributes`, `syncedAt`.
-  External entries must not declare `localDir`/`manifest`/`implementation` — the
-  validator errors when a non-redistributable source is given fabricated local paths.
+  `implementation`, `dependencies`, `license`, `aesthetics`, `attributes`, `syncedAt`,
+  `behaviors`. External entries must not declare `localDir`/`manifest`/`implementation`
+  — the validator errors when a non-redistributable source is given fabricated local paths.
 
 ### 5.5 Schema evolution
 
@@ -422,6 +434,29 @@ builder, showcase isolation, lazy loading, hash routing, six appearance themes).
    corrected to the audited truth; changelog order fixed (v1.4 now precedes v1.5).
    Pixel-screenshot evidence that was blocked by an undrawn client window is
    recorded as a limitation, never claimed.
+
+**M7.1 refinement (2026-10-25).** Post-M7 refinement pass, superseding M7.3/M7.4 where
+they conflict:
+
+- **Minimal gallery** — cards shrink to exactly three visible elements: the preview,
+  the component name, and a selection checkbox. All metadata (summary, source,
+  category, aesthetics, dependencies, status) stays in the preview workspace rail and
+  the browser detail pane. Card previews are 14rem (16rem on large desktops, inside
+  the 220–300px band), grid gaps widen to 1.4rem, and the unchecked checkbox is
+  unobtrusive (55% opacity, full on card hover/focus-within and when selected — never
+  hover-only, the ~40px touch target stays tappable). Selection and preview-open
+  remain independent actions (checkbox is a sibling, not a child, of the stretched
+  open link).
+- **Interactive animation taxonomy** — `taxonomy/behaviors.json` as specified above,
+  with every entry classified from its verified showcase implementation. Behavior ids
+  now validate against the real taxonomy set (the validator previously enforced entry
+  aesthetics/attributes/behaviors/sources against empty sets, which let an
+  undocumented id slip through silently).
+- **Immersive preview stage** — the workspace rail gains behavior chips and the stage
+  shows a behavior-derived interaction cue (cursor-reactive → move the pointer,
+  draggable → drag & release, scroll → scroll inside the stage, …) capped at two cues;
+  existing stage modes, viewports, replay, fullscreen, controls, and honest fallback
+  states are unchanged.
 
 ## 11) Verification gates
 

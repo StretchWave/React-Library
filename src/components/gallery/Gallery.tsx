@@ -14,7 +14,6 @@ export interface GalleryProps {
   totalCount: number;
   filtersActive: boolean;
   onResetFilters: () => void;
-  onOpenDetail: (id: string) => void;
   /** M5.4 selection state (stable ids, order preserved). */
   selectedIds: string[];
   selectionItems: CatalogEntry[];
@@ -31,7 +30,6 @@ export function Gallery({
   totalCount,
   filtersActive,
   onResetFilters,
-  onOpenDetail,
   selectedIds,
   selectionItems,
   onToggleSelect,
@@ -84,7 +82,6 @@ export function Gallery({
             <GalleryCard
               key={entry.id}
               entry={entry}
-              onOpenDetail={onOpenDetail}
               selected={selectedSet.has(entry.id)}
               onToggleSelect={onToggleSelect}
             />

@@ -1,18 +1,19 @@
 #!/usr/bin/env node
 // Component lookup CLI (MASTER_SPEC.md §8.2)
 //   node scripts/lookup.mjs <query> [--theme <id>] [--category <id>] [--aesthetic <id>]
-//     [--source <id>] [--type local|external] [--json] [--list]
+//     [--behavior <id>] [--source <id>] [--type local|external] [--json] [--list]
 // Exit codes: 0 found · 1 no match · 2 unknown filter id · 64 usage error.
 import { parseArgs } from "node:util";
 import { loadCatalog, repoRoot, searchEntries, formatEntryText } from "./lib/catalog.mjs";
 
 function usage() {
-  console.error(`Usage: node scripts/lookup.mjs <query> [--theme <id>] [--category <id>] [--aesthetic <id>] [--source <id>] [--type local|external] [--json] [--list]
+  console.error(`Usage: node scripts/lookup.mjs <query> [--theme <id>] [--category <id>] [--aesthetic <id>] [--behavior <id>] [--source <id>] [--type local|external] [--json] [--list]
 
-Finds a component by id, alias, search text, aesthetics, or source over the canonical catalog.
+Finds a component by id, alias, search text, aesthetics, interactions (behaviors), or source over the canonical catalog.
   --theme <id>       restrict to an app appearance theme (taxonomy/themes.json)
   --category <id>    restrict to a category id (taxonomy/categories.json)
   --aesthetic <id>   restrict to an aesthetic id (taxonomy/aesthetics.json)
+  --behavior <id>    restrict to an interaction behavior (taxonomy/behaviors.json)
   --source <id>      restrict to a source id (taxonomy/sources.json)
   --type local|external  restrict to entry type
   --json             print exactly one JSON object (entry, or { query, matches })
@@ -29,6 +30,7 @@ try {
       theme: { type: "string" },
       category: { type: "string" },
       aesthetic: { type: "string" },
+      behavior: { type: "string" },
       source: { type: "string" },
       type: { type: "string" },
     },
@@ -48,12 +50,13 @@ try {
   console.error(error.message);
   process.exit(1);
 }
-const { catalog, themes, categories, aesthetics, sources } = loaded;
+const { catalog, themes, categories, aesthetics, behaviors, sources } = loaded;
 const entries = catalog.entries;
 
 const themeIds = themes.themes.map((t) => t.id);
 const categoryIds = categories.categories.map((c) => c.id);
 const aestheticIds = aesthetics.aesthetics.map((a) => a.id);
+const behaviorIds = behaviors.behaviors.map((b) => b.id);
 const sourceIds = sources.sources.map((s) => s.id);
 const entryTypes = ["local", "external"];
 if (values.theme && !themeIds.includes(values.theme)) {
@@ -66,6 +69,10 @@ if (values.category && !categoryIds.includes(values.category)) {
 }
 if (values.aesthetic && !aestheticIds.includes(values.aesthetic)) {
   console.error(`Unknown --aesthetic "${values.aesthetic}". Known: ${aestheticIds.join(", ")}`);
+  process.exit(2);
+}
+if (values.behavior && !behaviorIds.includes(values.behavior)) {
+  console.error(`Unknown --behavior "${values.behavior}". Known: ${behaviorIds.join(", ")}`);
   process.exit(2);
 }
 if (values.source && !sourceIds.includes(values.source)) {
@@ -81,6 +88,7 @@ const filters = {
   theme: values.theme,
   category: values.category,
   aesthetic: values.aesthetic,
+  behavior: values.behavior,
   source: values.source,
   entryType: values.type,
 };
@@ -106,6 +114,7 @@ if (matches.length === 0) {
     values.theme ? `theme "${values.theme}"` : null,
     values.category ? `category "${values.category}"` : null,
     values.aesthetic ? `aesthetic "${values.aesthetic}"` : null,
+    values.behavior ? `behavior "${values.behavior}"` : null,
     values.source ? `source "${values.source}"` : null,
     values.type ? `type "${values.type}"` : null,
   ].filter(Boolean);

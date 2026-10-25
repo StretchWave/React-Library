@@ -61,6 +61,9 @@
       "a11yNotes": "Renders with role=\"alert\" so content is announced when inserted.",
       "usedFrom": [
         "src/catalog/demos.ts"
+      ],
+      "behaviors": [
+        "static"
       ]
     },
     {
@@ -112,6 +115,9 @@
       },
       "usedFrom": [
         "src/catalog/demos.ts"
+      ],
+      "behaviors": [
+        "static"
       ]
     },
     {
@@ -177,6 +183,10 @@
       "usedFrom": [
         "src/components/browser/DetailPane.tsx",
         "src/catalog/demos.ts"
+      ],
+      "behaviors": [
+        "hover",
+        "click"
       ]
     },
     {
@@ -241,6 +251,9 @@
       "usedFrom": [
         "src/components/browser/DetailPane.tsx",
         "src/catalog/demos.ts"
+      ],
+      "behaviors": [
+        "static"
       ]
     },
     {
@@ -307,7 +320,10 @@
         "animated",
         "scroll-driven"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "scroll"
+      ]
     },
     {
       "id": "magic-ui-border-beam",
@@ -376,7 +392,10 @@
         "animated",
         "gradient"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "magic-ui-dot-pattern",
@@ -445,7 +464,10 @@
         "static",
         "geometric"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "magic-ui-word-rotate",
@@ -514,7 +536,10 @@
         "dark",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-animated-content",
@@ -582,7 +607,10 @@
         "animated",
         "gsap"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "scroll"
+      ]
     },
     {
       "id": "react-bits-animated-list",
@@ -654,7 +682,11 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto",
+        "stateful"
+      ]
     },
     {
       "id": "react-bits-aurora",
@@ -717,7 +749,10 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-ballpit",
@@ -779,7 +814,12 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "cursor-reactive",
+        "interactive-3d",
+        "auto"
+      ]
     },
     {
       "id": "react-bits-beams",
@@ -842,7 +882,10 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-blob-cursor",
@@ -912,7 +955,11 @@
         "animated",
         "webgl"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "cursor-reactive",
+        "interactive-3d"
+      ]
     },
     {
       "id": "react-bits-blur-text",
@@ -980,7 +1027,11 @@
         "animated",
         "motion"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "scroll",
+        "interactive-text"
+      ]
     },
     {
       "id": "react-bits-border-glow",
@@ -1043,7 +1094,11 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "cursor-reactive",
+        "auto"
+      ]
     },
     {
       "id": "react-bits-bubble-menu",
@@ -1112,7 +1167,12 @@
         "animated",
         "gsap"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "click",
+        "stateful",
+        "interactive-nav"
+      ]
     },
     {
       "id": "react-bits-card-nav",
@@ -1184,7 +1244,12 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "click",
+        "stateful",
+        "interactive-nav"
+      ]
     },
     {
       "id": "react-bits-carousel",
@@ -1253,7 +1318,11 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "click",
+        "stateful"
+      ]
     },
     {
       "id": "react-bits-chroma-grid",
@@ -1316,7 +1385,10 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "hover"
+      ]
     },
     {
       "id": "react-bits-circular-gallery",
@@ -1382,7 +1454,13 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "draggable",
+        "gesture",
+        "interactive-3d",
+        "auto"
+      ]
     },
     {
       "id": "react-bits-circular-text",
@@ -1451,7 +1529,10 @@
         "animated",
         "motion"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-click-spark",
@@ -1514,7 +1595,10 @@
         "animated",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "click"
+      ]
     },
     {
       "id": "react-bits-count-up",
@@ -1582,7 +1666,10 @@
         "animated",
         "motion"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-counter",
@@ -1642,7 +1729,11 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "stateful",
+        "auto"
+      ]
     },
     {
       "id": "react-bits-decrypted-text",
@@ -1710,7 +1801,11 @@
         "motion",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "scroll",
+        "interactive-text"
+      ]
     },
     {
       "id": "react-bits-dock",
@@ -1771,7 +1866,11 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "hover",
+        "interactive-nav"
+      ]
     },
     {
       "id": "react-bits-dome-gallery",
@@ -1843,7 +1942,12 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "draggable",
+        "gesture",
+        "interactive-3d"
+      ]
     },
     {
       "id": "react-bits-dot-grid",
@@ -1909,7 +2013,11 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "cursor-reactive",
+        "interactive-3d"
+      ]
     },
     {
       "id": "react-bits-elastic-slider",
@@ -1982,7 +2090,12 @@
         "animated",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "draggable",
+        "gesture",
+        "stateful"
+      ]
     },
     {
       "id": "react-bits-fade-content",
@@ -2050,7 +2163,10 @@
         "animated",
         "gsap"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "scroll"
+      ]
     },
     {
       "id": "react-bits-falling-text",
@@ -2119,7 +2235,12 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "click",
+        "draggable",
+        "interactive-text"
+      ]
     },
     {
       "id": "react-bits-flowing-menu",
@@ -2191,7 +2312,11 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "hover",
+        "interactive-nav"
+      ]
     },
     {
       "id": "react-bits-fluid-glass",
@@ -2257,7 +2382,11 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "draggable",
+        "interactive-3d"
+      ]
     },
     {
       "id": "react-bits-glare-hover",
@@ -2320,7 +2449,10 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "hover"
+      ]
     },
     {
       "id": "react-bits-glass-surface",
@@ -2386,7 +2518,10 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "static"
+      ]
     },
     {
       "id": "react-bits-glitch-text",
@@ -2450,7 +2585,11 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto",
+        "interactive-text"
+      ]
     },
     {
       "id": "react-bits-gooey-nav",
@@ -2516,7 +2655,12 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "hover",
+        "interactive-nav",
+        "stateful"
+      ]
     },
     {
       "id": "react-bits-gradient-text",
@@ -2579,7 +2723,10 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-grid-motion",
@@ -2642,7 +2789,11 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "cursor-reactive",
+        "auto"
+      ]
     },
     {
       "id": "react-bits-hyperspeed",
@@ -2710,7 +2861,10 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-iridescence",
@@ -2773,7 +2927,12 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "cursor-reactive",
+        "interactive-3d",
+        "auto"
+      ]
     },
     {
       "id": "react-bits-lanyard",
@@ -2841,7 +3000,12 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "draggable",
+        "interactive-3d",
+        "auto"
+      ]
     },
     {
       "id": "react-bits-laser-flow",
@@ -2907,7 +3071,10 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-letter-glitch",
@@ -2973,7 +3140,10 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-lightning",
@@ -3036,7 +3206,10 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-magnet",
@@ -3095,7 +3268,10 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "cursor-reactive"
+      ]
     },
     {
       "id": "react-bits-magnet-lines",
@@ -3161,7 +3337,10 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "cursor-reactive"
+      ]
     },
     {
       "id": "react-bits-masonry",
@@ -3230,7 +3409,10 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "hover"
+      ]
     },
     {
       "id": "react-bits-meta-balls",
@@ -3296,7 +3478,12 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "cursor-reactive",
+        "interactive-3d",
+        "auto"
+      ]
     },
     {
       "id": "react-bits-metallic-paint",
@@ -3362,7 +3549,10 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-noise",
@@ -3423,7 +3613,10 @@
         "animated",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-particles",
@@ -3486,7 +3679,10 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-pixel-card",
@@ -3550,7 +3746,11 @@
         "animated",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "cursor-reactive",
+        "hover"
+      ]
     },
     {
       "id": "react-bits-pixel-transition",
@@ -3614,7 +3814,11 @@
         "animated",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "hover",
+        "click"
+      ]
     },
     {
       "id": "react-bits-ribbons",
@@ -3677,7 +3881,10 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-rotating-text",
@@ -3746,7 +3953,11 @@
         "animated",
         "motion"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto",
+        "interactive-text"
+      ]
     },
     {
       "id": "react-bits-scrambled-text",
@@ -3815,7 +4026,12 @@
         "animated",
         "gsap"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "click",
+        "interactive-text",
+        "auto"
+      ]
     },
     {
       "id": "react-bits-shiny-text",
@@ -3879,7 +4095,10 @@
         "animated",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-split-text",
@@ -3951,7 +4170,10 @@
         "animated",
         "gsap"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "react-bits-spotlight-card",
@@ -4014,7 +4236,10 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "cursor-reactive"
+      ]
     },
     {
       "id": "react-bits-stack",
@@ -4081,7 +4306,13 @@
         "animated",
         "motion"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "click",
+        "draggable",
+        "gesture",
+        "stateful"
+      ]
     },
     {
       "id": "react-bits-staggered-menu",
@@ -4150,7 +4381,12 @@
         "animated",
         "gsap"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "click",
+        "stateful",
+        "interactive-nav"
+      ]
     },
     {
       "id": "react-bits-star-border",
@@ -4214,7 +4450,12 @@
         "animated",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "hover",
+        "auto",
+        "click"
+      ]
     },
     {
       "id": "react-bits-stepper",
@@ -4283,7 +4524,11 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "click",
+        "stateful"
+      ]
     },
     {
       "id": "react-bits-text-pressure",
@@ -4345,7 +4590,11 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "cursor-reactive",
+        "interactive-text"
+      ]
     },
     {
       "id": "react-bits-text-type",
@@ -4414,7 +4663,11 @@
         "animated",
         "gsap"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto",
+        "interactive-text"
+      ]
     },
     {
       "id": "react-bits-tilted-card",
@@ -4477,7 +4730,11 @@
         "css",
         "animated"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "cursor-reactive",
+        "hover"
+      ]
     },
     {
       "id": "react-bits-waves",
@@ -4540,7 +4797,10 @@
         "webgl",
         "canvas"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "shadcn-accordion",
@@ -4606,7 +4866,11 @@
         "animated",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "click",
+        "stateful"
+      ]
     },
     {
       "id": "shadcn-alert",
@@ -4669,7 +4933,10 @@
         "static",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "static"
+      ]
     },
     {
       "id": "shadcn-avatar",
@@ -4735,7 +5002,10 @@
         "static",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "static"
+      ]
     },
     {
       "id": "shadcn-badge",
@@ -4802,7 +5072,10 @@
         "static",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "static"
+      ]
     },
     {
       "id": "shadcn-breadcrumb",
@@ -4868,7 +5141,10 @@
         "static",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "interactive-nav"
+      ]
     },
     {
       "id": "shadcn-button",
@@ -4934,7 +5210,11 @@
         "static",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "hover",
+        "click"
+      ]
     },
     {
       "id": "shadcn-card",
@@ -4997,7 +5277,10 @@
         "static",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "static"
+      ]
     },
     {
       "id": "shadcn-dialog",
@@ -5063,7 +5346,11 @@
         "animated",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "click",
+        "stateful"
+      ]
     },
     {
       "id": "shadcn-dropdown-menu",
@@ -5129,7 +5416,12 @@
         "animated",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "click",
+        "stateful",
+        "interactive-nav"
+      ]
     },
     {
       "id": "shadcn-input",
@@ -5192,7 +5484,10 @@
         "static",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "stateful"
+      ]
     },
     {
       "id": "shadcn-progress",
@@ -5258,7 +5553,10 @@
         "animated",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "stateful"
+      ]
     },
     {
       "id": "shadcn-skeleton",
@@ -5321,7 +5619,10 @@
         "animated",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "auto"
+      ]
     },
     {
       "id": "shadcn-switch",
@@ -5387,7 +5688,11 @@
         "animated",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "click",
+        "stateful"
+      ]
     },
     {
       "id": "shadcn-table",
@@ -5450,7 +5755,10 @@
         "static",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "static"
+      ]
     },
     {
       "id": "shadcn-tabs",
@@ -5516,7 +5824,11 @@
         "animated",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "click",
+        "stateful"
+      ]
     },
     {
       "id": "shadcn-tooltip",
@@ -5582,7 +5894,11 @@
         "animated",
         "rounded"
       ],
-      "syncedAt": "2026-10-24"
+      "syncedAt": "2026-10-24",
+      "behaviors": [
+        "hover",
+        "stateful"
+      ]
     },
     {
       "id": "tabs",
@@ -5631,6 +5947,10 @@
       "a11yNotes": "role=tablist/tab/tabpanel wiring; arrow-key navigation with roving tabindex and selection-follows-focus.",
       "usedFrom": [
         "src/catalog/demos.ts"
+      ],
+      "behaviors": [
+        "click",
+        "stateful"
       ]
     },
     {
@@ -5705,6 +6025,9 @@
       "a11yNotes": "Label is programmatically bound; helper text links via aria-describedby; invalid sets aria-invalid.",
       "usedFrom": [
         "src/catalog/demos.ts"
+      ],
+      "behaviors": [
+        "stateful"
       ]
     }
   ]

@@ -47,6 +47,8 @@ function defaultProps(overrides: Partial<FilterBarProps> = {}): FilterBarProps {
     onThemeChange: vi.fn(),
     aesthetic: "",
     onAestheticChange: vi.fn(),
+    behavior: "",
+    onBehaviorChange: vi.fn(),
     source: "",
     onSourceChange: vi.fn(),
     entryType: "",
@@ -206,6 +208,8 @@ describe("FilterBar (M2)", () => {
     expect((screen.getByLabelText("Filter by aesthetic") as HTMLSelectElement).options.length).toBe(13);
     expect((screen.getByLabelText("Filter by source library") as HTMLSelectElement).options.length).toBe(10);
     expect(screen.getByLabelText("Catalog availability")).toBeTruthy();
+    // M7.1: 1 "All interactions" + 12 behavior subcategories
+    expect((screen.getByLabelText("Interaction") as HTMLSelectElement).options.length).toBe(13);
   });
 });
 
@@ -668,5 +672,73 @@ describe("PreviewPanel (M4 copy-usage)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Copy usage snippet for GhostThing" }));
     await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
     expect(writeText.mock.calls[0]![0]).toContain("// GhostThing (no source link registered");
+  });
+});
+
+describe("App (M7.1 minimal gallery + behaviors)", () => {
+  function galleryCard(entryId: string): HTMLElement {
+    return document.querySelector(`li[data-entry-id="${entryId}"]`) as HTMLElement;
+  }
+
+  it("each card shows only the preview, the name, and the selection checkbox", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "shiny" } });
+    const card = galleryCard("react-bits-shiny-text");
+    // The name is the card's only visible text (exactly one heading).
+    expect(card.querySelectorAll("h3").length).toBe(1);
+    // No metadata leaked back into the card (all of it lives in the rail/detail view).
+    expect(card.querySelector(".gallery-summary")).toBeNull();
+    expect(card.querySelector(".status-chip")).toBeNull();
+    expect(card.querySelector(".type-chip")).toBeNull();
+    expect(card.querySelector(".aesthetic-chip")).toBeNull();
+    expect(card.querySelector(".kind-chip")).toBeNull();
+    // Exactly one open action (the stretched overlay link) and one checkbox.
+    expect(card.querySelectorAll('[data-testid="gallery-card-open"]').length).toBe(1);
+    expect(card.querySelectorAll('input[type="checkbox"]').length).toBe(1);
+  });
+
+  it("toggling the checkbox never opens the preview or navigates away", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "shiny" } });
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: "Select Shiny Text (React Bits) for the master prompt" }),
+    );
+    // Checkbox isolation: selection only — no route change, no preview route.
+    expect(window.location.hash).toBe("#/gallery");
+    expect(screen.getByTestId("tray-count").textContent?.trim()).toBe("1");
+  });
+
+  it("opens the in-app preview workspace from the card's open action", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "shiny" } });
+    const overlay = galleryCard("react-bits-shiny-text").querySelector<HTMLAnchorElement>(
+      '[data-testid="gallery-card-open"]',
+    );
+    // The stretched link targets the local preview workspace deep link.
+    expect(overlay?.getAttribute("href")).toBe("#/preview/react-bits-shiny-text");
+  });
+
+  it("filters the gallery by interaction behavior", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    fireEvent.change(screen.getByLabelText("Interaction"), { target: { value: "scroll" } });
+    expect(screen.getByRole("status").textContent).toContain("5 of 87 entries");
+    fireEvent.change(screen.getByLabelText("Interaction"), { target: { value: "interactive-nav" } });
+    expect(screen.getByRole("status").textContent).toContain("8 of 87 entries");
+  });
+
+  it("the preview workspace rail classifies behaviors and the stage explains interaction", async () => {
+    window.location.hash = "/preview/react-bits-dock";
+    renderApp();
+    const rail = await screen.findByTestId("preview-rail");
+    // Both behavior classifications surface with their taxonomy labels.
+    expect(rail.textContent).toContain("Hover interaction");
+    expect(rail.textContent).toContain("Interactive navigation");
+    // The behavior-derived cue replaces the generic hint under the stage.
+    const cue = await screen.findByTestId("preview-interaction-cue");
+    expect(cue.textContent).toContain("Rest the pointer");
   });
 });

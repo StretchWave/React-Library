@@ -22,33 +22,40 @@ Schema: [`docs/SCHEMA.md`](./docs/SCHEMA.md)
 | Gallery + honest previews (M5.3), multi-selection (M5.4), master prompt (M5.5) | ✅ working |
 | Animation-first correction (M6): 87 real entries (all local records), 61 React Bits + 4 Magic UI items vendored from the official registries, 71 runnable live previews (65 showcase stages + 6 seeded demos, audit-verified M7), preview workspace `#/preview/<id>` with per-entry controls (lazy-loaded), gallery mini stages with a persisted play/pause toggle, heavy entries gated to the workspace | ✅ working (verify gate green; browser-verified) |
 | Visual overhaul (M7): gallery-first landing, preview-first cards, redesigned preview workspace with fullscreen, editable prompt pane, six restored appearance themes | ✅ working (105/105 app tests; DOM-based visual QA — see IMPLEMENTATION_CHECKLIST M7) |
+| Minimal gallery + interaction taxonomy (M7.1): three-element cards (preview · name · checkbox), 14–16rem previews in a spacious 1.4rem-gutter grid, 12 `taxonomy/behaviors.json` interaction behaviors classified on all 87 entries with an "Interaction" filter, `--behavior` lookup flag, and behavior-derived preview-stage cues | ✅ working (see IMPLEMENTATION_CHECKLIST M7.1) |
 
 ## Browse features
 
 - Catalog-driven component list with search (`/` to focus, `Esc` to clear) and
-  category/theme/aesthetic/source/availability filters, with a resettable empty state.
+  category/theme/behavior/aesthetic/source/availability filters, with a resettable empty state.
 - Detail pane per component: status chip, description, supported themes, props table,
   aliases, tags, source/demo links, a11y notes — plus v2 provenance (entry type,
   source library + official link, license, retrieval command, runtime dependencies,
-  manifest/implementation paths, aesthetics/attributes).
+  manifest/implementation paths, aesthetics/attributes, interaction behaviors).
 - Live preview rendered in the active theme; **Copy usage** puts a ready-to-paste
   snippet on your clipboard.
-- Gallery view (the app's default landing view since M7): preview-first card grid
-  over the same filters with honest previews per entry — live mini stages for all
+- Gallery view (the app's default landing view since M7): minimal card grid
+  (M7.1) over the same filters — each card is exactly the preview, the component
+  name, and a selection checkbox, with honest previews per entry — live mini stages
+  for all
   65 showcase-wrapped items plus the 6 seeded demos (auto-play on visibility, manual
-  Play fallback), large ~220–240px preview frames, and a deliberate poster state for
+  Play fallback), large 224–256px preview frames, and a deliberate poster state for
   the 23 heavy entries (they run only in the preview workspace). The 16 shadcn
   doc-page items show a clearly labeled off-site tile ("Open official preview") —
   inspecting any card opens the in-app `#/preview/<id>` workspace instead of
-  navigating away. A persisted **Pause previews** toggle stops every mini stage.
+  navigating away, and the selection checkbox is a sibling of the open action so
+  selection never navigates. A persisted **Pause previews** toggle stops every mini stage.
   Ingested third-party code is never executed in the app outside the reviewed
   showcase wrappers (M6.6: the registry loads on demand from a code-split chunk).
 - Preview workspace (`#/preview/<id>`, M7 redesign): full-stage live preview for
   every runnable entry with stage background modes (neutral/inverted/grid),
   viewport widths (full/1280/768/375), Replay, Fullscreen, per-entry controls
   verified against the vendored sources (hosted in the information rail), an
-  information rail (source, license verbatim, retrieval, dependencies, vendored
-  paths, related components), and the selection toggle. Non-runnable records show
+  information rail (classification chips incl. interaction behaviors, source,
+  license verbatim, retrieval, dependencies, vendored
+  paths, related components), the selection toggle, and a behavior-derived
+  interaction cue under the stage (e.g. cursor-reactive entries tell you to move the
+  pointer across the stage). Non-runnable records show
   an honest kind card with the official link instead of a fake stage.
 - Multi-selection (M5.4): card checkboxes, "Select all visible", persistent
   `rl.selection.v1` store (stale ids pruned), reorderable selection tray with
@@ -69,6 +76,7 @@ npm run generate     # regenerate catalog/index.json (derived — never hand-edi
 npm run lookup -- button          # inspect a component
 npm run lookup -- --list          # list everything
 npm run lookup -- button --source shadcn --aesthetic minimal   # v2 filtered lookup
+npm run lookup -- --list --behavior scroll   # M7.1 interaction-behavior filter
 npm test             # zero-dependency tooling suites (node --test)
 npm run dev          # React app
 npm run verify       # full release gate
@@ -81,13 +89,16 @@ npm run verify       # full release gate
 - Canonical data: `catalog/catalog.json` (schema v2 — `docs/SCHEMA.md`)
 - Derived index: `catalog/index.json` (generated)
 - Taxonomy: `taxonomy/themes.json` (6 appearance themes), `taxonomy/categories.json`
-  (24 categories), `taxonomy/aesthetics.json` (12 aesthetics), `taxonomy/attributes.json`
+  (24 categories), `taxonomy/aesthetics.json` (12 aesthetics), `taxonomy/behaviors.json`
+  (12 interaction behaviors — M7.1), `taxonomy/attributes.json`
   (25 attributes), `taxonomy/sources.json` (9 researched sources + access/licensing facts)
-- Entries (33 total — 26 local / 7 external): the six in-app components below,
-  20 vendored shadcn/Magic UI items under `catalog/components/{shadcn,magic-ui}/`,
-  7 verified external references to react-bits (registry slugs confirmed live).
+- Entries (87 total — 87 local / 0 external, M6.6-audited): the six in-app components,
+  61 vendored React Bits items and 4 Magic UI items (all live through showcases), and
+  16 shadcn doc-page items under `catalog/components/{shadcn,magic-ui,react-bits}/`.
 - The two theme systems are separate: the six `--rl-*` themes style this app;
-  `taxonomy/aesthetics.json` classifies the visual style of cataloged components.
+  `taxonomy/aesthetics.json` classifies the visual style of cataloged components and
+  `taxonomy/behaviors.json` classifies what user input drives their animation — a
+  cursor effect can be cursor-reactive and cyberpunk at once.
 
 ## Components (in-app, themeable demos)
 

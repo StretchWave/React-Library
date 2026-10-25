@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 2,
+  "description": "Canonical interaction behaviors (M7.1, taxonomy/behaviors.json). These describe WHAT AN COMPONENT DOES with user input — how its animation is triggered — not how it looks (taxonomy/aesthetics.json) and not its tech stack (taxonomy/attributes.json). A component may carry several behaviors at once. Classification rule (MASTER_SPEC.md §5.4): an animation that plays on its own with no user input is 'auto'; only components that respond to pointer, keyboard, drag, scroll or state changes carry the matching interactive behavior. Ids are referenced from entry 'behaviors' arrays and enforced by the validator.",
+  "behaviors": [
+    { "id": "auto", "label": "Autonomous", "description": "Plays by itself; no user input required (loop timers, continuous shaders, entrance-on-mount)." },
+    { "id": "cursor-reactive", "label": "Cursor-reactive", "description": "Responds to pointer position: tracking, magnetic pull, parallax, or bend toward the cursor." },
+    { "id": "hover", "label": "Hover interaction", "description": "Transforms while the pointer rests over it (glare, tilt, pixel flood, dock magnification)." },
+    { "id": "click", "label": "Click-triggered", "description": "A click or tap fires the effect (sparks, scramble waves, physics release)." },
+    { "id": "draggable", "label": "Drag & physics", "description": "Supports dragging with momentum or spring physics (@use-gesture, matter-js, or pointer-drag)." },
+    { "id": "scroll", "label": "Scroll-triggered", "description": "Driven by viewport entry or scroll position (fade/fade-blur on view, in-view entrances)." },
+    { "id": "gesture", "label": "Gesture-driven", "description": "Multi-input gestures: pinch, wheel, two-axis drag, or elastic release beyond a plain click." },
+    { "id": "interactive-3d", "label": "Interactive 3D / WebGL", "description": "WebGL/3D scenes that accept pointer or wheel input (orbit, slosh, dangle, warp)." },
+    { "id": "interactive-text", "label": "Interactive text", "description": "Text whose glyphs respond to input: hover effects, click bursts, or cursor pressure." },
+    { "id": "interactive-nav", "label": "Interactive navigation", "description": "Menus, docks, breadcrumbs and nav patterns whose structure animates with interaction (open/close, magnify, flow, stagger reveal)." },
+    { "id": "stateful", "label": "Stateful transitions", "description": "UI-state transitions respond to interaction: steppers, menus opening, tab/step changes, nav folds." },
+    { "id": "static", "label": "Static", "description": "No motion and no interaction; plain informational UI." }
+  ]
+}

@@ -13,6 +13,8 @@ export interface SearchFilters {
   aesthetic?: string | null;
   source?: string | null;
   attribute?: string | null;
+  /** M7.1: interaction behavior (taxonomy/behaviors.json). */
+  behavior?: string | null;
   entryType?: string | null;
 }
 
@@ -27,6 +29,7 @@ function rank(entry: CatalogEntry, q: string): number {
   if (entry.aliases.some((alias) => alias.includes(q))) return 20;
   if ((entry.aesthetics ?? []).some((a) => a.includes(q))) return 15;
   if ((entry.attributes ?? []).some((a) => a.includes(q))) return 12;
+  if ((entry.behaviors ?? []).some((b) => b.includes(q) && b !== "auto")) return 11;
   if ((entry.source ?? "").includes(q)) return 10;
   return 0;
 }
@@ -46,6 +49,7 @@ export function searchEntries(
       if (filters.category && entry.category !== filters.category) return false;
       if (filters.aesthetic && !(entry.aesthetics ?? []).includes(filters.aesthetic)) return false;
       if (filters.attribute && !(entry.attributes ?? []).includes(filters.attribute)) return false;
+      if (filters.behavior && !(entry.behaviors ?? []).includes(filters.behavior)) return false;
       if (filters.source && entry.source !== filters.source) return false;
       if (filters.entryType && entryTypeOf(entry) !== filters.entryType) return false;
       return true;
@@ -69,6 +73,7 @@ export function hasActiveFilters(query: string, filters: SearchFilters): boolean
     Boolean(filters.aesthetic) ||
     Boolean(filters.source) ||
     Boolean(filters.attribute) ||
+    Boolean(filters.behavior) ||
     Boolean(filters.entryType)
   );
 }

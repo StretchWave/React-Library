@@ -36,10 +36,10 @@ try {
   fail(error.message);
 }
 
-const { catalog, themes, categories, aesthetics, attributes, sources } = loaded;
+const { catalog, themes, categories, aesthetics, attributes, behaviors, sources } = loaded;
 
 // Validate taxonomies first so category/theme references resolve against full sets.
-const taxonomyResult = validateTaxonomy(themes, categories, { aesthetics, attributes, sources });
+const taxonomyResult = validateTaxonomy(themes, categories, { aesthetics, attributes, behaviors, sources });
 errors.push(...taxonomyResult.errors);
 warnings.push(...taxonomyResult.warnings);
 
@@ -51,12 +51,18 @@ const categoriesDocForEntries = taxonomyResult.errors.length === 0
   : { categories: [] };
 
 const entryOptions = { root, checkLinks: !skipLinks };
+// All v2 taxonomies pass real documented sets: the schema enforces that entry
+// aesthetic/attribute/behavior/source references resolve against the taxonomy
+// files (M7.1 — behaviors was previously validated against an empty set, which
+// let a misclassified id slip through silently). Themes/categories stay behind
+// the taxonomy-error gate as before because their entry checks are strict.
 const entryTaxonomies = {
   themes: themesDocForEntries,
   categories: categoriesDocForEntries,
-  aesthetics: { aesthetics: [] },
-  attributes: { attributes: [] },
-  sources: { sources: [] },
+  aesthetics,
+  attributes,
+  behaviors,
+  sources,
 };
 const catalogResult = validateCatalog(catalog, entryTaxonomies, entryOptions);
 errors.push(...catalogResult.errors);
@@ -81,7 +87,7 @@ if (checkIndex) {
       errors.push(`catalog/index.json is not valid JSON: ${error.message}`);
     }
     if (stored) {
-      const derived = buildIndex(catalog, themes, categories, { aesthetics, attributes, sources }, "STAMP");
+      const derived = buildIndex(catalog, themes, categories, { aesthetics, attributes, behaviors, sources }, "STAMP");
       delete derived.generatedAt;
       if (JSON.stringify(derived) !== JSON.stringify(stored)) {
         errors.push("catalog/index.json is stale or divergent - run 'npm run generate'");
@@ -94,7 +100,7 @@ if (errors.length > 0) {
   console.log(`Catalog invalid: ${errors.length} error(s)${skipLinks ? " (link checks skipped)" : ""}`);
   for (const error of errors.sort()) console.log(`  ✗ ${error}`);
 } else {
-  const counts = `entries ${catalog.entries.length}, themes ${themes.themes.length}, categories ${categories.categories.length}, aesthetics ${(aesthetics.aesthetics || []).length}, sources ${(sources.sources || []).length}`;
+  const counts = `entries ${catalog.entries.length}, themes ${themes.themes.length}, categories ${categories.categories.length}, aesthetics ${(aesthetics.aesthetics || []).length}, behaviors ${(behaviors.behaviors || []).length}, sources ${(sources.sources || []).length}`;
   console.log(
     `Catalog valid — ${counts}${checkIndex ? ", index up to date" : ""}${skipLinks ? " (link checks skipped)" : ""}`,
   );

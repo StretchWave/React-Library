@@ -12,6 +12,7 @@ worked examples, and the change history of the schema.
 | `taxonomy/themes.json` | App appearance-theme taxonomy (source of truth) | ✅ yes |
 | `taxonomy/categories.json` | Category taxonomy (source of truth) | ✅ yes |
 | `taxonomy/aesthetics.json` | Component aesthetic taxonomy (visual style — v2) | ✅ yes |
+| `taxonomy/behaviors.json` | Interaction-behavior taxonomy (M7.1 — what input drives the animation) | ✅ yes |
 | `taxonomy/attributes.json` | Independent attribute taxonomy, grouped appearance/motion/tech (v2) | ✅ yes |
 | `taxonomy/sources.json` | Component source registry: access methods, statuses, licensing (v2) | ✅ yes |
 
@@ -112,6 +113,7 @@ fields is a legacy `local` entry. The six built-in components are exactly that.
 | `dependencies` | array of `{ name, reason? }`; `react`/`react-dom` must not be listed (implicit); duplicate names error. These are the component's own requirements for the *target* project — they never become app dependencies. |
 | `aesthetics` | array of ids from `taxonomy/aesthetics.json`; an entry may carry many. |
 | `attributes` | array of ids from `taxonomy/attributes.json` (`appearance | motion | tech` groups); an entry may carry many. |
+| `behaviors` | array of ids from `taxonomy/behaviors.json` (M7.1); an entry may carry many; validator enforces membership and every entry carries at least one. Describes how the component's animation is triggered, not how it looks. |
 
 ### Taxonomy files (v2)
 
@@ -120,6 +122,17 @@ fields is a legacy `local` entry. The six built-in components are exactly that.
   the **application**, not the cataloged components.
 - `taxonomy/attributes.json`: `attributes: [{ id, label, group }]` with groups
   `appearance / motion / tech`.
+- `taxonomy/behaviors.json` (M7.1): `behaviors: [{ id, label, description? }]` —
+  twelve canonical interaction behaviors (`auto`, `cursor-reactive`, `hover`, `click`,
+  `draggable`, `scroll`, `gesture`, `interactive-3d`, `interactive-text`,
+  `interactive-nav`, `stateful`, `static`). Deliberately distinct from
+  `taxonomy/aesthetics.json`: behaviors classify **what user input drives the
+  animation**, aesthetics classify **how it looks** — a neon cursor effect may be
+  cursor-reactive and cyberpunk at once. Classification rule: an animation that plays
+  with no user input is `auto`; only components that respond to pointer, keyboard,
+  drag, scroll, gesture or state changes carry the matching interactive behavior.
+  Exposed as the first-class "Interaction" filter in the browser and gallery, the
+  `--behavior` lookup CLI flag, and the index `taxonomies.behaviors` listing.
 - `taxonomy/sources.json`: `sources: [{ id, name, url, repo?, accessMethod, status,
   license, auth?, limit?, notes }]`, plus a `statuses` vocabulary
   (`available | partial | reference-only | requires-auth | unavailable`) and an
@@ -155,7 +168,8 @@ fields is a legacy `local` entry. The six built-in components are exactly that.
   "license": { "note": "Custom free license; source redistribution forbidden." },
   "dependencies": [{ "name": "motion", "reason": "Animation runtime." }],
   "aesthetics": ["futuristic", "editorial"],
-  "attributes": ["dark", "animated", "tailwind"]
+  "attributes": ["dark", "animated", "tailwind"],
+  "behaviors": ["auto", "scroll"]
 }
 ```
 
@@ -187,3 +201,4 @@ Optional (with inline fallbacks in component CSS): `--rl-shadow`, `--rl-focus`
 |---|---|---|
 | v1 | 2026-10-24 | Initial schema: 21 entry fields, taxonomy-linked enums, link existence rules. |
 | v2 | 2026-10-24 | M5: multi-source catalog. New optional entry fields (`entryType`, `source`, `sourceUrl`, `externalId`, `retrieval`, `preview`, `localDir`, `manifest`, `implementation`, `dependencies`, `license`, `aesthetics`, `attributes`, `syncedAt`); `taxonomy/aesthetics.json`, `taxonomy/attributes.json`, `taxonomy/sources.json`; 16 new categories (22 total); local-path existence checks; strict external-entry rules (no fabricated paths); index gains `counts.byEntryType`/`counts.bySource` and taxonomy listings. |
+| v2.1 | 2026-10-25 | M7.1: optional entry field `behaviors`; `taxonomy/behaviors.json` (12 interaction behaviors); entry behavior/aesthetic/attribute/source references now validate against the real taxonomy sets (behaviors were previously validated against an empty set); `lookup --behavior`; index `taxonomies.behaviors`. |

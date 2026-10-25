@@ -72,6 +72,9 @@ export interface CatalogEntry {
   license?: EntryLicense;
   aesthetics?: string[];
   attributes?: string[];
+  /** M7.1: verified interaction behaviors (ids from taxonomy/behaviors.json).
+   *  Absent → not yet classified (separate from `runtime`/`heavy`). */
+  behaviors?: string[];
   syncedAt?: string;
   // --- M6 correction: animation runtime of a vendored component's preview
   // engine ("css" | "dom" | "gsap" | "motion" | "physics" | "webgl" |
@@ -145,6 +148,21 @@ export interface AttributesFile {
   schemaVersion: number;
   description?: string;
   attributes: AttributeDoc[];
+}
+
+/** M7.1: canonical interaction-behavior classification (taxonomy/behaviors.json).
+ *  Describes what a component DOES with user input, separate from aesthetics
+ *  (how it looks) and source/category; entries may carry many. */
+export interface BehaviorDoc {
+  id: string;
+  label: string;
+  description?: string;
+}
+
+export interface BehaviorsFile {
+  schemaVersion: number;
+  description?: string;
+  behaviors: BehaviorDoc[];
 }
 
 export interface SourceDoc {

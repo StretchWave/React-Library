@@ -96,6 +96,7 @@ export default function App() {
   const [category, setCategory] = useState("");
   const [theme, setTheme] = useState("");
   const [aesthetic, setAesthetic] = useState("");
+  const [behavior, setBehavior] = useState("");
   const [source, setSource] = useState("");
   const [entryType, setEntryType] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -191,11 +192,11 @@ export default function App() {
     setSelection((prev) => moveSelectionId(prev, id, delta));
   }
 
-  const filters: SearchFilters = { category, theme, aesthetic, source, entryType };
+  const filters: SearchFilters = { category, theme, aesthetic, behavior, source, entryType };
   const filtersActive = hasActiveFilters(query, filters);
   const filtered = useMemo(
     () => searchEntries(entries, query, filters),
-    [query, category, theme, aesthetic, source, entryType],
+    [query, category, theme, aesthetic, behavior, source, entryType],
   );
   const selected = selectedId ? (entries.find((entry) => entry.id === selectedId) ?? null) : null;
   const localCount = useMemo(
@@ -209,6 +210,7 @@ export default function App() {
     setCategory("");
     setTheme("");
     setAesthetic("");
+    setBehavior("");
     setSource("");
     setEntryType("");
   }
@@ -274,6 +276,8 @@ export default function App() {
                 onThemeChange={setTheme}
                 aesthetic={aesthetic}
                 onAestheticChange={setAesthetic}
+                behavior={behavior}
+                onBehaviorChange={setBehavior}
                 source={source}
                 onSourceChange={setSource}
                 entryType={entryType}
@@ -286,7 +290,6 @@ export default function App() {
               totalCount={catalogCounts.entries}
               filtersActive={filtersActive}
               onResetFilters={resetFilters}
-              onOpenDetail={selectEntry}
               selectedIds={selection}
               selectionItems={selection
                 .map((id) => findEntry(id))
@@ -337,6 +340,8 @@ export default function App() {
                 onThemeChange={setTheme}
                 aesthetic={aesthetic}
                 onAestheticChange={setAesthetic}
+                behavior={behavior}
+                onBehaviorChange={setBehavior}
                 source={source}
                 onSourceChange={setSource}
                 entryType={entryType}

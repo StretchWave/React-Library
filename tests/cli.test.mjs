@@ -64,6 +64,38 @@ test("lookup rejects unknown filters with exit code 2", () => {
   assert.equal(badSource.status, 2);
   const badType = run("scripts/lookup.mjs", ["button", "--type", "hologram"]);
   assert.equal(badType.status, 2);
+  const badBehavior = run("scripts/lookup.mjs", ["button", "--behavior", "hover-into-the-void"]);
+  assert.equal(badBehavior.status, 2);
+});
+
+// --- M7.1 interaction-behavior filter (taxonomy/behaviors.json) --------------
+
+test("lookup --list --behavior filters to entries classified with that behavior", () => {
+  const result = run("scripts/lookup.mjs", ["--list", "--behavior", "interactive-nav"]);
+  assert.equal(result.status, 0);
+  // All eight classified entries surface (verified against the canonical records).
+  for (const id of [
+    "react-bits-bubble-menu",
+    "react-bits-dock",
+    "react-bits-gooey-nav",
+    "shadcn-breadcrumb",
+    "shadcn-dropdown-menu",
+  ]) {
+    assert.ok(result.stdout.includes(id), `expected ${id} in interactive-nav list`);
+  }
+  // And behaviorless ids stay out: a static entry is not interactive navigation.
+  assert.ok(!result.stdout.includes("shadcn-badgetext"));
+  assert.ok(!result.stdout.replace(/shadcn-\S*/g, "").includes("button —"));
+});
+
+test("lookup emits the Behavior line for a multi-behavior entry", () => {
+  const result = run("scripts/lookup.mjs", ["react-bits-dock", "--json"]);
+  assert.equal(result.status, 0);
+  // Multi-classification: the record keeps the full behavior array intact.
+  const parsed = JSON.parse(result.stdout);
+  assert.ok(Array.isArray(parsed.behaviors));
+  assert.ok(parsed.behaviors.includes("interactive-nav"));
+  assert.ok(parsed.behaviors.includes("hover"));
 });
 
 test("lookup without arguments is a usage error", () => {

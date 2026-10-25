@@ -13,35 +13,38 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
-  gap: 1rem;
+  /* M7.1 spacious grid: wider cards (real previews need width) with
+   * generous gutters; auto-fill keeps density adaptive to the viewport. */
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: 1.4rem;
   align-items: stretch;
 }
 
 .gallery-card {
+  /* Anchors the absolutely positioned selection checkbox and stretched
+   * open link (both were viewport-positioned before this anchor). */
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  padding: 0.7rem;
+  gap: 0.45rem;
+  padding: 0.55rem;
   border: 1px solid var(--rl-border);
   border-radius: var(--rl-radius);
   background: var(--rl-surface-alt);
   box-shadow: var(--rl-shadow, none);
   min-width: 0;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .gallery-card:hover {
   border-color: var(--rl-accent);
   box-shadow: var(--rl-shadow, none);
-  transform: translateY(-2px);
 }
 
 /* Deliberate, subtle card entrance (skipped for reduced motion). */
 .gallery-card {
   animation: card-in 0.22s ease both;
 }
-
 @keyframes card-in {
   from {
     opacity: 0;
@@ -53,7 +56,6 @@
   .gallery-card,
   .gallery-card:hover {
     animation: none;
-    transform: none;
     transition: none;
   }
 }
@@ -64,47 +66,45 @@
   min-width: 0;
 }
 
-/* Selection checkbox is overlaid on the frame corner but never overlaps the
- * title row's rounded corner and is always visible (hover not required). */
+/* Selection checkbox is overlaid on the frame corner and must never overlap
+ * the title row's corner. M7.1: unobtrusive at rest (muted, semi-transparent),
+ * discovered on card hover or focus-within — and never hover-only (opacity
+ * stays low, so the ~40px touch target remains tappable on touchscreens
+ * where hover does not exist). Selected state is clearly visible. */
 .gallery-frame-select {
   position: absolute;
-  top: 0.45rem;
-  left: 0.45rem;
+  top: 0.95rem;
+  left: 0.95rem;
   z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.22rem 0.55rem;
+  display: grid;
+  place-content: center;
+  inline-size: 2rem;
+  block-size: 2rem;
   border-radius: calc(var(--rl-radius) / 2);
-  font-size: 0.78rem;
   color: var(--rl-text);
-  background: var(--rl-surface-alt);
-  border: 1px solid var(--rl-border);
   cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+}
+
+.gallery-card:hover .gallery-frame-select,
+.gallery-card:focus-within .gallery-frame-select,
+.gallery-card.is-selected .gallery-frame-select {
+  opacity: 1;
 }
 
 .gallery-card.is-selected .gallery-frame-select {
-  border-color: var(--rl-accent);
-  color: var(--rl-accent-contrast);
-  background: var(--rl-accent);
-}
-
-.gallery-card.is-selected .gallery-frame-select:hover {
-  color: var(--rl-text);
-  background: var(--rl-surface-alt);
-}
-
-.gallery-frame-select:hover {
-  border-color: var(--rl-accent);
+  color: var(--rl-accent);
 }
 
 .preview-frame {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Preview-first: 2.5–3x the old 7.5rem frame so motion, gradients, geometry
-   * and cursor effects are actually recognizable in the grid. */
-  height: 13.5rem;
+  /* M7.1 spacious previews: 224px at rest, 256px on large desktops — inside
+   * the requested 220–300px band so motion, gradients and cursor effects are
+   * recognizable without scrolling the grid. */
+  height: 14rem;
   padding: 0.5rem;
   border: 1px solid var(--rl-border);
   border-radius: var(--rl-radius);
@@ -115,7 +115,7 @@
 
 @media (min-width: 1100px) and (min-height: 760px) {
   .preview-frame {
-    height: 15rem;
+    height: 16rem;
   }
 }
 
@@ -294,30 +294,13 @@
 }
 
 /* --- card body ---------------------------------------------------------------- */
-.gallery-card-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
 .gallery-title {
-  font-size: 1rem;
+  /* M7.1: the component name is the only visible text on the card. */
+  font-size: 0.98rem;
   font-family: var(--rl-font);
   color: var(--rl-text);
-  margin: 0;
+  margin: 0 0 0.15rem;
   overflow-wrap: anywhere;
-}
-
-.gallery-summary {
-  font-size: 0.85rem;
-  color: var(--rl-text-muted);
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .type-chip {
@@ -336,11 +319,6 @@
   border-radius: var(--rl-radius);
   padding: 0.1rem 0.5rem;
   font-size: 0.78rem;
-}
-
-.gallery-card.is-selected .aesthetic-chip,
-.gallery-card.is-selected .license-chip {
-  color: var(--rl-text);
 }
 
 .kind-chip {
@@ -362,73 +340,46 @@
   color: var(--rl-accent);
 }
 
-.gallery-details {
-  margin-top: auto;
-  align-self: flex-start;
-  color: var(--rl-accent-contrast);
-  background: var(--rl-accent);
-  border: none;
-  border-radius: var(--rl-radius);
-  padding: 0.4rem 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
+/* M7.1 stretched open link: covers the whole card so a click anywhere opens
+ * the in-app preview workspace; the checkbox sits above it (higher z-index)
+ * so toggling selection never triggers navigation. */
+.gallery-card-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
 }
 
-.gallery-details:focus-visible {
+.gallery-card-overlay:focus-visible {
   outline: var(--rl-focus, 2px solid var(--rl-accent));
-  outline-offset: 2px;
-}
-
-/* Card footer: inspect in-app is the primary action, details secondary. */
-.gallery-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin-top: auto;
-}
-
-.gallery-actions .gallery-details {
-  margin-top: 0;
-}
-
-.gallery-preview-open {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  border: 1px solid transparent;
-  background: var(--rl-accent);
-  color: var(--rl-accent-contrast);
-  border-radius: var(--rl-radius);
-  padding: 0.42rem 0.8rem;
-  font-weight: 700;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.gallery-preview-open:hover {
-  border-color: var(--rl-accent);
-}
-
-.gallery-preview-open:focus-visible,
-.gallery-preview-open:focus-visible {
-  outline: var(--rl-focus, 2px solid var(--rl-accent));
-  outline-offset: 2px;
+  outline-offset: 3px;
+  z-index: 2;
 }
 
 /* --- selection (M5.4) ----------------------------------------------------------*/
-/* In M7 the frame corner checkbox replaced the top row; the hover emphasis on
- * the tray remains below. */
-.gallery-card .select-check-label.is-head {
-  color: var(--rl-text-muted);
-}
-
 .select-check {
   accent-color: var(--rl-accent);
-  inline-size: 1rem;
-  block-size: 1rem;
+  inline-size: 1.15rem;
+  block-size: 1.15rem;
   cursor: pointer;
+}
+
+.select-check-mark {
+  /* Decorative ✓ over the checked state; the real checkbox stays interactive
+   * (decorative mark ignores pointer events). Hidden when unchecked. */
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  pointer-events: none;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--rl-accent);
+  opacity: 0;
+}
+
+.gallery-frame-select .select-check:checked ~ .select-check-mark {
+  opacity: 1;
 }
 
 .gallery-bulk-actions {

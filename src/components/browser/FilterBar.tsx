@@ -3,7 +3,7 @@
 // Escape here. v2 filters (aesthetic / source / entry type) come from the
 // taxonomies and feed the semantic mirror in src/lib/search.ts.
 import type { RefObject } from "react";
-import { aesthetics, categories, sources, themes } from "../../catalog/client";
+import { aesthetics, behaviors, categories, sources, themes } from "../../catalog/client";
 
 export interface FilterBarProps {
   query: string;
@@ -14,6 +14,9 @@ export interface FilterBarProps {
   onThemeChange: (value: string) => void;
   aesthetic?: string;
   onAestheticChange?: (value: string) => void;
+  /** M7.1: interaction-behavior filter (taxonomy/behaviors.json). */
+  behavior?: string;
+  onBehaviorChange?: (value: string) => void;
   source?: string;
   onSourceChange?: (value: string) => void;
   entryType?: string;
@@ -30,6 +33,8 @@ export function FilterBar({
   onThemeChange,
   aesthetic = "",
   onAestheticChange,
+  behavior = "",
+  onBehaviorChange,
   source = "",
   onSourceChange,
   entryType = "",
@@ -57,6 +62,21 @@ export function FilterBar({
         }}
       />
       <div className="filter-row">
+        <label className="filter-select-label">
+          Interaction
+          <select
+            className="filter-select"
+            value={behavior}
+            onChange={(event) => onBehaviorChange?.(event.target.value)}
+          >
+            <option value="">All interactions</option>
+            {behaviors.map((behaviorOption) => (
+              <option key={behaviorOption.id} value={behaviorOption.id}>
+                {behaviorOption.label}
+              </option>
+            ))}
+          </select>
+        </label>
         <label className="filter-select-label">
           Category
           <select

@@ -23,8 +23,8 @@ try {
   process.exit(1);
 }
 
-const { catalog, themes, categories, aesthetics, attributes, sources } = loaded;
-const taxonomyResult = validateTaxonomy(themes, categories, { aesthetics, attributes, sources });
+const { catalog, themes, categories, aesthetics, attributes, behaviors, sources } = loaded;
+const taxonomyResult = validateTaxonomy(themes, categories, { aesthetics, attributes, behaviors, sources });
 const themesDocForEntries = taxonomyResult.errors.length === 0 ? themes : { themes: [] };
 const categoriesDocForEntries = taxonomyResult.errors.length === 0 ? categories : { categories: [] };
 const catalogResult = validateCatalog(
@@ -34,6 +34,7 @@ const catalogResult = validateCatalog(
     categories: categoriesDocForEntries,
     aesthetics: { aesthetics: [] },
     attributes: { attributes: [] },
+    behaviors: { behaviors: [] },
     sources: { sources: [] },
   },
   { root, checkLinks: !skipLinks },
@@ -47,7 +48,7 @@ if (errors.length > 0) {
 }
 
 const generatedAt = new Date().toISOString();
-const index = buildIndex(catalog, themes, categories, { aesthetics, attributes, sources }, generatedAt);
+const index = buildIndex(catalog, themes, categories, { aesthetics, attributes, behaviors, sources }, generatedAt);
 const file = writeIndex(root, index);
 
 const counts = index.counts;

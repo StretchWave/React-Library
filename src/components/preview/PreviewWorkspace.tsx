@@ -10,6 +10,7 @@ import { Component, useRef, useState, type ReactNode } from "react";
 import {
   aestheticById,
   attributeById,
+  behaviorById,
   categoryById,
   entries,
   sourceById,
@@ -118,6 +119,37 @@ interface WorkspaceShellProps {
 }
 
 /** Keyed by entry id so stage state resets when the deep link changes. */
+/** M7.1 immersive stage: an interaction cue derived from the entry's verified
+ *  behavior classification (taxonomy/behaviors.json) so the user knows how the
+ *  stage wants to be used without leaving the canvas. Ordered by input
+ *  priority: a component that both follows the cursor and fires on click gets
+ *  both cues, capped at two to keep the stage quiet. */
+const CUES: Array<[string, string]> = [
+  ["cursor-reactive", "Move the pointer across the stage — the effect follows the cursor."],
+  ["draggable", "Drag elements on the stage, release, and press Replay to reset."],
+  ["gesture", "Pinch, drag or wheel over the stage."],
+  ["interactive-3d", "Drag the stage to orbit; scroll to zoom where supported."],
+  ["click", "Click on the stage to fire the effect."],
+  ["hover", "Rest the pointer over the component to trigger its hover transition."],
+  ["interactive-text", "Hover, click or type on the text to trigger the effect."],
+  ["interactive-nav", "Interact with the navigation elements to reveal their transitions."],
+  ["scroll", "Scroll inside the stage to trigger the viewport entrance."],
+  ["stateful", "Use the component's controls — the transition runs on state change."],
+  ["auto", "The animation plays on its own; press Replay to restart it."],
+];
+
+function stageInteractionCue(entry: CatalogEntry): string | null {
+  const behaviors = entry.behaviors ?? [];
+  const cues: string[] = [];
+  for (const [behavior, cue] of CUES) {
+    if (behaviors.length === 0) break;
+    if (behaviors.includes(behavior)) cues.push(cue);
+    if (cues.length === 2) break;
+  }
+  if (cues.length === 0) return null;
+  return cues.join(" ");
+}
+
 function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: WorkspaceShellProps) {
   const stageRef = useRef<HTMLDivElement | null>(null);
   const [viewport, setViewport] = useState<Viewport>("full");
@@ -142,6 +174,7 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
   const kind = previewKindOf(entry, showcase);
   const categoryLabel = categoryById(entry.category)?.label ?? entry.category;
   const viewportWidth = VIEWPORTS.find((candidate) => candidate.id === viewport)?.width ?? null;
+  const cue = stageInteractionCue(entry);
 
   function resetControls(): void {
     const initial: ShowcaseValues = {};
@@ -307,8 +340,8 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
                 </StageErrorBoundary>
               </div>
             </div>
-            <p className="workspace-hint">
-              {showcase.hint ?? "Press Replay to restart the animation."}
+            <p className="workspace-hint" data-testid="preview-interaction-cue">
+              {cue ?? showcase.hint ?? "Press Replay to restart the animation."}
             </p>
           </>
         ) : (
@@ -366,6 +399,16 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
           <span className="neutral-chip">preview: {kind}</span>
           <span className="neutral-chip">{entryTypeOf(entry) === "external" ? "external record" : "local record"}</span>
         </div>
+
+        {(entry.behaviors ?? []).length > 0 ? (
+          <div className="chip-row" aria-label="Interaction behaviors" data-testid="preview-behavior-chips">
+            {(entry.behaviors ?? []).map((id) => (
+              <span key={id} className="aesthetic-chip" data-behavior={id}>
+                {behaviorById(id)?.label ?? id}
+              </span>
+            ))}
+          </div>
+        ) : null}
 
         {entry.summary ? <p className="workspace-summary">{entry.summary}</p> : null}
 

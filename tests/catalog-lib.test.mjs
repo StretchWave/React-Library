@@ -22,6 +22,7 @@ const taxonomies = {
   categories: seed.categories,
   aesthetics: seed.aesthetics,
   attributes: seed.attributes,
+  behaviors: seed.behaviors,
   sources: seed.sources,
 };
 
@@ -95,6 +96,57 @@ test("theme taxonomy: duplicate ids are errors", () => {
 test("category taxonomy: unknown membership surfaces through entry validation", () => {
   const { errors } = validate([mkEntry({ id: "x", category: "not-a-category" })]);
   assert.ok(errors.some((message) => message.includes("not-a-category")));
+});
+
+// --- M7.1 interaction behaviors (taxonomy/behaviors.json) -------------------
+
+test("seed behavior taxonomy loads with every M7.1 subcategory and validates", () => {
+  const behaviorIds = seed.behaviors.behaviors.map((behavior) => behavior.id);
+  for (const required of [
+    "cursor-reactive",
+    "hover",
+    "click",
+    "draggable",
+    "scroll",
+    "gesture",
+    "interactive-3d",
+    "interactive-text",
+    "interactive-nav",
+    "stateful",
+  ]) {
+    assert.ok(behaviorIds.includes(required), `missing behavior id ${required}`);
+  }
+  // Behavior ids are unique and slugged by the matrix validator (checked in
+  // the validateTaxonomy pass inside loadCatalog).
+  assert.equal(new Set(behaviorIds).size, behaviorIds.length);
+});
+
+test("entry behaviors validate against the behavior taxonomy (M7.1 hole fixed)", () => {
+  // A legal behavior id passes cleanly...
+  const ok = validate([mkEntry({ id: "x", behaviors: ["hover"] })]);
+  assert.deepEqual(ok.errors, []);
+  // ...and an undocumented id is an error (it used to be validated against an
+  // empty set, so anything passed silently).
+  const bad = validate([mkEntry({ id: "x", behaviors: ["interactive-not-real"] })]);
+  assert.ok(bad.errors.some((message) => message.includes("interactive-not-real")));
+});
+
+test("multiple behavior classifications are legal and filter independently", () => {
+  assert.deepEqual(searchEntries(seedEntries, "", { behavior: "scroll" }).length, 5);
+  const cursor = searchEntries(seedEntries, "", { behavior: "cursor-reactive" });
+  assert.equal(cursor.length, 13);
+  // Multi-classification works both ways (cursor-reactive entries also appear
+  // under their second behavior where they have one).
+  const both = cursor.filter((entry) => (entry.behaviors ?? []).includes("hover"));
+  assert.ok(both.length > 0);
+  const hoverOnly = searchEntries(seedEntries, "", { behavior: "hover" });
+  assert.ok(hoverOnly.some((entry) => entry.id === both[0].id));
+});
+
+test("every catalog entry carries at least one behavior classification", () => {
+  for (const entry of seedEntries) {
+    assert.ok((entry.behaviors ?? []).length > 0, `${entry.id} has no behaviors`);
+  }
 });
 
 test("entries must be sorted by id", () => {

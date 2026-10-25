@@ -6,6 +6,7 @@ import themesJson from "../../taxonomy/themes.json";
 import categoriesJson from "../../taxonomy/categories.json";
 import aestheticsJson from "../../taxonomy/aesthetics.json";
 import attributesJson from "../../taxonomy/attributes.json";
+import behaviorsJson from "../../taxonomy/behaviors.json";
 import sourcesJson from "../../taxonomy/sources.json";
 import type {
   AestheticDoc,
@@ -20,6 +21,8 @@ import type {
   SourcesFile,
   ThemeDoc,
   ThemesFile,
+  BehaviorDoc,
+  BehaviorsFile,
 } from "./types";
 
 export const catalog = catalogJson as unknown as CatalogFile;
@@ -27,6 +30,7 @@ const themesDoc = themesJson as unknown as ThemesFile;
 const categoriesDoc = categoriesJson as unknown as CategoriesFile;
 const aestheticsDoc = aestheticsJson as unknown as AestheticsFile;
 const attributesDoc = attributesJson as unknown as AttributesFile;
+const behaviorsDoc = behaviorsJson as unknown as BehaviorsFile;
 const sourcesDoc = sourcesJson as unknown as SourcesFile;
 
 export const entries: CatalogEntry[] = catalog.entries;
@@ -34,6 +38,7 @@ export const themes: ThemeDoc[] = themesDoc.themes;
 export const categories: CategoryDoc[] = categoriesDoc.categories;
 export const aesthetics: AestheticDoc[] = aestheticsDoc.aesthetics;
 export const attributes: AttributeDoc[] = attributesDoc.attributes;
+export const behaviors: BehaviorDoc[] = behaviorsDoc.behaviors;
 export const sources: SourceDoc[] = sourcesDoc.sources;
 
 export const catalogCounts = {
@@ -62,6 +67,10 @@ export function aestheticById(id: string): AestheticDoc | undefined {
 
 export function attributeById(id: string): AttributeDoc | undefined {
   return attributes.find((attribute) => attribute.id === id);
+}
+
+export function behaviorById(id: string): BehaviorDoc | undefined {
+  return behaviors.find((behavior) => behavior.id === id);
 }
 
 export function sourceById(id: string): SourceDoc | undefined {

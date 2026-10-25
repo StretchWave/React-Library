@@ -69,6 +69,7 @@ const ENTRY_FIELDS = new Set([
   "license",
   "aesthetics",
   "attributes",
+  "behaviors",
   "syncedAt",
   // --- M6 correction: animation runtime of a vendored component (preview engine
   // selector): "css" | "dom" | "gsap" | "motion" | "webgl" | "tailwind" | "three"
@@ -108,6 +109,7 @@ export function loadCatalog(root = repoRoot()) {
     categories: path.join(root, "taxonomy", "categories.json"),
     aesthetics: path.join(root, "taxonomy", "aesthetics.json"),
     attributes: path.join(root, "taxonomy", "attributes.json"),
+    behaviors: path.join(root, "taxonomy", "behaviors.json"),
     sources: path.join(root, "taxonomy", "sources.json"),
   };
   return {
@@ -116,6 +118,7 @@ export function loadCatalog(root = repoRoot()) {
     categories: readJsonFileSync(paths.categories, "category taxonomy"),
     aesthetics: readJsonFileSync(paths.aesthetics, "aesthetic taxonomy"),
     attributes: readJsonFileSync(paths.attributes, "attribute taxonomy"),
+    behaviors: readJsonFileSync(paths.behaviors, "behavior taxonomy"),
     sources: readJsonFileSync(paths.sources, "sources taxonomy"),
     paths,
   };
@@ -237,8 +240,32 @@ export function validateTaxonomy(themesDoc, categoriesDoc, extras = {}) {
     }
   }
 
+  const behaviors = extras.behaviors && extras.behaviors.behaviors;
+  if (extras.behaviors) {
+    if (!Array.isArray(behaviors) || behaviors.length === 0) {
+      errors.push("taxonomy/behaviors.json: 'behaviors' must be a non-empty array");
+    } else {
+      const seen = new Set();
+      behaviors.forEach((behavior, i) => {
+        const where = `taxonomy/behaviors.json behaviors[${i}]`;
+        if (!isPlainObject(behavior)) {
+          errors.push(`${where}: behavior must be an object`);
+          return;
+        }
+        if (!isSlugValue(behavior.id)) errors.push(`${where}: invalid id slug "${str(behavior.id)}"`);
+        if (seen.has(behavior.id)) errors.push(`${where}: duplicate behavior id "${behavior.id}"`);
+        seen.add(behavior.id);
+        if (!isNonEmptyString(behavior.label)) errors.push(`${where}: 'label' must be a non-empty string`);
+        if ("description" in behavior && !isNonEmptyString(behavior.description)) {
+          errors.push(`${where}: 'description' must be a non-empty string when present`);
+        }
+      });
+    }
+  }
+
   const sources = extras.sources && extras.sources.sources;
   if (extras.sources) {
+
     const knownStatuses = Array.isArray(extras.sources.statuses) ? extras.sources.statuses : SOURCE_STATUSES;
     if (!Array.isArray(sources) || sources.length === 0) {
       errors.push("taxonomy/sources.json: 'sources' must be a non-empty array");
@@ -308,6 +335,7 @@ export function validateCatalog(catalog, taxonomies, { root = repoRoot(), checkL
   // v2 taxonomies: enforced only when provided; legacy callers may omit them.
   const aestheticIds = new Set((taxonomies.aesthetics && taxonomies.aesthetics.aesthetics || []).map((a) => a.id));
   const attributeIds = new Set((taxonomies.attributes && taxonomies.attributes.attributes || []).map((a) => a.id));
+  const behaviorIds = new Set((taxonomies.behaviors && taxonomies.behaviors.behaviors || []).map((b) => b.id));
   const sourceIds = new Set((taxonomies.sources && taxonomies.sources.sources || []).map((s) => s.id));
 
   const entryIds = new Set();
@@ -660,6 +688,18 @@ export function validateCatalog(catalog, taxonomies, { root = repoRoot(), checkL
       }
     }
 
+    if ("behaviors" in entry) {
+      if (!Array.isArray(entry.behaviors)) {
+        errors.push(`${label}: 'behaviors' must be an array of taxonomy behavior ids`);
+      } else if (behaviorIds.size > 0) {
+        for (const behavior of entry.behaviors) {
+          if (!isNonEmptyString(behavior) || !behaviorIds.has(behavior)) {
+            errors.push(`${label}: behavior "${str(behavior)}" is not in the behaviors taxonomy (taxonomy/behaviors.json)`);
+          }
+        }
+      }
+    }
+
     if (prevId && prevId > id) {
       errors.push(`${label}: entries must be sorted by id ("${prevId}" appears before "${id}")`);
     }
@@ -677,13 +717,14 @@ export function validateCatalog(catalog, taxonomies, { root = repoRoot(), checkL
 
 /** Ranked search: exact id > exact alias > id-prefix/id-substring > name > summary > tags > aliases.
  *  v2: optional filters aesthetic/source/attribute/entryType; aesthetics/attributes/source also rank in text search. */
-export function searchEntries(entries, query, { theme, category, aesthetic, source, attribute, entryType } = {}) {
+export function searchEntries(entries, query, { theme, category, aesthetic, source, attribute, behavior, entryType } = {}) {
   const all = [...entries].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   const filtered = all.filter((entry) => {
     if (theme && !entry.themes.includes(theme)) return false;
     if (category && entry.category !== category) return false;
     if (aesthetic && !(entry.aesthetics || []).includes(aesthetic)) return false;
     if (attribute && !(entry.attributes || []).includes(attribute)) return false;
+    if (behavior && !(entry.behaviors || []).includes(behavior)) return false;
     if (source && entry.source !== source) return false;
     if (entryType && (entry.entryType ?? "local") !== entryType) return false;
     return true;
@@ -704,6 +745,7 @@ export function searchEntries(entries, query, { theme, category, aesthetic, sour
     else if (entry.aliases.some((a) => a.includes(q))) score = 20;
     else if ((entry.aesthetics || []).some((a) => a.includes(q))) score = 15;
     else if ((entry.attributes || []).some((a) => a.includes(q))) score = 12;
+    else if ((entry.behaviors || []).some((b) => b.includes(q) && b !== "auto")) score = 11;
     else if (String(entry.source ?? "").includes(q)) score = 10;
     else continue;
     scored.push({ score, entry });
@@ -742,6 +784,7 @@ export function buildIndex(catalog, themesDoc, categoriesDoc, extras, generatedA
       categories: categoriesDoc.categories.map((c) => c.id),
       aesthetics: (extras.aesthetics && extras.aesthetics.aesthetics || []).map((a) => a.id),
       attributes: (extras.attributes && extras.attributes.attributes || []).map((a) => a.id),
+      behaviors: (extras.behaviors && extras.behaviors.behaviors || []).map((b) => b.id),
       sources: sourcesList.map((s) => ({ id: s.id, name: s.name, status: s.status, url: s.url })),
     },
     entries: structuredClone(entries),
@@ -774,6 +817,9 @@ export function formatEntryText(entry) {
   }
   if (Array.isArray(entry.attributes) && entry.attributes.length > 0) {
     lines.push(`Attributes: ${entry.attributes.join(", ")}`);
+  }
+  if (Array.isArray(entry.behaviors) && entry.behaviors.length > 0) {
+    lines.push(`Behaviors: ${entry.behaviors.join(", ")}`);
   }
   if (entry.source) {
     lines.push(`Library source: ${entry.source}${entry.sourceUrl ? ` (${entry.sourceUrl})` : ""}`);
