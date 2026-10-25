@@ -1,46 +1,10 @@
-/* Gallery view styles (M5.3) — themeable only through --rl-* tokens. */
-
-/* --- view switcher ---------------------------------------------------------- */
-.app-views {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.6rem 1.25rem 0;
-}
-
-.view-switch {
-  border: 1px solid var(--rl-border);
-  background: var(--rl-surface);
-  color: var(--rl-text);
-  border-radius: var(--rl-radius);
-  padding: 0.35rem 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: var(--rl-font);
-}
-
-.view-switch.is-active {
-  color: var(--rl-accent-contrast);
-  background: var(--rl-accent);
-  border-color: var(--rl-accent);
-}
-
-.view-switch:focus-visible,
-.view-counts:focus-visible {
-  outline: var(--rl-focus, 2px solid var(--rl-accent));
-  outline-offset: 2px;
-}
-
-.view-counts {
-  margin-left: auto;
-  color: var(--rl-text-muted);
-  font-size: 0.85rem;
-}
-
+/* Gallery view styles (M5.3; M7.3 visual redesign) — themeable only through
+ * --rl-* tokens. The card is preview-first: the live/real preview region is the
+ * largest surface, metadata is compact, actions are explicit. */
 .gallery-view {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.85rem;
   min-width: 0;
 }
 
@@ -49,35 +13,110 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr));
-  gap: 0.9rem;
-  align-items: start;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 1rem;
+  align-items: stretch;
 }
 
 .gallery-card {
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
-  padding: 0.75rem;
+  padding: 0.7rem;
   border: 1px solid var(--rl-border);
   border-radius: var(--rl-radius);
   background: var(--rl-surface-alt);
   box-shadow: var(--rl-shadow, none);
   min-width: 0;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
-/* --- preview frames ------------------------------------------------------- */
+.gallery-card:hover {
+  border-color: var(--rl-accent);
+  box-shadow: var(--rl-shadow, none);
+  transform: translateY(-2px);
+}
+
+/* Deliberate, subtle card entrance (skipped for reduced motion). */
+.gallery-card {
+  animation: card-in 0.22s ease both;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-card,
+  .gallery-card:hover {
+    animation: none;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* --- preview frames --------------------------------------------------------- */
+.gallery-frame-wrap {
+  position: relative;
+  min-width: 0;
+}
+
+/* Selection checkbox is overlaid on the frame corner but never overlaps the
+ * title row's rounded corner and is always visible (hover not required). */
+.gallery-frame-select {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.45rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: calc(var(--rl-radius) / 2);
+  font-size: 0.78rem;
+  color: var(--rl-text);
+  background: var(--rl-surface-alt);
+  border: 1px solid var(--rl-border);
+  cursor: pointer;
+}
+
+.gallery-card.is-selected .gallery-frame-select {
+  border-color: var(--rl-accent);
+  color: var(--rl-accent-contrast);
+  background: var(--rl-accent);
+}
+
+.gallery-card.is-selected .gallery-frame-select:hover {
+  color: var(--rl-text);
+  background: var(--rl-surface-alt);
+}
+
+.gallery-frame-select:hover {
+  border-color: var(--rl-accent);
+}
+
 .preview-frame {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 7.5rem;
-  padding: 0.4rem;
+  /* Preview-first: 2.5–3x the old 7.5rem frame so motion, gradients, geometry
+   * and cursor effects are actually recognizable in the grid. */
+  height: 13.5rem;
+  padding: 0.5rem;
   border: 1px solid var(--rl-border);
   border-radius: var(--rl-radius);
   background: var(--rl-surface);
   overflow: hidden;
   position: relative;
+}
+
+@media (min-width: 1100px) and (min-height: 760px) {
+  .preview-frame {
+    height: 15rem;
+  }
 }
 
 .preview-frame.is-link,
@@ -88,6 +127,24 @@
   text-decoration: none;
   font-weight: 600;
   text-align: center;
+}
+
+/* External tiles read as an explicit off-site action, not a preview. */
+.preview-frame.is-link::before {
+  content: "↗";
+  display: grid;
+  place-content: center;
+  inline-size: 2.6rem;
+  block-size: 2.6rem;
+  border: 1px dashed var(--rl-border);
+  border-radius: calc(var(--rl-radius) / 2);
+  font-size: 1.2rem;
+  color: var(--rl-text-muted);
+  background: var(--rl-surface-alt);
+}
+
+.preview-frame.is-link > .preview-frame-title {
+  color: var(--rl-text);
 }
 
 /* Optional token with a token-derived fallback (no raw colors). */
@@ -109,6 +166,7 @@
   font-size: 0.85rem;
   text-align: center;
   margin: 0;
+  padding: 0 0.75rem;
 }
 
 .preview-demo-scale {
@@ -118,7 +176,7 @@
   max-width: 100%;
 }
 
-/* --- M6.4 lazy mini stages -------------------------------------------------- */
+/* --- M6.4 lazy mini stages ---------------------------------------------------- */
 .preview-mini-stage {
   position: absolute;
   inset: 0;
@@ -128,10 +186,17 @@
 }
 
 .preview-mini-scaler {
-  transform: scale(0.6);
+  transform: scale(0.72);
   transform-origin: top center;
-  width: 167%;
+  width: 139%;
   pointer-events: none;
+}
+
+/* Fixed-height stops the stage mounting from shifting card layout. */
+.preview-mini-stage,
+.preview-mini-loading {
+  min-height: 100%;
+  align-items: center;
 }
 
 .preview-mini-play {
@@ -166,6 +231,46 @@
   font-size: 0.8rem;
   color: var(--rl-text-muted);
   text-align: center;
+  max-width: 15rem;
+}
+
+/* Heavy cards get a deliberate "poster" state, not an empty box. */
+.preview-frame.is-heavy {
+  background:
+    linear-gradient(var(--rl-border) 1px, transparent 1px) 0 0 / 100% 2.4rem,
+    var(--rl-surface-alt);
+  background-blend-mode: soft-light;
+}
+
+.preview-frame.is-heavy::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, transparent 55%, currentcolor 150%);
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.preview-mini-open-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--rl-text);
+  text-align: center;
+  text-wrap: balance;
+  max-width: 14rem;
+}
+
+.preview-mini-kindchip {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--rl-text-muted);
+  border: 1px dashed var(--rl-border);
+  border-radius: calc(var(--rl-radius) / 2);
+  padding: 0.08rem 0.5rem;
 }
 
 .preview-mini-play:focus-visible,
@@ -188,10 +293,10 @@
   border-color: var(--rl-accent);
 }
 
-/* --- card body ------------------------------------------------------------ */
+/* --- card body ---------------------------------------------------------------- */
 .gallery-card-head {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: 0.5rem;
 }
@@ -233,6 +338,30 @@
   font-size: 0.78rem;
 }
 
+.gallery-card.is-selected .aesthetic-chip,
+.gallery-card.is-selected .license-chip {
+  color: var(--rl-text);
+}
+
+.kind-chip {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.kind-chip[data-chip="live"] {
+  color: var(--rl-status-success, var(--rl-accent));
+}
+
+.kind-chip[data-chip="poster"] {
+  color: var(--rl-text-muted);
+}
+
+.kind-chip[data-chip="external"] {
+  color: var(--rl-accent);
+}
+
 .gallery-details {
   margin-top: auto;
   align-self: flex-start;
@@ -250,24 +379,49 @@
   outline-offset: 2px;
 }
 
-/* --- selection (M5.4) ------------------------------------------------------*/
-.gallery-card.is-selected {
-  outline: var(--rl-focus, 2px solid var(--rl-accent));
-  outline-offset: -2px;
-}
-
-.gallery-select-row {
+/* Card footer: inspect in-app is the primary action, details secondary. */
+.gallery-actions {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: auto;
 }
 
-.select-check-label {
+.gallery-actions .gallery-details {
+  margin-top: 0;
+}
+
+.gallery-preview-open {
+  flex: 1;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  font-size: 0.8rem;
-  color: var(--rl-text-muted);
+  justify-content: center;
+  gap: 0.35rem;
+  border: 1px solid transparent;
+  background: var(--rl-accent);
+  color: var(--rl-accent-contrast);
+  border-radius: var(--rl-radius);
+  padding: 0.42rem 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
   cursor: pointer;
+}
+
+.gallery-preview-open:hover {
+  border-color: var(--rl-accent);
+}
+
+.gallery-preview-open:focus-visible,
+.gallery-preview-open:focus-visible {
+  outline: var(--rl-focus, 2px solid var(--rl-accent));
+  outline-offset: 2px;
+}
+
+/* --- selection (M5.4) ----------------------------------------------------------*/
+/* In M7 the frame corner checkbox replaced the top row; the hover emphasis on
+ * the tray remains below. */
+.gallery-card .select-check-label.is-head {
+  color: var(--rl-text-muted);
 }
 
 .select-check {
@@ -304,15 +458,16 @@
   cursor: not-allowed;
 }
 
-/* --- selection tray --------------------------------------------------------*/
+/* --- selection tray -------------------------------------------------------------*/
 .selection-tray {
   border: 1px solid var(--rl-border);
   border-radius: var(--rl-radius);
-  background: var(--rl-surface);
-  padding: 0.9rem 1rem;
+  background: var(--rl-surface-alt);
+  padding: 0.8rem 1rem;
   box-shadow: var(--rl-shadow, none);
   position: sticky;
   bottom: 0.75rem;
+  z-index: 3;
 }
 
 .tray-head {
@@ -361,7 +516,7 @@
   padding: 0.45rem 0.55rem;
   border: 1px solid var(--rl-border);
   border-radius: calc(var(--rl-radius) / 2);
-  background: var(--rl-surface-alt);
+  background: var(--rl-surface);
 }
 
 .tray-order {
@@ -416,12 +571,43 @@
   font-family: var(--rl-font);
 }
 
+.tray-generate:hover {
+  border-color: var(--rl-accent);
+}
+
 .tray-generate:focus-visible,
 .gallery-bulk-select:focus-visible,
 .tray-clear:focus-visible,
 .tray-remove:focus-visible,
 .tray-move:focus-visible,
-.select-check:focus-visible {
+.select-check:focus-visible,
+.gallery-frame-select:focus-within {
   outline: var(--rl-focus, 2px solid var(--rl-accent));
   outline-offset: 2px;
+}
+
+@media (min-width: 900px) {
+  /* Tray compresses to a single row so it never covers the grid. */
+  .tray-list {
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    overflow-x: auto;
+    gap: 0.4rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .tray-item {
+    max-width: 15rem;
+  }
+
+  .tray-warnings {
+    flex-basis: 0;
+    flex-grow: 1;
+    min-width: 8rem;
+    padding-left: 1.1rem;
+  }
+
+  .tray-item {
+    padding: 0.35rem 0.5rem;
+  }
 }

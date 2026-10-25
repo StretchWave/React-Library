@@ -29,6 +29,14 @@ function renderApp() {
   );
 }
 
+/** M7: the visual gallery is the default landing view; browser-view tests
+ *  navigate there via the view switcher exactly as a user would. */
+function renderBrowser() {
+  const utils = renderApp();
+  fireEvent.click(screen.getByRole("button", { name: "Browser" }));
+  return utils;
+}
+
 function defaultProps(overrides: Partial<FilterBarProps> = {}): FilterBarProps {
   return {
     query: "",
@@ -57,7 +65,7 @@ function entryItem(name: string) {
 
 describe("App (M1 skeleton)", () => {
   it("renders every canonical catalog entry name", () => {
-    renderApp();
+    renderBrowser();
     expect(screen.getByText("React Library")).toBeTruthy();
     for (const name of ENTRY_NAMES) {
       expect(entryItem(name)).toBeTruthy();
@@ -65,19 +73,19 @@ describe("App (M1 skeleton)", () => {
   });
 
   it("shows the empty state until an entry is selected", () => {
-    renderApp();
+    renderBrowser();
     expect(screen.getAllByText(/Select a component from the catalog/).length).toBeGreaterThan(0);
   });
 
   it("updates the detail pane when an entry is selected", () => {
-    renderApp();
+    renderBrowser();
     fireEvent.click(entryItem("Card"));
     expect(screen.getAllByRole("heading", { level: 2, name: "Card" }).length).toBeGreaterThan(0);
     expect(screen.getAllByText("Themed surface container that groups related content.").length).toBeGreaterThan(0);
   });
 
   it("switches detail when another entry is selected", () => {
-    renderApp();
+    renderBrowser();
     fireEvent.click(entryItem("Card"));
     fireEvent.click(entryItem("Alert"));
     expect(screen.getAllByRole("heading", { level: 2, name: "Alert" }).length).toBeGreaterThan(0);
@@ -85,7 +93,7 @@ describe("App (M1 skeleton)", () => {
   });
 
   it("marks the selected entry with aria-current", () => {
-    renderApp();
+    renderBrowser();
     const before = entryItem("Button");
     expect(before.getAttribute("aria-current")).toBeNull();
     fireEvent.click(before);
@@ -95,7 +103,7 @@ describe("App (M1 skeleton)", () => {
 
 describe("App (M2 component browser)", () => {
   it("filters by query from the search box", () => {
-    renderApp();
+    renderBrowser();
     fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "tabs" } });
     expect(screen.getByRole("status").textContent).toContain("2 of 87 components");
     expect(entryItem("TabSheet")).toBeTruthy();
@@ -103,20 +111,20 @@ describe("App (M2 component browser)", () => {
   });
 
   it("filters by category via the taxonomy-driven select", () => {
-    renderApp();
+    renderBrowser();
     fireEvent.change(screen.getByLabelText("Category"), { target: { value: "inputs" } });
     expect(screen.getByRole("status").textContent).toContain("5 of 87 components");
     expect(screen.getByRole("button", { name: /^TextInput\b/ })).toBeTruthy();
   });
 
   it("filters by theme via the taxonomy-driven select", () => {
-    renderApp();
+    renderBrowser();
     fireEvent.change(screen.getByLabelText("Filter by theme"), { target: { value: "retro-terminal" } });
     expect(screen.getByRole("status").textContent).toContain("87 of 87 components");
   });
 
   it("shows the filter empty state and restores on Reset filters", () => {
-    renderApp();
+    renderBrowser();
     fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "zzz-no-match" } });
     expect(screen.getByText(/No components match/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Reset filters" }));
@@ -136,7 +144,7 @@ describe("App (M2 component browser)", () => {
   });
 
   it("keeps list, detail, and filter state independent when selecting an entry", () => {
-    renderApp();
+    renderBrowser();
     fireEvent.change(screen.getByLabelText("Category"), { target: { value: "display" } });
     fireEvent.click(entryItem("Badge"));
     expect(screen.getAllByRole("heading", { level: 2, name: "Badge" }).length).toBeGreaterThan(0);
@@ -164,7 +172,7 @@ describe("App (M3 theme engine + live preview)", () => {
   });
 
   it("renders the live preview for the selected entry's demo", () => {
-    renderApp();
+    renderBrowser();
     fireEvent.click(entryItem("Button"));
     expect(screen.getByTestId("live-preview")).toBeTruthy();
     expect(document.querySelector('[data-demo-id="button"]')).toBeTruthy();
@@ -229,7 +237,7 @@ describe("App (M4 deep links)", () => {
   });
 
   it("selection writes the hash; hash changes drive back/forward selection", async () => {
-    renderApp();
+    renderBrowser();
     fireEvent.click(entryItem("Alert"));
     expect(window.location.hash).toBe("#/component/alert");
     expect(
@@ -248,19 +256,28 @@ describe("App (M4 deep links)", () => {
     renderApp();
     expect(screen.getAllByRole("heading", { level: 2, name: "Alert" }).length).toBeGreaterThan(0);
     window.location.hash = "";
+    // M7: the empty hash lands on the visual gallery with the selection cleared.
     await waitFor(() => {
-      expect(screen.getAllByText(/Select a component from the catalog/).length).toBeGreaterThan(0);
+      expect(screen.getByRole("region", { name: "Component gallery" })).toBeTruthy();
+      expect(screen.queryByRole("heading", { level: 2, name: "Alert" })).toBeNull();
     });
   });
 
   it("ignores unknown ids in the hash", () => {
     window.location.hash = "/component/extinct";
     renderApp();
-    expect(screen.getAllByText(/Select a component from the catalog/).length).toBeGreaterThan(0);
+    expect(screen.getByRole("region", { name: "Component gallery" })).toBeTruthy();
+    expect(screen.queryByRole("heading", { level: 2, name: "Alert" })).toBeNull();
   });
 });
 
 describe("App (M5.3 gallery)", () => {
+  it("a fresh launch lands in the visual gallery (M7 default view)", () => {
+    renderApp();
+    expect(screen.getByRole("region", { name: "Component gallery" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /^Alert \b/ })).toBeNull();
+  });
+
   it("renders a preview card per entry with honest preview kinds", () => {
     renderApp();
     fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
@@ -382,7 +399,7 @@ describe("App (M5.4 multi-selection)", () => {
   });
 
   it("the detail view offers a selection toggle (browser view)", () => {
-    renderApp();
+    renderBrowser();
     fireEvent.click(entryItem("Button"));
     fireEvent.click(screen.getByRole("checkbox", { name: "Select Button for the master prompt" }));
     // The selection count chip in the header reflects browser-view selections.
@@ -491,7 +508,7 @@ describe("App (M6.2 preview workspace)", () => {
   });
 
   it("the browser detail pane links into the workspace (href) and deep link opens it", async () => {
-    renderApp();
+    renderBrowser();
     fireEvent.click(entryItem("Card"));
     // jsdom does not navigate on anchor clicks; assert the deep link affordance,
     // then enter the route the way a browser would (hash change).

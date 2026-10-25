@@ -2,7 +2,7 @@
 // truth; this view composes the browser (search/filters/detail), the gallery
 // (visual card grid over the same filters), the taxonomy-driven theme engine
 // (ThemeProvider/ThemePicker), and live component previews.
-import { useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
+import { Component, useEffect, useMemo, useRef, useState, lazy, Suspense, type ReactNode } from "react";
 import { DetailPane } from "./components/browser/DetailPane";
 import { EntryList } from "./components/browser/EntryList";
 import { FilterBar } from "./components/browser/FilterBar";
@@ -29,10 +29,42 @@ import "./components/prompt/prompt.css";
 type View = "browser" | "gallery" | "prompt" | "preview";
 
 /** M6.2: the preview workspace (vendored showcases + animation engines) is a
- * heavy view, so it loads lazily — browser/gallery users never pay for it. */
+ * heavy view, so it loads lazily — browser/gallery users never pay for it.
+ * M7.2: a failed chunk (offline deploy, build mismatch) shows an actionable
+ * retry card instead of a blank screen. */
 const PreviewWorkspace = lazy(() =>
   import("./components/preview/PreviewWorkspace").then((module) => ({ default: module.PreviewWorkspace })),
 );
+
+class LazyLoadBoundary extends Component<
+  { children: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return (
+      <div className="workspace-empty" data-testid="preview-load-error" aria-label="Preview workspace failed to load">
+        <h2>The preview workspace could not load</h2>
+        <p>
+          Its code-split chunk failed to fetch (offline, deploy mismatch, or a build
+          problem). Nothing was lost — the page itself is still running.
+        </p>
+        <button
+          type="button"
+          className="reset-filters"
+          onClick={() => this.setState({ failed: false })}
+        >
+          Retry load
+        </button>
+        <a href="#/gallery">Back to gallery</a>
+      </div>
+    );
+  }
+}
 
 /** Deep links look like `#/component/<id>` (M4), `#/gallery` (M5.3),
  * `#/preview/<id>` (M6.2), and `#/prompt` (M5.4). */
@@ -57,7 +89,9 @@ function isEditableTarget(target: EventTarget | null): boolean {
 }
 
 export default function App() {
-  const [view, setView] = useState<View>("browser");
+  // M7: the visual gallery is the default landing view — the component browser
+  // stays one click away (and is still selected by #/component deep links).
+  const [view, setView] = useState<View>("gallery");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
   const [theme, setTheme] = useState("");
@@ -107,7 +141,7 @@ export default function App() {
         setView("prompt");
         return;
       }
-      setView("browser");
+      setView("gallery");
       setSelectedId(null);
     };
     syncFromHash();
@@ -133,6 +167,11 @@ export default function App() {
 
   function openBrowser() {
     setView("browser");
+  }
+
+  function openPromptView() {
+    window.location.hash = "/prompt";
+    setView("prompt");
   }
 
   function openPrompt() {
@@ -178,36 +217,51 @@ export default function App() {
     <div className="app-shell">
       <header className="app-header">
         <div className="app-heading">
-          <h1 className="app-title">React Library</h1>
-          <p className="app-tagline">
-            Agent-first component catalog — {catalogCounts.entries} components,{" "}
-            {catalogCounts.themes} themes
-          </p>
+          <span className="app-mark" aria-hidden="true">RL</span>
+          <div>
+            <h1 className="app-title">React Library</h1>
+            <p className="app-tagline">
+              Agent-first component catalog — {catalogCounts.entries} components,{" "}
+              {catalogCounts.themes} themes
+            </p>
+          </div>
         </div>
-        <ThemePicker />
+        <div className="app-header-actions">
+          <ThemePicker />
+        </div>
       </header>
       <nav className="app-views" aria-label="Catalog views">
-        <button
-          type="button"
-          className={`view-switch ${view === "browser" ? "is-active" : ""}`}
-          aria-pressed={view === "browser"}
-          onClick={openBrowser}
-        >
-          Browser
-        </button>
-        <button
-          type="button"
-          className={`view-switch ${view === "gallery" ? "is-active" : ""}`}
-          aria-pressed={view === "gallery"}
-          onClick={openGallery}
-        >
-          Gallery
-        </button>
+        <div className="view-switcher" role="presentation">
+          <button
+            type="button"
+            className={`view-switch ${view === "gallery" ? "is-active" : ""}`}
+            aria-pressed={view === "gallery"}
+            onClick={openGallery}
+          >
+            Gallery
+          </button>
+          <button
+            type="button"
+            className={`view-switch ${view === "browser" ? "is-active" : ""}`}
+            aria-pressed={view === "browser"}
+            onClick={openBrowser}
+          >
+            Browser
+          </button>
+          <button
+            type="button"
+            className={`view-switch ${view === "prompt" ? "is-active" : ""}`}
+            aria-pressed={view === "prompt"}
+            onClick={openPromptView}
+          >
+            Prompt studio
+          </button>
+        </div>
         <span className="view-counts">
           {localCount} local · {externalCount} external · {selection.length} selected
         </span>
       </nav>
-      <main className="app-main">
+      <main className={`app-main ${view === "browser" ? "is-catalog" : ""}`}>
         {view === "gallery" ? (
           <>
             <section className="entry-nav" aria-label="Component gallery filters">
@@ -246,19 +300,21 @@ export default function App() {
             />
           </>
         ) : view === "preview" ? (
-          <Suspense
-            fallback={
-              <main className="workspace-empty" data-testid="preview-loading" aria-label="Preview workspace">
-                Loading preview…
-              </main>
-            }
-          >
-            <PreviewWorkspace
-              entry={selected}
-              selected={selected ? selection.includes(selected.id) : undefined}
-              onToggleSelection={toggleSelection}
-            />
-          </Suspense>
+          <LazyLoadBoundary>
+            <Suspense
+              fallback={
+                <main className="workspace-empty" data-testid="preview-loading" aria-label="Preview workspace">
+                  Loading preview…
+                </main>
+              }
+            >
+              <PreviewWorkspace
+                entry={selected}
+                selected={selected ? selection.includes(selected.id) : undefined}
+                onToggleSelection={toggleSelection}
+              />
+            </Suspense>
+          </LazyLoadBoundary>
         ) : view === "prompt" ? (
           <PromptStudio
             items={selection

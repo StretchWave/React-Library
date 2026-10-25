@@ -1,44 +1,151 @@
-/* App shell layout (M1). Colors come from --rl-* tokens with classic-clean
- * fallbacks only; M3's ThemeProvider owns live theme switching. */
+/* App shell layout (M1; M7.2 visual redesign). Colors come from --rl-* tokens
+ * with classic-clean fallbacks only; ThemeProvider owns live theme switching.
+ * The shell is chrome only: previews keep their own styling so component
+ * character is never recolored by the application theme. */
 .app-shell {
   display: flex;
   flex-direction: column;
   min-height: 100%;
 }
 
+/* --- identity header -------------------------------------------------------- */
 .app-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  padding: 1rem 1.5rem;
+  padding: 0.85rem 1.5rem;
   background: var(--rl-surface-alt, #ffffff);
   border-bottom: 1px solid var(--rl-border, #d8dee6);
-  box-shadow: var(--rl-shadow, 0 1px 3px rgb(15 23 42 / 0.12));
+}
+
+.app-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+/* The title block shrinks so the tagline's ellipsis can engage on mobile. */
+.app-heading > div {
+  min-width: 0;
+}
+
+/* Accent monogram so the product has a mark, not only a text line. */
+.app-mark {
+  display: inline-grid;
+  place-content: center;
+  inline-size: 2.4rem;
+  block-size: 2.4rem;
+  flex: none;
+  border-radius: calc(var(--rl-radius, 12px) / 2);
+  background: var(--rl-accent, #2563eb);
+  color: var(--rl-accent-contrast, #ffffff);
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  font-family: var(--rl-font, inherit);
 }
 
 .app-title {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 .app-tagline {
   color: var(--rl-text-muted, #5c6670);
-  font-size: 0.875rem;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+.app-header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* --- view switcher (segmented control) -------------------------------------- */
+.app-views {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1.5rem 0.9rem;
+  background: var(--rl-surface-alt, #ffffff);
+}
+
+.view-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--rl-border, #d8dee6);
+  border-radius: var(--rl-radius, 12px);
+  background: var(--rl-surface, #f7f8fa);
+}
+
+.view-switch {
+  border: none;
+  background: transparent;
+  color: var(--rl-text, #1c2128);
+  border-radius: calc(var(--rl-radius, 12px) / 2);
+  padding: 0.32rem 0.85rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: var(--rl-font, inherit);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.view-switch:hover {
+  background: var(--rl-surface-alt, #ffffff);
+}
+
+.view-switch.is-active {
+  color: var(--rl-accent-contrast, #ffffff);
+  background: var(--rl-accent, #2563eb);
+}
+
+.view-switch.is-active:hover {
+  background: var(--rl-accent, #2563eb);
+}
+
+.view-counts {
+  margin-left: auto;
+  color: var(--rl-text-muted, #5c6670);
+  font-size: 0.85rem;
+}
+
+/* --- main layout ------------------------------------------------------------ */
+/* Default: one column (gallery, preview, prompt fill the full width). Only the
+ * catalog browser view opts into the classic list + detail two-column layout. */
 .app-main {
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   flex: 1;
   min-height: 0;
+  padding: 1rem 1.5rem 2rem;
+  gap: 1rem;
+}
+
+.app-main.is-catalog {
+  grid-template-columns: 280px minmax(0, 1fr);
 }
 
 .entry-nav {
   overflow-y: auto;
   background: var(--rl-surface-alt, #ffffff);
-  border-right: 1px solid var(--rl-border, #d8dee6);
+  border: 1px solid var(--rl-border, #d8dee6);
+  border-radius: var(--rl-radius, 12px);
   padding: 0.5rem;
+  align-self: start;
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
 }
 
 .entry-list {
@@ -61,7 +168,7 @@
   color: inherit;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: var(--rl-radius, 12px);
+  border-radius: calc(var(--rl-radius, 12px) / 2);
   cursor: pointer;
 }
 
@@ -86,7 +193,8 @@
 
 .detail-pane {
   overflow-y: auto;
-  padding: 1.5rem;
+  padding: 0.25rem;
+  min-width: 0;
 }
 
 .detail-card {
@@ -111,15 +219,31 @@
   color: var(--rl-text-muted, #5c6670);
 }
 
+.workspace-open-row {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.workspace-open {
+  font-weight: 600;
+}
+
 @media (max-width: 720px) {
+  .app-header,
+  .app-views,
   .app-main {
-    grid-template-columns: 1fr;
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+  }
+
+  .app-main.is-catalog {
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
   }
 
   .entry-nav {
+    position: static;
     border-right: 0;
-    border-bottom: 1px solid var(--rl-border, #d8dee6);
     max-height: 40vh;
   }
 }

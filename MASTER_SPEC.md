@@ -390,6 +390,39 @@ preview-class handling. Staged; see `IMPLEMENTATION_CHECKLIST.md` §6.x.
    Evidence gates: null-gl bail scan, full multi-file import audit (only `three`
    is added), and a GPU smoke in a real browser before the flip is claimed.
 
+### M7 — Visual overhaul: gallery-first product (2026-10-25)
+
+M6 made the previews honest; M7 makes the product a visual motion-design laboratory
+while preserving every working behavior (catalog client, selection store, prompt
+builder, showcase isolation, lazy loading, hash routing, six appearance themes).
+
+1. **M7.1 Audit first** — verify HEAD vs `7e98d8c`, run the gate, reconcile the
+   documented counts against the live registry (recorded in the checklist), and
+   produce the defect list that scopes M7.2–M7.6.
+2. **M7.2 Art direction + shell** — gallery is the default landing view (`#/component`
+   deep links and the browser switch keep it one click away); identity header with a
+   mark, global search stays per-view, compact segmented navigation, single-column
+   main layout with the two-column split scoped to the browser view only.
+3. **M7.3 Gallery redesign** — preview-first cards (13.5–15rem preview frames vs the
+   old 7.5rem, scaler 0.72), overlaid always-visible selection checkbox, explicit
+   in-app `#/preview/<id>` action as the default inspect path (off-site links remain
+   separately labeled), distinctive heavy-poster states, hover/focus elevation,
+   reduced-motion-respecting entrance animation, no layout shift on stage mount.
+4. **M7.4 Preview workspace redesign** — stage-first canvas
+   (`min-height: clamp(420px, 62vh, 720px)`), compact toolbar (stage modes,
+   viewports, replay, fullscreen with graceful degradation), verified per-entry
+   controls hosted in the information rail, honest-card canvas presence, and an
+   app-level error boundary with Retry around the lazy workspace chunk.
+5. **M7.5 Selection + prompt studio** — tray compresses to a sticky single row on
+   desktop; prompt pane wraps (`pre-wrap`) and gains an explicit edit/restore mode
+   that never mutates the canonical selection; optional target-project name
+   (deterministic line via `PromptOptions.targetProject`).
+6. **M7.6 QA + docs** — full suite + build + flagless verify; DOM-based browser QA
+   of the §13 acceptance flows at 1440/1280/390 widths; README/checklist counts
+   corrected to the audited truth; changelog order fixed (v1.4 now precedes v1.5).
+   Pixel-screenshot evidence that was blocked by an undrawn client window is
+   recorded as a limitation, never claimed.
+
 ## 11) Verification gates
 
 ```text
@@ -461,11 +494,6 @@ masquerades as working. When done, status flips to *working* with the evidence
   ingestion, preview workspace, visual gallery, prompt/status extensions); §12
   amended to allow the animation runtimes (`gsap`, `@gsap/react`, `motion`,
   `matter-js`) and entry fields `runtime`/`heavy`.
-- **v1.5 — 2026-10-25:** M6.6 everything-local previews shipped; §12 extended with
-  `three` (Blob Cursor, Hyperspeed, procedural Lanyard). All 21 raw-WebGL React
-  Bits variants plus the 16 shadcn and 4 Magic UI vendored items render live
-  through reviewed wrappers; webgl entries auto-`heavy`; zero preview redirects
-  remain in the catalog.
 - **v1.4 — 2026-10-24:** M6.2–M6.4 shipped: preview workspace `#/preview/<id>`
   (stage modes, viewports, replay, per-entry verified controls, honest kind card),
   40 reviewed showcase wrappers, the `react-bits-animated-list` record flipped to a
@@ -475,3 +503,14 @@ masquerades as working. When done, status flips to *working* with the evidence
   IntersectionObserver play policy, a persisted global pause toggle, and heavy
   gating; the workspace view is lazy-loaded so gallery users never pay for the
   animation engines.
+- **v1.5 — 2026-10-25:** M6.6 everything-local previews shipped; §12 extended with
+  `three` (Blob Cursor, Hyperspeed, procedural Lanyard). All 21 raw-WebGL React
+  Bits variants plus the 16 shadcn and 4 Magic UI vendored items render live
+  through reviewed wrappers; webgl entries auto-`heavy`; zero preview redirects
+  remain in the catalog.
+- **v1.6 — 2026-10-25:** M7 visual overhaul milestone added (§16): gallery-first
+  default landing, preview-first gallery cards, redesigned preview workspace with
+  fullscreen and rail-hosted controls, prompt studio polish (editable copy,
+  wrapping pane, optional target-project line via `PromptOptions.targetProject`),
+  shell art direction with the six appearance themes preserved, and a
+  lazy-preview error boundary. No dependency-policy change.

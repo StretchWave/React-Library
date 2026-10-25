@@ -1,5 +1,7 @@
-// Gallery card (M5.3; +M5.4 selection checkbox): preview box + name/status +
-// category + source/type + license indicators + aesthetic & attribute chips.
+// Gallery card (M5.3; M7.3 redesign): preview-first composition. The preview
+// region is the card's dominant surface; the in-app preview workspace is the
+// primary inspect action; the original source stays a separate, explicitly
+// labeled action so inspecting a card never navigates away from the catalog.
 import type { CatalogEntry } from "../../catalog/types";
 import { aestheticById, attributeById, categoryById, sourceById } from "../../catalog/client";
 import { entryTypeOf } from "../../catalog/types";
@@ -15,6 +17,18 @@ export interface GalleryCardProps {
 
 const VISIBLE_ATTRIBUTES = 4;
 
+/** Compact kind chip copy keeps the card honest about what the frame shows. */
+function kindChipLabel(kind: string, heavy: boolean): { chip: string; label: string } {
+  if (kind === "local-demo") {
+    return heavy ? { chip: "poster", label: "heavy · runs in workspace" } : { chip: "live", label: "live" };
+  }
+  if (kind === "external" || kind === "source-link") {
+    return { chip: "external", label: "official demo off-site" };
+  }
+  if (kind === "static") return { chip: "poster", label: "static still" };
+  return { chip: "poster", label: "no preview yet" };
+}
+
 export function GalleryCard({ entry, onOpenDetail, selected = false, onToggleSelect }: GalleryCardProps) {
   const type = entryTypeOf(entry);
   const categoryLabel = categoryById(entry.category)?.label ?? entry.category;
@@ -23,15 +37,18 @@ export function GalleryCard({ entry, onOpenDetail, selected = false, onToggleSel
   const aesthetics = (entry.aesthetics ?? []).map((id) => aestheticById(id)?.label ?? id);
   const attributes = (entry.attributes ?? []).map((id) => attributeById(id)?.label ?? id);
   const overflow = Math.max(0, attributes.length - VISIBLE_ATTRIBUTES);
+  const kind = previewKind(entry);
+  const heavy = Boolean(entry.heavy);
+  const chip = kindChipLabel(kind, heavy);
 
   return (
     <li
       className={`gallery-card ${selected ? "is-selected" : ""}`}
       data-entry-id={entry.id}
-      data-preview-kind={previewKind(entry)}
+      data-preview-kind={kind}
     >
-      <div className="gallery-select-row">
-        <label className="select-check-label">
+      <div className="gallery-frame-wrap" data-preview-kind={kind}>
+        <label className="gallery-frame-select">
           <input
             type="checkbox"
             className="select-check"
@@ -41,8 +58,8 @@ export function GalleryCard({ entry, onOpenDetail, selected = false, onToggleSel
           />
           <span aria-hidden="true">Select</span>
         </label>
+        <PreviewBox entry={entry} />
       </div>
-      <PreviewBox entry={entry} />
       <div className="gallery-card-head">
         <h3 className="gallery-title">{entry.name}</h3>
         <span className={`status-chip ${statusChipClass(entry)}`}>{entry.status}</span>
@@ -75,14 +92,26 @@ export function GalleryCard({ entry, onOpenDetail, selected = false, onToggleSel
           {overflow > 0 ? <span className="neutral-chip">+{overflow}</span> : null}
         </div>
       ) : null}
-      <button
-        type="button"
-        className="gallery-details"
-        aria-label={`Open details for ${entry.name}`}
-        onClick={() => onOpenDetail(entry.id)}
-      >
-        Details
-      </button>
+      <div className="gallery-actions">
+        <a
+          className="gallery-preview-open"
+          href={`#/preview/${entry.id}`}
+          aria-label={`Open ${entry.name} in the preview workspace`}
+        >
+          Preview <span aria-hidden="true">↗</span>
+        </a>
+        <span className={`kind-chip`} data-chip={chip.chip}>
+          {chip.label}
+        </span>
+        <button
+          type="button"
+          className="gallery-details"
+          aria-label={`Open details for ${entry.name}`}
+          onClick={() => onOpenDetail(entry.id)}
+        >
+          Details
+        </button>
+      </div>
     </li>
   );
 }

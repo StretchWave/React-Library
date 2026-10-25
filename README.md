@@ -20,7 +20,8 @@ Schema: [`docs/SCHEMA.md`](./docs/SCHEMA.md)
 | Advanced interactions (M4): TabSheet arrow keys, copy-usage, hash deep links | ✅ working |
 | Catalog ingestion (M5.1–M5.2): schema v2, 9-source registry, 16 shadcn + 4 Magic UI vendored, 7 verified react-bits references | ✅ working — 33 real entries (26 local / 7 external) |
 | Gallery + honest previews (M5.3), multi-selection (M5.4), master prompt (M5.5) | ✅ working |
-| Animation-first correction (M6): 87 real entries (all local), 61 verified React Bits items vendored from the official registry, 46 live previews (6 demos + 40 showcase stages), preview workspace `#/preview/<id>` with per-entry controls (lazy-loaded), gallery mini stages with a persisted play/pause toggle, heavy entries gated to the workspace | ✅ working (verify gate green; browser-verified) |
+| Animation-first correction (M6): 87 real entries (all local records), 61 React Bits + 4 Magic UI items vendored from the official registries, 71 runnable live previews (65 showcase stages + 6 seeded demos, audit-verified M7), preview workspace `#/preview/<id>` with per-entry controls (lazy-loaded), gallery mini stages with a persisted play/pause toggle, heavy entries gated to the workspace | ✅ working (verify gate green; browser-verified) |
+| Visual overhaul (M7): gallery-first landing, preview-first cards, redesigned preview workspace with fullscreen, editable prompt pane, six restored appearance themes | ✅ working (105/105 app tests; DOM-based visual QA — see IMPLEMENTATION_CHECKLIST M7) |
 
 ## Browse features
 
@@ -32,20 +33,23 @@ Schema: [`docs/SCHEMA.md`](./docs/SCHEMA.md)
   manifest/implementation paths, aesthetics/attributes).
 - Live preview rendered in the active theme; **Copy usage** puts a ready-to-paste
   snippet on your clipboard.
-- Gallery view (`#/gallery`, header switch): preview-first card grid over the same
-  filters with honest previews per entry — live mini stages for the six in-app
-  components and the 40 runnable React Bits items (auto-play on visibility, manual
-  Play fallback), "Open official preview" links for doc-page items, "View at source"
-  for the raw-WebGL variants, and heavy items (Stack, Falling Text) gated behind the
-  preview workspace. A persisted **Pause previews** toggle stops every mini stage.
+- Gallery view (the app's default landing view since M7): preview-first card grid
+  over the same filters with honest previews per entry — live mini stages for all
+  65 showcase-wrapped items plus the 6 seeded demos (auto-play on visibility, manual
+  Play fallback), large ~220–240px preview frames, and a deliberate poster state for
+  the 23 heavy entries (they run only in the preview workspace). The 16 shadcn
+  doc-page items show a clearly labeled off-site tile ("Open official preview") —
+  inspecting any card opens the in-app `#/preview/<id>` workspace instead of
+  navigating away. A persisted **Pause previews** toggle stops every mini stage.
   Ingested third-party code is never executed in the app outside the reviewed
-  showcase wrappers.
-- Preview workspace (`#/preview/<id>`): full-stage live preview for every runnable
-  entry with stage background modes (neutral/inverted/grid), viewport widths
-  (full/1280/768/375), Replay, per-entry controls verified against the vendored
-  sources, an information rail (source, license verbatim, retrieval, dependencies,
-  vendored paths, related components), and the selection toggle. Non-runnable
-  records show an honest kind card with the official link instead of a fake stage.
+  showcase wrappers (M6.6: the registry loads on demand from a code-split chunk).
+- Preview workspace (`#/preview/<id>`, M7 redesign): full-stage live preview for
+  every runnable entry with stage background modes (neutral/inverted/grid),
+  viewport widths (full/1280/768/375), Replay, Fullscreen, per-entry controls
+  verified against the vendored sources (hosted in the information rail), an
+  information rail (source, license verbatim, retrieval, dependencies, vendored
+  paths, related components), and the selection toggle. Non-runnable records show
+  an honest kind card with the official link instead of a fake stage.
 - Multi-selection (M5.4): card checkboxes, "Select all visible", persistent
   `rl.selection.v1` store (stale ids pruned), reorderable selection tray with
   availability flags; selection survives filters, view switches, and reloads.

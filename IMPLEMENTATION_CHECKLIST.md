@@ -43,6 +43,30 @@ and description updated at v0.3.0; `--skip-links` was removed at M3.)
   selection-follows-focus, Home/End, Arrow keys wrap at both ends), copy-usage snippet
   with clipboard fallback + "Copied ✓" feedback, hash deep links `#/component/<id>`
   synced with `hashchange` (back/forward safe). Catalog `tabs` bumped to v0.3.0.
+- 2026-10-25 — **M6.6 correction recorded (audit-verified):** the "Catalog truth"
+  line below this log was written before the M6.6 webgl flip landed. Verified
+  actual state: **87 entries, all local records** (shadcn 16 · magic-ui 4 ·
+  react-bits 61 · seeded 6). Preview kinds: **65 `local-demo`** (61 react-bits +
+  4 Magic UI — including the 21 raw-WebGL variants flipped from `source-link`) +
+  6 seeded entries that resolve their previews through the vetted demo registry,
+  **16 `external`** official doc pages (~30 live card previews + 16 workspace
+  stages; 23 heavy entries poster-state in the gallery). The stale numbers here
+  and in the M6.3 entry are corrected in place below.
+- 2026-10-25 — **M7 shipped (visual overhaul):** gallery-first default landing,
+  preview-first gallery cards (13.5–15rem frames, overlaid selection, in-app
+  Preview action replacing card click-through), redesigned preview workspace
+  (stage-first canvas `min-height: clamp(420px, 62vh, 720px)`, toolbar with
+  Fullscreen, controls hosted in the info rail), prompt studio polish (wrapping
+  pane, edit/restore, optional target-project line via `PromptOptions`
+  — no new dependencies), shell redesign (identity header, segmented nav,
+  single-column main with browser-only two-column opt-in), lazy-preview error
+  boundary with retry. Verified: 105/105 app tests, node tests green, typecheck
+  green, build main 435.48 kB / 101.51 kB gzip (baseline 431.63 kB / 100.61 —
+  +3.9 kB from shell/gallery chrome; showcase chunk unchanged 1,740.88 kB and
+  still lazy; workspace chunk 11.28 kB), `npm run verify` green. Browser visual
+  QA (see M7 section below) used the accessibility tree and computed-style
+  checks; pixel captures were blocked because the desktop client window was not
+  drawn during the session.
 - 2026-10-24 — `@testing-library/dom` appears as a direct devDependency because it is a
   mandatory peer of `@testing-library/react` v16 (npm auto-installed it); spec §12
   amended accordingly. Otherwise the dependency set matches §12 exactly.
@@ -398,9 +422,12 @@ master prompt — with honest handling of what can and cannot run in this app.
 - [x] M6.3 gallery motion: `src/lib/motion.ts` preference store
       (`rl-motion-play`, default playing, external store), toolbar
       "Pause previews"/"Play previews" (`aria-pressed`), `PreviewBox` MiniStage for
-      all 46 local-demo cards — auto-play via IntersectionObserver when visible +
-      playing, manual Play fallback, unmount off-screen; `source-link`/`external`
-      cards unchanged (20 official + 21 at-source links)
+      the 65 local-demo cards plus the 6 seeded demo previews (M7 correction of
+      the historical "46 local-demo" figure: 65 showcase stages + 6 seeded demos,
+      71 live-preview total; the 21 raw-WebGL `source-link` variants were later
+      flipped to local wrappers in M6.6) — auto-play via IntersectionObserver when
+      visible + playing, manual Play fallback, unmount off-screen; the 16 shadcn
+      doc-page cards keep their official-preview links
 - [x] Heavy gating: Stack + Falling Text show workspace-bound placeholders in the
       gallery (`data-heavy="true"`); only the workspace runs them
 - [x] M6.2 workspace shipped lazy: React.lazy + Suspense split the animation
@@ -412,11 +439,51 @@ master prompt — with honest handling of what can and cannot run in this app.
       AnimatedList flip — app suite 104/104; tooling 64/64; typecheck + build green;
       flagless `npm run verify` green
 - [x] Browser smoke (5173): `#/preview/react-bits-shiny-text` mounts the lazy stage
-      with no console errors; `#/gallery` shows 87 cards, 44 play buttons
-      (46 local-demo − 2 heavy), 2 heavy workspace links, and the motion toggle
-- Catalog truth: **87 entries, all local** (shadcn 16 · magic-ui 4 · react-bits 61 ·
-  seeded 6). Preview kinds: **46 `local-demo`** (6 seeded demos + 40 runtime-live
-  react-bits) · 21 `source-link` (react-bits raw-WebGL variants) · 0 `external`
+      with no console errors; `#/gallery` shows 87 cards with live/poster/external
+      states per the corrected kind counts below, and the motion toggle persists
+      (M7 DOM re-check: pause zeroes every `.preview-mini-stage`, `rl-motion-play`
+      flips to "paused", resume restores the Play affordances)
+- [x] M7.1 audit (2026-10-25, before any redesign edit): HEAD = `7e98d8c` (M6.6
+      code-splitting committed); baseline `npm run verify` green; baseline build
+      main 431.63 kB / 100.61 gzip, showcases chunk 1,740.88 kB / 541.31 gzip lazy,
+      workspace chunk 10.86 kB. Defect list drove the M7 backlog:
+      (1) default view was the text browser, not the gallery;
+      (2) `.app-main` forced `280px + 1fr` — preview/prompt views rendered inside
+      the 280px sidebar column;
+      (3) gallery preview frames 7.5rem tall with a 0.6 scaler — effects
+      unrecognizable;
+      (4) cards were chrome-heavy with no hover/focus affordances;
+      (5) clicking an external card navigated off-site with no in-app inspect
+      action;
+      (6) heavy cards were near-empty boxes;
+      (7) prompt pane used `white-space: pre` forcing page-wide horizontal
+      scrolling on mobile;
+      (8) no fullscreen in the workspace; controls sat under the stage;
+      (9) a failed lazy import had no error boundary;
+      (10) filter rail stacked vertically in a 280px column;
+      (11) docs carried pre-M6.6 counts (46 live previews, "View at source"
+      links) and MASTER_SPEC's changelog listed v1.5 before v1.4.
+- [x] M7.2–M7.5 shipped (details in the Decisions log): shell art direction,
+      gallery-first default, preview-first cards + frames, workspace redesign,
+      prompt studio (wrapping pane, edit/restore, target-project line), tray
+      compression, lazy-load error boundary with Retry
+- [x] M7.6 visual QA (browser, 5173): fresh launch lands in the gallery; a
+      lightweight card's mini stage mounts and plays ("Blur Text" verified live);
+      the heavy entry `react-bits-falling-text` runs in the workspace (stage
+      `min-height` 558px present, 4 rail controls, Replay/grid/375px viewport
+      exercised); `shadcn-accordion` shows the honest external card with its
+      `ui.shadcn.com` link; every catalog theme id switches `
+data-theme` scope
+      (6/6); global pause zeroes stages and persists; prompt pane wraps
+      (`pre-wrap`/`break-word`) and edit/restore works; no horizontal overflow at
+      390px (fixed the tagline ellipsis shrink). Pixel screenshots unavailable
+      during the session (client window not drawn) — recorded as a limitation
+      rather than a claim.
+- Catalog truth (true as of M7, verified live): **87 entries, all local records**
+  (shadcn 16 · magic-ui 4 · react-bits 61 · seeded 6). Preview kinds:
+  **65 `local-demo`** (61 react-bits + 4 Magic UI) + 6 seeded entries resolving
+  via the vetted demos = **71 runnable live previews** (23 heavy) ·
+  **16 `external`** (official doc pages) · 0 `source-link` remaining
 
 ## 6) Future work (explicitly not now)
 

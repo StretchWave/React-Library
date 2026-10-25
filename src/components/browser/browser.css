@@ -1,21 +1,54 @@
 /* Component-browser UI (M2). Colors via --rl-* tokens (+ --rl-status-*), with
  * classic-clean fallbacks that M3's ThemeProvider will drive live. */
+/* M7.3: horizontal filter rail — search grows, selects wrap into rows. The
+ * same component serves the gallery's top bar and the browser sidebar. */
 .filter-bar {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
   padding: 0.75rem;
   border-bottom: 1px solid var(--rl-border, #d8dee6);
 }
 
+@media (min-width: 720px) {
+  .filter-bar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.65rem;
+    border: 1px solid var(--rl-border, #d8dee6);
+    border-radius: var(--rl-radius, 12px);
+    background: var(--rl-surface-alt, #ffffff);
+    padding: 0.65rem 0.85rem;
+  }
+
+  .filter-bar > .filter-select-label {
+    flex: 1 1 9rem;
+    min-width: 8.5rem;
+  }
+
+  /* The search field dominates the rail. */
+  .filter-bar > :first-child {
+    flex: 3 1 16rem;
+  }
+}
+
 .filter-input,
 .filter-select {
+  display: block;
   width: 100%;
   padding: 0.45rem 0.6rem;
   font: inherit;
   color: inherit;
   background: var(--rl-surface, #f7f8fa);
   border: 1px solid var(--rl-border, #d8dee6);
-  border-radius: var(--rl-radius, 12px);
+  border-radius: calc(var(--rl-radius, 12px) / 2);
+}
+
+.filter-input:focus-visible,
+.filter-select:focus-visible {
+  outline: var(--rl-focus, 2px solid var(--rl-accent, #2563eb));
+  outline-offset: 1px;
 }
 
 .filter-select-label {
@@ -32,8 +65,10 @@
 }
 
 .result-count {
-  padding: 0.25rem 0.75rem 0;
-  font-size: 0.75rem;
+  padding: 0.25rem 0.25rem 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   color: var(--rl-text-muted, #5c6670);
 }
 

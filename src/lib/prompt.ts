@@ -10,6 +10,9 @@ import { sourceById } from "../catalog/client";
 export interface PromptOptions {
   /** Optional ISO timestamp; prompts stay deterministic without it. */
   generatedAt?: string;
+  /** M7.5: an optional target-project name recorded in the prompt header so
+   *  the consuming agent knows what it is assembling into. Deterministic. */
+  targetProject?: string;
 }
 
 const RULES: string[] = [
@@ -166,7 +169,7 @@ export function buildMasterPrompt(
     "# Master prompt — React Library component build",
     "",
     `This prompt is assembled exclusively from the canonical React Library catalog (schema v2).`,
-    `Selected components: ${items.length}${options.generatedAt ? ` · generated at ${options.generatedAt}` : ""}`,
+    `Selected components: ${items.length}${options.generatedAt ? ` · generated at ${options.generatedAt}` : ""}${options.targetProject ? ` · target project: ${options.targetProject}` : ""}`,
     `Selection order below is the user-defined order (position 1 = first).`,
   ];
 

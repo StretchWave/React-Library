@@ -1,9 +1,12 @@
-// Preview workspace (M6.2): dedicated full-stage preview for one catalog entry.
-// Runnable entries render exclusively through src/catalog/showcases — vendored
+// Preview workspace (M6.2; M7.4 visual redesign): a dedicated full-stage
+// preview where the component — not the chrome — is the main event. Runnable
+// entries render exclusively through src/catalog/showcases — vendored
 // third-party code never executes in the app outside those reviewed wrappers.
 // Entries without a runnable preview show an honest kind card with the official
-// link and the agent retrieval path. All styling uses --rl-* tokens only.
-import { Component, useMemo, useState, type ReactNode } from "react";
+// link and the agent retrieval path. The canvas keeps its own stage background
+// (neutral/inverted/grid) so the application theme never recolors a component
+// preview. All styling uses --rl-* tokens only.
+import { Component, useRef, useState, type ReactNode } from "react";
 import {
   aestheticById,
   attributeById,
@@ -116,6 +119,7 @@ interface WorkspaceShellProps {
 
 /** Keyed by entry id so stage state resets when the deep link changes. */
 function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: WorkspaceShellProps) {
+  const stageRef = useRef<HTMLDivElement | null>(null);
   const [viewport, setViewport] = useState<Viewport>("full");
   const [stageMode, setStageMode] = useState<StageMode>(showcase?.stage ?? "neutral");
   const [replayKey, setReplayKey] = useState(0);
@@ -125,17 +129,14 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
     return initial;
   });
 
-  const related = useMemo(() => {
-    if (!entry.source) return [];
-    return entries
-      .filter((candidate) => candidate.id !== entry.id && candidate.source === entry.source)
-      .sort(
-        (a, b) =>
-          Number(b.category === entry.category) - Number(a.category === entry.category) ||
-          a.id.localeCompare(b.id),
-      )
-      .slice(0, 6);
-  }, [entry]);
+  const related = entries
+    .filter((candidate) => candidate.source && entry.source && candidate.source === entry.source && candidate.id !== entry.id)
+    .sort(
+      (a, b) =>
+        Number(b.category === entry.category) - Number(a.category === entry.category) ||
+        a.id.localeCompare(b.id),
+    )
+    .slice(0, 6);
 
   const runnable = Boolean(showcase);
   const kind = previewKindOf(entry, showcase);
@@ -150,6 +151,29 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
 
   function setControl(id: string, value: string | number | boolean): void {
     setValues((prev) => ({ ...prev, [id]: value }));
+  }
+
+  function toggleFullscreen(): void {
+    const stage = stageRef.current;
+    if (!stage) return;
+    if (document.fullscreenElement && typeof document.exitFullscreen === "function") {
+      void document.exitFullscreen().catch(() => {
+        // Leaving fullscreen is best-effort; the inline canvas stays usable.
+      });
+      return;
+    }
+    try {
+      const request = stage.requestFullscreen?.();
+      if (request && typeof request.catch === "function") {
+        request.catch(() => {
+          // Denied or unsupported (for example kiosk mode): the inline canvas
+          // remains the honest fallback; no state is changed.
+        });
+      }
+    } catch {
+      // Some engines throw synchronously when fullscreen is unavailable; the
+      // inline canvas remains usable.
+    }
   }
 
   function renderControl(control: ShowcaseControl) {
@@ -221,47 +245,56 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
   return (
     <main className="workspace-shell" data-testid="preview-workspace" aria-label={`Preview workspace for ${entry.name}`}>
       <section className="workspace-main" aria-label="Live preview stage">
+        <div className="workspace-toolbar">
+          <label className="workspace-toolbar-field">
+            Stage
+            <select
+              data-testid="preview-stage-mode"
+              aria-label="Stage background mode"
+              value={stageMode}
+              onChange={(event) => setStageMode(event.target.value as StageMode)}
+            >
+              <option value="neutral">neutral</option>
+              <option value="inverted">inverted</option>
+              <option value="grid">grid</option>
+            </select>
+          </label>
+          <label className="workspace-toolbar-field">
+            Viewport
+            <select
+              data-testid="preview-viewport-select"
+              aria-label="Stage viewport width"
+              value={viewport}
+              onChange={(event) => setViewport(event.target.value as Viewport)}
+            >
+              {VIEWPORTS.map((candidate) => (
+                <option key={candidate.id} value={candidate.id}>
+                  {candidate.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            className="workspace-replay"
+            data-testid="preview-replay"
+            onClick={() => setReplayKey((current) => current + 1)}
+          >
+            Replay
+          </button>
+          <button
+            type="button"
+            className="workspace-replay"
+            onClick={toggleFullscreen}
+            aria-label="Toggle fullscreen preview"
+            disabled={!runnable}
+          >
+            Fullscreen
+          </button>
+        </div>
         {runnable && showcase ? (
           <>
-            <div className="workspace-toolbar">
-              <label className="workspace-toolbar-field">
-                Stage
-                <select
-                  data-testid="preview-stage-mode"
-                  aria-label="Stage background mode"
-                  value={stageMode}
-                  onChange={(event) => setStageMode(event.target.value as StageMode)}
-                >
-                  <option value="neutral">neutral</option>
-                  <option value="inverted">inverted</option>
-                  <option value="grid">grid</option>
-                </select>
-              </label>
-              <label className="workspace-toolbar-field">
-                Viewport
-                <select
-                  data-testid="preview-viewport-select"
-                  aria-label="Stage viewport width"
-                  value={viewport}
-                  onChange={(event) => setViewport(event.target.value as Viewport)}
-                >
-                  {VIEWPORTS.map((candidate) => (
-                    <option key={candidate.id} value={candidate.id}>
-                      {candidate.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="button"
-                className="workspace-replay"
-                data-testid="preview-replay"
-                onClick={() => setReplayKey((current) => current + 1)}
-              >
-                Replay
-              </button>
-            </div>
-            <div className="workspace-stage-wrap" data-stage={stageMode} data-testid="preview-stage-wrap">
+            <div className="workspace-stage-wrap" data-stage={stageMode} data-testid="preview-stage-wrap" ref={stageRef}>
               <div
                 className="workspace-stage-frame"
                 key={replayKey}
@@ -277,23 +310,6 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
             <p className="workspace-hint">
               {showcase.hint ?? "Press Replay to restart the animation."}
             </p>
-            <section
-              className="workspace-controls"
-              data-testid="preview-controls"
-              aria-label="Preview controls"
-            >
-              <h3 className="workspace-controls-title">Controls</h3>
-              {(showcase.controls ?? []).length > 0 ? (
-                <>
-                  {(showcase.controls ?? []).map((control) => renderControl(control))}
-                  <button type="button" className="workspace-reset" onClick={resetControls}>
-                    Reset controls
-                  </button>
-                </>
-              ) : (
-                <p className="workspace-controls-empty">This demo has no tunable controls.</p>
-              )}
-            </section>
           </>
         ) : (
           <div className="workspace-honest" data-testid="preview-honest">
@@ -352,6 +368,26 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
         </div>
 
         {entry.summary ? <p className="workspace-summary">{entry.summary}</p> : null}
+
+        {runnable && showcase ? (
+          <section
+            className="workspace-controls"
+            data-testid="preview-controls"
+            aria-label="Preview controls"
+          >
+            <h3 className="workspace-controls-title">Controls</h3>
+            {(showcase.controls ?? []).length > 0 ? (
+              <>
+                {(showcase.controls ?? []).map((control) => renderControl(control))}
+                <button type="button" className="workspace-reset" onClick={resetControls}>
+                  Reset controls
+                </button>
+              </>
+            ) : (
+              <p className="workspace-controls-empty">This demo has no tunable controls.</p>
+            )}
+          </section>
+        ) : null}
 
         {(entry.aesthetics ?? []).length > 0 ? (
           <div className="chip-row" aria-label="Visual aesthetics">

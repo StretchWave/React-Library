@@ -107,7 +107,7 @@ function MiniStage({ entryId, name, Component, heavy, onPlaybackStart }: MiniSta
 
   return (
     <div
-      className="preview-frame"
+      className={`preview-frame ${heavy ? "is-heavy" : ""}`}
       ref={hostRef}
       data-preview-kind="local-demo"
       data-played={active ? "true" : "false"}
@@ -115,10 +115,14 @@ function MiniStage({ entryId, name, Component, heavy, onPlaybackStart }: MiniSta
     >
       {heavy ? (
         <div className="preview-mini-placeholder">
+          <span className="preview-mini-kindchip">heavy preview</span>
           <a href={`#/preview/${entryId}`} className="preview-mini-open">
             Open in preview workspace ↗
           </a>
-          <p className="preview-mini-note">Heavy preview — full fidelity lives in the workspace.</p>
+          <p className="preview-mini-open-title">{name}</p>
+          <p className="preview-mini-note">
+            Heavy preview — it renders at full fidelity on demand in the workspace, never en masse in the grid.
+          </p>
         </div>
       ) : Component && active ? (
         <div className="preview-mini-stage" aria-label={`Live mini preview of ${name}`}>
@@ -199,9 +203,13 @@ export function PreviewBox({ entry }: { entry: CatalogEntry }) {
         href={url}
         target="_blank"
         rel="noreferrer noopener"
+        aria-label={`${LINK_CARD_COPY[kind]} for ${entry.name} (opens off-site)`}
       >
-        {LINK_CARD_COPY[kind]}
+        <span className="preview-frame-title">{LINK_CARD_COPY[kind]}</span>
         <span className="preview-frame-hint">{new URL(url).hostname}</span>
+        <span className="preview-frame-hint">
+          Inspect it in-app with the Preview action below.
+        </span>
       </a>
     );
   }
