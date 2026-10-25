@@ -11,6 +11,8 @@ import { surfaceShowcases } from "./surfaces";
 import { sectionShowcases } from "./sections";
 import { backgroundShowcases } from "./backgrounds";
 import { listShowcases } from "./lists";
+import { webglShowcases } from "./webgl";
+import { magicuiShowcases } from "./magicui";
 import type { Showcase } from "./types";
 
 export type { Showcase, ShowcaseControl, ShowcaseControlType, ShowcaseValues } from "./types";
@@ -23,6 +25,8 @@ const VENDORED_SHOWCASES: Showcase[] = [
   ...sectionShowcases,
   ...backgroundShowcases,
   ...listShowcases,
+  ...webglShowcases,
+  ...magicuiShowcases,
 ];
 
 /** Catalog entries that keep their seeded in-app demo in the workspace. */

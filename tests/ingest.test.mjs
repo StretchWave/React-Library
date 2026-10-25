@@ -211,25 +211,26 @@ test("composeReactBitsEntry builds an honest vendored entry with runtime-driven 
   assert.deepEqual(entry.aliases, ["splittext", "split-text"]);
 });
 
-test("composeReactBitsEntry: heavy flag and live:false->source-link override", () => {
+test("composeReactBitsEntry: webgl runs live-and-heavy; live:false stays external", () => {
   const webgl = reactBitsItem("FluidGlass", ["FluidGlass.css", "FluidGlass.tsx"], { dependencies: ["three"] });
   const entry = composeReactBitsEntry("FluidGlass", "backgrounds", webgl, {
     fetchedAt: "2026-10-24",
-    overrides: { heavy: true, aesthetics: ["futuristic"] },
+    overrides: { aesthetics: ["futuristic"] },
   });
   assert.equal(entry.runtime, "webgl");
-  assert.equal(entry.preview.type, "source-link");
+  assert.equal(entry.preview.type, "local-demo");
   assert.equal(entry.heavy, true);
-  assert.ok(entry.preview.url.includes("reactbits.dev/backgrounds/fluid-glass"));
+  assert.ok(entry.preview.note.includes("GPU"));
 
   const opted = reactBitsItem("AnimatedList", ["AnimatedList.tsx"], { dependencies: ["@hugeicons/react"] });
   const opt = composeReactBitsEntry("AnimatedList", "components", opted, {
     fetchedAt: "2026-10-24",
-    overrides: { live: false, category: "feedback" },
+    overrides: { live: false, category: "feedback", heavy: true },
   });
   assert.equal(opt.runtime, "dom");
   assert.equal(opt.preview.type, "external");
-  assert.ok(opt.preview.note.includes("official"));
+  assert.ok(opt.preview.note.includes("runtime outside"));
+  assert.equal(opt.heavy, true);
   // heavy flag is dropped when the live preview stays enabled
   const live = composeReactBitsEntry("AnimatedList", "components", opted, { fetchedAt: "2026-10-24", overrides: {} });
   assert.equal(live.preview.type, "local-demo");

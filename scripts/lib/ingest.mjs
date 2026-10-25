@@ -351,7 +351,14 @@ export function composeMagicUiEntry(item, registry, { fetchedAt }) {
     sourceUrl: `https://magicui.design/docs/components/${item}`,
     externalId: item,
     retrieval: `npx shadcn@latest add ${magicRegistryUrlFor(item)} (official CLI), or use the vendored files in ${localDir}/`,
-    preview: { type: "external", url: `https://magicui.design/docs/components/${item}` },
+    // M6.6 everything-local: all four Magic UI items render live through
+    // reviewed showcases (motion/react is already in the runtime union;
+    // src/lib/cn.ts backs their "@/lib/utils" import; Tailwind classes ship
+    // verbatim to the target project and the stage bridges layout tokens).
+    preview: {
+      type: "local-demo",
+      note: "Live preview renders the vendored component in the preview workspace (token-bridge styling; no external page).",
+    },
     localDir,
     manifest: `${localDir}/component.json`,
     implementation: files.map((file) => `${localDir}/${file}`),
@@ -547,21 +554,26 @@ export function composeReactBitsEntry(name, group, registry, { fetchedAt, overri
   });
   const body = (registry.files ?? []).map((file) => file.content ?? "").join("\n");
   const usesCanvas = /<canvas|getContext\(/.test(body);
-  const liveBase = runtime === "dom" || runtime === "gsap" || runtime === "motion" || runtime === "physics";
+  // M6.6 "everything-local": raw-WebGL variants run locally as heavy workspace
+  // stages (19 hand-rolled WebGL2 + blob-cursor/hyperspeed/lanyard on three.js).
+  const liveBase = runtime === "dom" || runtime === "gsap" || runtime === "motion" || runtime === "physics" || runtime === "webgl";
   const live = liveBase && !(overrides.live === false);
   const displayName = humanizeReactBitsName(name);
   const description = String(registry.description ?? "").trim();
   const summaryBase = description || `${displayName} from React Bits`;
   const summary = `${displayName}: ${summaryBase}`.slice(0, 140);
   const preview = live
-    ? { type: "local-demo", note: "Live preview renders the vendored component in the preview workspace." }
-    : {
-        type: runtime === "webgl" ? "source-link" : "external",
-        url: docsUrl,
+    ? {
+        type: "local-demo",
         note:
           runtime === "webgl"
-            ? "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
-            : "Preview requires component styling outside this app's runtime; see the official demo.",
+            ? "Live local preview renders the vendored component on this machine's GPU."
+            : "Live preview renders the vendored component in the preview workspace.",
+      }
+    : {
+        type: "external",
+        url: docsUrl,
+        note: "Preview requires a runtime outside this app's union; see the official demo.",
       };
   const attributes = [...REACT_BITS_BASE_ATTRIBUTES];
   if (runtime === "gsap") attributes.push("gsap");
@@ -601,7 +613,7 @@ export function composeReactBitsEntry(name, group, registry, { fetchedAt, overri
     dependencies: deps,
     license: REACT_BITS_LICENSE,
     runtime,
-    heavy: Boolean(overrides.heavy) || undefined,
+    heavy: Boolean(overrides.heavy) || (runtime === "webgl" ? true : undefined),
     aesthetics: overrides.aesthetics ?? ["minimal"],
     attributes: [...new Set(attributes)],
     syncedAt: fetchedAt,

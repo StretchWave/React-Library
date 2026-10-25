@@ -255,7 +255,11 @@ test("index: deterministic shape and counts", () => {
   );
   assert.ok(
     a.entries.some(
-      (entry) => entry.id === "react-bits-fluid-glass" && entry.runtime === "webgl" && entry.preview.type === "source-link",
+      (entry) =>
+        entry.id === "react-bits-fluid-glass" &&
+        entry.runtime === "webgl" &&
+        entry.preview.type === "local-demo" &&
+        entry.heavy === true,
     ),
   );
   assert.deepEqual(a.taxonomies.categories.slice(0, 6), ["buttons", "inputs", "layout", "display", "feedback", "navigation"]);

@@ -16,7 +16,12 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "paths": {
+      "cn": ["./src/lib/cn.ts"],
+      "@/lib/utils": ["./src/lib/cn.ts"],
+      "@/registry/new-york-v4/ui/button": ["./catalog/components/shadcn/button/button.tsx"]
+    }
   },
   "include": ["src"]
 }

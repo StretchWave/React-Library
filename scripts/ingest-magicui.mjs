@@ -12,7 +12,7 @@ import {
   composeMagicUiManifest,
   fetchMagicUiItem,
   fileBasename,
-  mergeEntry,
+  replaceEntry,
 } from "./lib/ingest.mjs";
 
 const args = process.argv.slice(2);
@@ -53,7 +53,7 @@ for (const item of items) {
       }
     }
     const entry = composeMagicUiEntry(item, registry, { fetchedAt });
-    const result = mergeEntry(working, entry);
+    const result = replaceEntry(working, entry);
     console.log(result.merged ? `ADD ${entry.id}` : `KEEP ${entry.id}: ${result.reason}`);
     if (result.merged) working = result.catalog;
   } catch (error) {

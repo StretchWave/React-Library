@@ -3,7 +3,7 @@
 // third-party code never executes in the app outside those reviewed wrappers.
 // Entries without a runnable preview show an honest kind card with the official
 // link and the agent retrieval path. All styling uses --rl-* tokens only.
-import { useMemo, useState } from "react";
+import { Component, useMemo, useState, type ReactNode } from "react";
 import {
   aestheticById,
   attributeById,
@@ -52,6 +52,41 @@ function honestReason(entry: CatalogEntry): string {
       return "The official demo lives outside this catalog and is not panel-embeddable here; the link opens it in its own page.";
     default:
       return "No runnable preview is registered for this entry yet.";
+  }
+}
+
+/** Honest failure card when a stage component throws at mount (for example
+ *  when WebGL2 is unavailable): the vendored source still ships to the target
+ *  project; nothing on-stage executes off-machine. */
+class StageErrorBoundary extends Component<{ entry: CatalogEntry; children: ReactNode }, { error: string }> {
+  state = { error: "" };
+  static getDerivedStateFromError(error: unknown) {
+    return { error: error instanceof Error ? `${error.name}: ${error.message}` : String(error) };
+  }
+  render() {
+    const entry = this.props.entry;
+    if (!this.state.error) return this.props.children;
+    return (
+      <div className="workspace-honest" data-testid="preview-stage-error">
+        <h2>{entry.name}</h2>
+        <p className="workspace-honest-kind">
+          The live stage threw on this machine: <strong>{this.state.error}</strong>
+        </p>
+        <p className="workspace-honest-reason">
+          Runtime previews degrade honestly when the browser lacks WebGL2. The vendored source still ships to the target project through the export path; nothing ran outside this catalog.
+        </p>
+        <div className="workspace-honest-actions">
+          {entry.sourceUrl ? (
+            <a href={entry.sourceUrl} target="_blank" rel="noreferrer noopener">
+              Official source ↗
+            </a>
+          ) : null}
+          <a href={`#/component/${entry.id}`} data-testid="preview-full-record">
+            Full record ↗
+          </a>
+        </div>
+      </div>
+    );
   }
 }
 
@@ -234,7 +269,9 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
                 data-testid="preview-stage"
                 style={viewportWidth ? { maxWidth: viewportWidth } : undefined}
               >
-                <showcase.Component {...values} />
+                <StageErrorBoundary entry={entry}>
+                  <showcase.Component {...values} />
+                </StageErrorBoundary>
               </div>
             </div>
             <p className="workspace-hint">

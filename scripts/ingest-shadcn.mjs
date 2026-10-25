@@ -13,7 +13,7 @@ import {
   composeShadcnManifest,
   fetchShadcnItem,
   fileBasename,
-  mergeEntry,
+  replaceEntry,
   registryUrlFor,
 } from "./lib/ingest.mjs";
 
@@ -56,7 +56,7 @@ for (const item of items) {
       }
     }
     const entry = composeShadcnEntry(item, registry, { fetchedAt });
-    const result = mergeEntry(working, entry);
+    const result = replaceEntry(working, entry);
     report.merged.push(entry.id);
     if (!write && result.merged) result.reason = `dry run: entry ${entry.id} would be added`;
     console.log(result.merged ? `ADD ${entry.id} (${(registry.files ?? []).length} file(s))` : `KEEP ${entry.id}: ${result.reason}`);

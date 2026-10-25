@@ -381,6 +381,14 @@ preview-class handling. Staged; see `IMPLEMENTATION_CHECKLIST.md` §6.x.
    intentionally dropped. three.js/OGL are deliberately not bundled.
 5. **M6.5 Tests, docs, release** — metadata/lookup tests, workspace/gallery/prompt
    app tests, README/checklist/spec sync, full flagless `npm run verify`.
+6. **M6.6 Everything-local previews** — no external preview redirects remain: the
+   21 raw-WebGL React Bits variants run in-app (18 hand-rolled WebGL2 with
+   null-context bail-outs; Blob Cursor, Hyperspeed, and the fully procedural
+   Lanyard on three.js), all marked `heavy` so the gallery shows workspace-bound
+   placeholders and only the preview workspace mounts them one at a time;
+   the 16 vendored shadcn items and 4 Magic UI items get reviewed wrappers too.
+   Evidence gates: null-gl bail scan, full multi-file import audit (only `three`
+   is added), and a GPU smoke in a real browser before the flip is claimed.
 
 ## 11) Verification gates
 
@@ -414,6 +422,7 @@ npm run verify
 | `matter-js` | runtime | 2D physics for vendored physics-based previews (e.g. Falling Text). *Amendment 2026-10-24, M6.4.* |
 | `@hugeicons/react`, `@hugeicons/core-free-icons` | runtime | Icon runtime + free icon data declared by the vendored sources (Card Nav, Carousel, Flowing Menu, Elastic Slider, Animated List). *Amendment 2026-10-24, M6.4.* |
 | `@use-gesture/react` | runtime | Pointer-drag gestures declared by the vendored Dome Gallery source. *Amendment 2026-10-24, M6.4.* |
+| `three` | runtime | three.js engine declared by the vendored Blob Cursor / Hyperspeed / Lanyard sources (both render locally; Lanyard is fully procedural — no external model assets). *Amendment 2026-10-25, M6.6.* |
 
 Anything else requires: spec §12 amendment + AGENTS.md update + checklist decision log,
 **before** installation. No UI kits, CSS frameworks, routers, state managers, or
@@ -452,6 +461,11 @@ masquerades as working. When done, status flips to *working* with the evidence
   ingestion, preview workspace, visual gallery, prompt/status extensions); §12
   amended to allow the animation runtimes (`gsap`, `@gsap/react`, `motion`,
   `matter-js`) and entry fields `runtime`/`heavy`.
+- **v1.5 — 2026-10-25:** M6.6 everything-local previews shipped; §12 extended with
+  `three` (Blob Cursor, Hyperspeed, procedural Lanyard). All 21 raw-WebGL React
+  Bits variants plus the 16 shadcn and 4 Magic UI vendored items render live
+  through reviewed wrappers; webgl entries auto-`heavy`; zero preview redirects
+  remain in the catalog.
 - **v1.4 — 2026-10-24:** M6.2–M6.4 shipped: preview workspace `#/preview/<id>`
   (stage modes, viewports, replay, per-entry verified controls, honest kind card),
   40 reviewed showcase wrappers, the `react-bits-animated-list` record flipped to a

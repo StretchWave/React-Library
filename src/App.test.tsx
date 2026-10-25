@@ -266,12 +266,14 @@ describe("App (M5.3 gallery)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
     const grid = screen.getByRole("list", { name: /component gallery/i });
     expect(grid.querySelectorAll("li[data-entry-id]").length).toBe(87);
-    // Seeded six render the vetted live demo; ingested doc-page items link out.
+    // Seeded six render the vetted live demo; M6.6: react-bits + Magic UI run
+    // live in-app, the 16 shadcn doc-page items still link out officially.
     expect(document.querySelector('li[data-preview-kind="local-demo"][data-entry-id="button"]')).toBeTruthy();
     const official = screen.getAllByRole("link", { name: /Open official preview/ });
-    expect(official.length).toBe(20); // 16 shadcn + 4 Magic UI doc pages (M6.2: AnimatedList runs live now)
+    expect(official.length).toBe(16); // 16 shadcn doc pages remain external until M6.6-C token-bridge wrappers
     expect(official.some((link) => (link.getAttribute("href") ?? "").includes("ui.shadcn.com"))).toBe(true);
-    expect(screen.getAllByRole("link", { name: /View at source/ }).length).toBe(21); // raw-WebGL react-bits variants (vendored, official demo only)
+    // M6.6: raw-WebGL react-bits variants run locally; no "View at source" remains.
+    expect(screen.queryAllByRole("link", { name: /View at source/ }).length).toBe(0);
   });
 
   it("supports source filtering inside the gallery view", () => {
@@ -281,12 +283,11 @@ describe("App (M5.3 gallery)", () => {
       target: { value: "react-bits" },
     });
     expect(screen.getByRole("status").textContent).toContain("61 of 87 entries");
-    // React Bits items are all vendored (local) now; honest preview kinds remain:
-    // runnable ones will become live (runtime recorded), raw-WebGL ones stay links.
-    expect(document.querySelector('li[data-preview-kind="source-link"][data-entry-id="react-bits-fluid-glass"]')).toBeTruthy();
+    // React Bits items are all vendored and live now (M6.6 webgl flip):
+    expect(document.querySelector('li[data-preview-kind="local-demo"][data-entry-id="react-bits-fluid-glass"]')).toBeTruthy();
     expect(
       document.querySelectorAll('li[data-preview-kind="local-demo"][data-entry-id^="react-bits-"]').length,
-    ).toBe(40); // 40 runtime-live vendored items (dom/gsap/motion/physics; M6.2 flips AnimatedList live via the installed icon runtime)
+    ).toBe(61); // all 61 curated react-bits items render live through showcases
   });
 
   it("the #/gallery deep link opens the gallery and filters persist across views", () => {
@@ -468,17 +469,17 @@ describe("App (M6.2 preview workspace)", () => {
   });
 
   it("non-runnable entries show an honest kind card instead of a stage", async () => {
-    window.location.hash = "/preview/react-bits-fluid-glass";
+    window.location.hash = "/preview/shadcn-accordion";
     renderApp();
     const honest = await screen.findByTestId("preview-honest");
-    expect(honest.textContent).toContain("source-link");
+    expect(honest.textContent).toContain("external");
     expect(screen.queryByTestId("preview-controls")).toBeNull();
     expect(screen.queryByTestId("preview-stage")).toBeNull();
     const official = screen.getByRole("link", { name: "Open official preview ↗" });
     expect((official.getAttribute("href") ?? "").startsWith("http")).toBe(true);
     expect(
       honest.querySelector('[data-testid="preview-full-record"]')?.getAttribute("href"),
-    ).toBe("#/component/react-bits-fluid-glass");
+    ).toBe("#/component/shadcn-accordion");
   });
 
   it("seeded components reuse their vetted demos in the workspace", async () => {
@@ -514,18 +515,27 @@ describe("App (M6.2 preview workspace)", () => {
     const live = entries.filter(
       (entry) => entry.source === "react-bits" && entry.preview?.type === "local-demo",
     );
-    expect(live.length).toBe(40);
+    expect(live.length).toBe(61);
     for (const entry of live) {
+      expect(SHOWCASE_IDS).toContain(entry.id);
+      expect(getShowcase(entry.id)).toBeTruthy();
+    }
+    // M6.6: the four Magic UI items run live too (motion/react + cn alias).
+    const magic = entries.filter(
+      (entry) => entry.source === "magic-ui" && entry.preview?.type === "local-demo",
+    );
+    expect(magic.length).toBe(4);
+    for (const entry of magic) {
       expect(SHOWCASE_IDS).toContain(entry.id);
       expect(getShowcase(entry.id)).toBeTruthy();
     }
     for (const seededId of ["alert", "badge", "button", "card", "tabs", "text-input"]) {
       expect(getShowcase(seededId)).toBeTruthy();
     }
-    // Honest invariant: records without runtime preview resolve no stage.
-    expect(getShowcase("react-bits-fluid-glass")).toBeUndefined();
+    // Honest invariant: records not yet wrapped resolve no stage (M6.6-C wraps shadcn).
+    expect(getShowcase("shadcn-accordion")).toBeUndefined();
     // Registry ids stay unique (a second registration would throw on import).
-    expect(new Set(SHOWCASE_IDS).size).toBe(40);
+    expect(new Set(SHOWCASE_IDS).size).toBe(65);
   });
 });
 
@@ -536,7 +546,7 @@ describe("App (M6.4 gallery motion)", () => {
     );
   }
 
-  it("gallery cards play showcase previews on demand (manual fallback in jsdom)", () => {
+  it("gallery cards play showcase previews on demand (manual fallback in jsdom)", async () => {
     renderApp();
     fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
     fireEvent.change(screen.getByLabelText("Filter by source library"), {
@@ -547,10 +557,14 @@ describe("App (M6.4 gallery motion)", () => {
     expect(card?.getAttribute("data-preview-kind")).toBe("local-demo");
     expect(card?.getAttribute("data-played")).toBe("false");
     fireEvent.click(screen.getByRole("button", { name: "Play preview of Shiny Text (React Bits)" }));
+    // data-played flips with the playback request; the stage itself mounts
+    // once the code-split showcase registry chunk resolves (M6.6).
     expect(cardFrame("react-bits-shiny-text")?.getAttribute("data-played")).toBe("true");
-    expect(
-      document.querySelector('li[data-entry-id="react-bits-shiny-text"] .preview-mini-stage'),
-    ).toBeTruthy();
+    await waitFor(() => {
+      expect(
+        document.querySelector('li[data-entry-id="react-bits-shiny-text"] .preview-mini-stage'),
+      ).toBeTruthy();
+    });
   });
 
   it("heavy previews keep a workspace link instead of auto playback", () => {

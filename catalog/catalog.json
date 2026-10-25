@@ -276,8 +276,8 @@
       "externalId": "blur-fade",
       "retrieval": "npx shadcn@latest add https://magicui.design/r/blur-fade.json (official CLI), or use the vendored files in catalog/components/magic-ui/blur-fade/",
       "preview": {
-        "type": "external",
-        "url": "https://magicui.design/docs/components/blur-fade"
+        "type": "local-demo",
+        "note": "Live preview renders the vendored component in the preview workspace (token-bridge styling; no external page)."
       },
       "localDir": "catalog/components/magic-ui/blur-fade",
       "manifest": "catalog/components/magic-ui/blur-fade/component.json",
@@ -341,8 +341,8 @@
       "externalId": "border-beam",
       "retrieval": "npx shadcn@latest add https://magicui.design/r/border-beam.json (official CLI), or use the vendored files in catalog/components/magic-ui/border-beam/",
       "preview": {
-        "type": "external",
-        "url": "https://magicui.design/docs/components/border-beam"
+        "type": "local-demo",
+        "note": "Live preview renders the vendored component in the preview workspace (token-bridge styling; no external page)."
       },
       "localDir": "catalog/components/magic-ui/border-beam",
       "manifest": "catalog/components/magic-ui/border-beam/component.json",
@@ -410,8 +410,8 @@
       "externalId": "dot-pattern",
       "retrieval": "npx shadcn@latest add https://magicui.design/r/dot-pattern.json (official CLI), or use the vendored files in catalog/components/magic-ui/dot-pattern/",
       "preview": {
-        "type": "external",
-        "url": "https://magicui.design/docs/components/dot-pattern"
+        "type": "local-demo",
+        "note": "Live preview renders the vendored component in the preview workspace (token-bridge styling; no external page)."
       },
       "localDir": "catalog/components/magic-ui/dot-pattern",
       "manifest": "catalog/components/magic-ui/dot-pattern/component.json",
@@ -480,8 +480,8 @@
       "externalId": "word-rotate",
       "retrieval": "npx shadcn@latest add https://magicui.design/r/word-rotate.json (official CLI), or use the vendored files in catalog/components/magic-ui/word-rotate/",
       "preview": {
-        "type": "external",
-        "url": "https://magicui.design/docs/components/word-rotate"
+        "type": "local-demo",
+        "note": "Live preview renders the vendored component in the preview workspace (token-bridge styling; no external page)."
       },
       "localDir": "catalog/components/magic-ui/word-rotate",
       "manifest": "catalog/components/magic-ui/word-rotate/component.json",
@@ -660,7 +660,7 @@
       "id": "react-bits-aurora",
       "name": "Aurora (React Bits)",
       "summary": "Aurora: A soft, calm aurora that flows across the top of the page and drifts toward the cursor.",
-      "description": "Aurora is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A soft, calm aurora that flows across the top of the page and drifts toward the cursor. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Aurora is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A soft, calm aurora that flows across the top of the page and drifts toward the cursor. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "backgrounds",
       "themes": [
         "brutalist-print",
@@ -689,9 +689,8 @@
       "externalId": "Aurora",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/Aurora-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/aurora/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/backgrounds/aurora",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/aurora",
       "manifest": "catalog/components/react-bits/aurora/component.json",
@@ -705,6 +704,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "futuristic",
         "organic"
@@ -723,7 +723,7 @@
       "id": "react-bits-ballpit",
       "name": "Ballpit (React Bits)",
       "summary": "Ballpit: A soft-lit pit of physics balls you can shove with the cursor, grab, throw and blast apart.",
-      "description": "Ballpit is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A soft-lit pit of physics balls you can shove with the cursor, grab, throw and blast apart. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Ballpit is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A soft-lit pit of physics balls you can shove with the cursor, grab, throw and blast apart. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "backgrounds",
       "themes": [
         "brutalist-print",
@@ -752,9 +752,8 @@
       "externalId": "Ballpit",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/Ballpit-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/ballpit/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/backgrounds/ballpit",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/ballpit",
       "manifest": "catalog/components/react-bits/ballpit/component.json",
@@ -786,7 +785,7 @@
       "id": "react-bits-beams",
       "name": "Beams (React Bits)",
       "summary": "Beams: Glossy ribbons that ripple in the dark and catch the light, which follows your cursor.",
-      "description": "Beams is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Glossy ribbons that ripple in the dark and catch the light, which follows your cursor. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Beams is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Glossy ribbons that ripple in the dark and catch the light, which follows your cursor. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "backgrounds",
       "themes": [
         "brutalist-print",
@@ -815,9 +814,8 @@
       "externalId": "Beams",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/Beams-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/beams/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/backgrounds/beams",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/beams",
       "manifest": "catalog/components/react-bits/beams/component.json",
@@ -831,6 +829,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "cyberpunk",
         "futuristic"
@@ -849,7 +848,7 @@
       "id": "react-bits-blob-cursor",
       "name": "Blob Cursor (React Bits)",
       "summary": "Blob Cursor: Liquid metal blob cursor that stretches, sloshes and bursts into droplets, in chrome, jelly, pearl or ink.",
-      "description": "Blob Cursor is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Liquid metal blob cursor that stretches, sloshes and bursts into droplets, in chrome, jelly, pearl or ink. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Blob Cursor is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Liquid metal blob cursor that stretches, sloshes and bursts into droplets, in chrome, jelly, pearl or ink. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "motion",
       "themes": [
         "brutalist-print",
@@ -881,9 +880,8 @@
       "externalId": "BlobCursor",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/BlobCursor-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/blob-cursor/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/animations/blob-cursor",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/blob-cursor",
       "manifest": "catalog/components/react-bits/blob-cursor/component.json",
@@ -902,6 +900,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "organic",
         "playful"
@@ -1323,7 +1322,7 @@
       "id": "react-bits-circular-gallery",
       "name": "Circular Gallery (React Bits)",
       "summary": "Circular Gallery: A curved image gallery you can drag, scroll or tab through, with cards that open to the full image.",
-      "description": "Circular Gallery is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A curved image gallery you can drag, scroll or tab through, with cards that open to the full image. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Circular Gallery is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A curved image gallery you can drag, scroll or tab through, with cards that open to the full image. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "page-sections",
       "themes": [
         "brutalist-print",
@@ -1355,9 +1354,8 @@
       "externalId": "CircularGallery",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/CircularGallery-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/circular-gallery/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/components/circular-gallery",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/circular-gallery",
       "manifest": "catalog/components/react-bits/circular-gallery/component.json",
@@ -1371,6 +1369,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "editorial",
         "luxury"
@@ -1850,7 +1849,7 @@
       "id": "react-bits-dot-grid",
       "name": "Dot Grid (React Bits)",
       "summary": "Dot Grid: A springy dot grid that the cursor flicks and drags through like jelly, with click shockwaves.",
-      "description": "Dot Grid is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A springy dot grid that the cursor flicks and drags through like jelly, with click shockwaves. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Dot Grid is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A springy dot grid that the cursor flicks and drags through like jelly, with click shockwaves. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "backgrounds",
       "themes": [
         "brutalist-print",
@@ -1882,9 +1881,8 @@
       "externalId": "DotGrid",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/DotGrid-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/dot-grid/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/backgrounds/dot-grid",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/dot-grid",
       "manifest": "catalog/components/react-bits/dot-grid/component.json",
@@ -1898,6 +1896,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "minimal",
         "futuristic"
@@ -2198,7 +2197,7 @@
       "id": "react-bits-fluid-glass",
       "name": "Fluid Glass (React Bits)",
       "summary": "Fluid Glass: A 3D glass object that refracts your headline, image or video, follows the cursor and melts between shapes.",
-      "description": "Fluid Glass is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A 3D glass object that refracts your headline, image or video, follows the cursor and melts between shapes. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Fluid Glass is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A 3D glass object that refracts your headline, image or video, follows the cursor and melts between shapes. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "backgrounds",
       "themes": [
         "brutalist-print",
@@ -2230,9 +2229,8 @@
       "externalId": "FluidGlass",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/FluidGlass-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/fluid-glass/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/backgrounds/fluid-glass",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/fluid-glass",
       "manifest": "catalog/components/react-bits/fluid-glass/component.json",
@@ -2246,6 +2244,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "futuristic",
         "organic"
@@ -2327,7 +2326,7 @@
       "id": "react-bits-glass-surface",
       "name": "Glass Surface (React Bits)",
       "summary": "Glass Surface: Apple-style liquid glass that bends what is behind it, in a rounded panel or any logo shape.",
-      "description": "Glass Surface is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Apple-style liquid glass that bends what is behind it, in a rounded panel or any logo shape. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Glass Surface is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Apple-style liquid glass that bends what is behind it, in a rounded panel or any logo shape. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "layout",
       "themes": [
         "brutalist-print",
@@ -2359,9 +2358,8 @@
       "externalId": "GlassSurface",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/GlassSurface-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/glass-surface/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/components/glass-surface",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/glass-surface",
       "manifest": "catalog/components/react-bits/glass-surface/component.json",
@@ -2375,6 +2373,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "luxury",
         "minimal"
@@ -2457,7 +2456,7 @@
       "id": "react-bits-gooey-nav",
       "name": "Gooey Nav (React Bits)",
       "summary": "Gooey Nav: A navigation bar whose active pill breaks into goo that flows over to the item you pick.",
-      "description": "Gooey Nav is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A navigation bar whose active pill breaks into goo that flows over to the item you pick. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Gooey Nav is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A navigation bar whose active pill breaks into goo that flows over to the item you pick. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "navigation",
       "themes": [
         "brutalist-print",
@@ -2489,9 +2488,8 @@
       "externalId": "GooeyNav",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/GooeyNav-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/gooey-nav/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/components/gooey-nav",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/gooey-nav",
       "manifest": "catalog/components/react-bits/gooey-nav/component.json",
@@ -2505,6 +2503,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "playful",
         "organic"
@@ -2649,7 +2648,7 @@
       "id": "react-bits-hyperspeed",
       "name": "Hyperspeed (React Bits)",
       "summary": "Hyperspeed: Night highway of glowing light trails on a winding road that warps into hyperspace while you hold.",
-      "description": "Hyperspeed is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Night highway of glowing light trails on a winding road that warps into hyperspace while you hold. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Hyperspeed is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Night highway of glowing light trails on a winding road that warps into hyperspace while you hold. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "3d-webgl",
       "themes": [
         "brutalist-print",
@@ -2678,9 +2677,8 @@
       "externalId": "Hyperspeed",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/Hyperspeed-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/hyperspeed/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/backgrounds/hyperspeed",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/hyperspeed",
       "manifest": "catalog/components/react-bits/hyperspeed/component.json",
@@ -2699,6 +2697,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "futuristic",
         "cyberpunk"
@@ -2717,7 +2716,7 @@
       "id": "react-bits-iridescence",
       "name": "Iridescence (React Bits)",
       "summary": "Iridescence: Liquid iridescent surface with shifting folds that you can stir with the cursor.",
-      "description": "Iridescence is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Liquid iridescent surface with shifting folds that you can stir with the cursor. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Iridescence is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Liquid iridescent surface with shifting folds that you can stir with the cursor. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "3d-webgl",
       "themes": [
         "brutalist-print",
@@ -2746,9 +2745,8 @@
       "externalId": "Iridescence",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/Iridescence-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/iridescence/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/backgrounds/iridescence",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/iridescence",
       "manifest": "catalog/components/react-bits/iridescence/component.json",
@@ -2762,6 +2760,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "futuristic",
         "organic"
@@ -2780,7 +2779,7 @@
       "id": "react-bits-lanyard",
       "name": "Lanyard (React Bits)",
       "summary": "Lanyard: Swinging 3D badge on a stretchy woven band that you can drag, throw or click to flip.",
-      "description": "Lanyard is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Swinging 3D badge on a stretchy woven band that you can drag, throw or click to flip. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Lanyard is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Swinging 3D badge on a stretchy woven band that you can drag, throw or click to flip. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "3d-webgl",
       "themes": [
         "brutalist-print",
@@ -2809,9 +2808,8 @@
       "externalId": "Lanyard",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/Lanyard-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/lanyard/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/components/lanyard",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/lanyard",
       "manifest": "catalog/components/react-bits/lanyard/component.json",
@@ -2830,6 +2828,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "futuristic",
         "playful"
@@ -2848,7 +2847,7 @@
       "id": "react-bits-laser-flow",
       "name": "Laser Flow (React Bits)",
       "summary": "Laser Flow: A beam of light that splashes onto your content and pours over its corners.",
-      "description": "Laser Flow is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A beam of light that splashes onto your content and pours over its corners. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Laser Flow is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A beam of light that splashes onto your content and pours over its corners. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "backgrounds",
       "themes": [
         "brutalist-print",
@@ -2880,9 +2879,8 @@
       "externalId": "LaserFlow",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/LaserFlow-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/laser-flow/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/backgrounds/laser-flow",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/laser-flow",
       "manifest": "catalog/components/react-bits/laser-flow/component.json",
@@ -2896,6 +2894,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "cyberpunk",
         "futuristic"
@@ -2914,7 +2913,7 @@
       "id": "react-bits-letter-glitch",
       "name": "Letter Glitch (React Bits)",
       "summary": "Letter Glitch: A calm field of letters that flicker, scramble and glitch in color, stirred by the cursor and torn by clicks.",
-      "description": "Letter Glitch is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A calm field of letters that flicker, scramble and glitch in color, stirred by the cursor and torn by clicks. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Letter Glitch is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A calm field of letters that flicker, scramble and glitch in color, stirred by the cursor and torn by clicks. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "backgrounds",
       "themes": [
         "brutalist-print",
@@ -2946,9 +2945,8 @@
       "externalId": "LetterGlitch",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/LetterGlitch-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/letter-glitch/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/backgrounds/letter-glitch",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/letter-glitch",
       "manifest": "catalog/components/react-bits/letter-glitch/component.json",
@@ -2962,6 +2960,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "cyberpunk",
         "brutalist"
@@ -2980,7 +2979,7 @@
       "id": "react-bits-lightning",
       "name": "Lightning (React Bits)",
       "summary": "Lightning: Crackling, branching lightning that bends toward the cursor and strikes wherever you click.",
-      "description": "Lightning is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Crackling, branching lightning that bends toward the cursor and strikes wherever you click. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Lightning is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Crackling, branching lightning that bends toward the cursor and strikes wherever you click. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "backgrounds",
       "themes": [
         "brutalist-print",
@@ -3009,9 +3008,8 @@
       "externalId": "Lightning",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/Lightning-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/lightning/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/backgrounds/lightning",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/lightning",
       "manifest": "catalog/components/react-bits/lightning/component.json",
@@ -3025,6 +3023,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "cyberpunk",
         "gaming"
@@ -3102,7 +3101,7 @@
       "id": "react-bits-magnet-lines",
       "name": "Magnet Lines (React Bits)",
       "summary": "Magnet Lines: A field of magnetic lines that swing toward the cursor, ripple outward and spin with every click.",
-      "description": "Magnet Lines is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A field of magnetic lines that swing toward the cursor, ripple outward and spin with every click. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Magnet Lines is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A field of magnetic lines that swing toward the cursor, ripple outward and spin with every click. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "backgrounds",
       "themes": [
         "brutalist-print",
@@ -3134,9 +3133,8 @@
       "externalId": "MagnetLines",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/MagnetLines-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/magnet-lines/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/backgrounds/magnet-lines",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/magnet-lines",
       "manifest": "catalog/components/react-bits/magnet-lines/component.json",
@@ -3150,6 +3148,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "futuristic",
         "minimal"
@@ -3237,7 +3236,7 @@
       "id": "react-bits-meta-balls",
       "name": "Meta Balls (React Bits)",
       "summary": "Meta Balls: Liquid metaballs that merge, stretch and pinch apart, with a cursor blob that pushes through them.",
-      "description": "Meta Balls is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Liquid metaballs that merge, stretch and pinch apart, with a cursor blob that pushes through them. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Meta Balls is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Liquid metaballs that merge, stretch and pinch apart, with a cursor blob that pushes through them. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "motion",
       "themes": [
         "brutalist-print",
@@ -3269,9 +3268,8 @@
       "externalId": "MetaBalls",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/MetaBalls-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/meta-balls/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/animations/meta-balls",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/meta-balls",
       "manifest": "catalog/components/react-bits/meta-balls/component.json",
@@ -3285,6 +3283,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "organic",
         "playful"
@@ -3303,7 +3302,7 @@
       "id": "react-bits-metallic-paint",
       "name": "Metallic Paint (React Bits)",
       "summary": "Metallic Paint: Liquid chrome that flows over your logo or text, adapted from Paper's Liquid Metal shader.",
-      "description": "Metallic Paint is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Liquid chrome that flows over your logo or text, adapted from Paper's Liquid Metal shader. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Metallic Paint is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Liquid chrome that flows over your logo or text, adapted from Paper's Liquid Metal shader. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "backgrounds",
       "themes": [
         "brutalist-print",
@@ -3335,9 +3334,8 @@
       "externalId": "MetallicPaint",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/MetallicPaint-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/metallic-paint/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/backgrounds/metallic-paint",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/metallic-paint",
       "manifest": "catalog/components/react-bits/metallic-paint/component.json",
@@ -3351,6 +3349,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "futuristic",
         "luxury"
@@ -3430,7 +3429,7 @@
       "id": "react-bits-particles",
       "name": "Particles (React Bits)",
       "summary": "Particles: A drifting 3D field of particles with glow, twinkle, constellation lines and cursor interaction.",
-      "description": "Particles is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A drifting 3D field of particles with glow, twinkle, constellation lines and cursor interaction. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Particles is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. A drifting 3D field of particles with glow, twinkle, constellation lines and cursor interaction. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "backgrounds",
       "themes": [
         "brutalist-print",
@@ -3459,9 +3458,8 @@
       "externalId": "Particles",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/Particles-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/particles/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/backgrounds/particles",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/particles",
       "manifest": "catalog/components/react-bits/particles/component.json",
@@ -3475,6 +3473,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "minimal",
         "futuristic"
@@ -3621,7 +3620,7 @@
       "id": "react-bits-ribbons",
       "name": "Ribbons (React Bits)",
       "summary": "Ribbons: Springy ribbons that trail the cursor, in lens, comet or even shapes with an optional wave.",
-      "description": "Ribbons is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Springy ribbons that trail the cursor, in lens, comet or even shapes with an optional wave. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Ribbons is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Springy ribbons that trail the cursor, in lens, comet or even shapes with an optional wave. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "motion",
       "themes": [
         "brutalist-print",
@@ -3650,9 +3649,8 @@
       "externalId": "Ribbons",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/Ribbons-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/ribbons/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/animations/ribbons",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/ribbons",
       "manifest": "catalog/components/react-bits/ribbons/component.json",
@@ -3666,6 +3664,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "futuristic",
         "editorial"
@@ -4484,7 +4483,7 @@
       "id": "react-bits-waves",
       "name": "Waves (React Bits)",
       "summary": "Waves: Dense flowing lines that sway like silk, bend around the cursor and spring back into place.",
-      "description": "Waves is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Dense flowing lines that sway like silk, bend around the cursor and spring back into place. The entry records the animation runtime (webgl) and the live demo runs on reactbits.dev; this catalog vendors the code for reference and agent delivery.",
+      "description": "Waves is vendored from the official React Bits registry (MIT + Commons Clause v1.0) in the TypeScript + plain CSS variant. Dense flowing lines that sway like silk, bend around the cursor and spring back into place. The entry records the animation runtime (webgl) and the preview workspace renders it live.",
       "category": "backgrounds",
       "themes": [
         "brutalist-print",
@@ -4513,9 +4512,8 @@
       "externalId": "Waves",
       "retrieval": "npx shadcn@latest add https://reactbits.dev/r/Waves-TS-CSS.json (official registry), or use the vendored files in catalog/components/react-bits/waves/",
       "preview": {
-        "type": "source-link",
-        "url": "https://reactbits.dev/backgrounds/waves",
-        "note": "WebGL/WebGPU component: source is vendored for the target project; the live demo runs on the official site."
+        "type": "local-demo",
+        "note": "Live local preview renders the vendored component on this machine's GPU."
       },
       "localDir": "catalog/components/react-bits/waves",
       "manifest": "catalog/components/react-bits/waves/component.json",
@@ -4529,6 +4527,7 @@
         "note": "MIT + Commons Clause v1.0. Use in applications is permitted; do not sell or re-license the react-bits source itself. Vendored here with attribution for preview and agent delivery."
       },
       "runtime": "webgl",
+      "heavy": true,
       "aesthetics": [
         "organic",
         "minimal"
