@@ -134,6 +134,20 @@
   color: var(--rl-text-muted);
 }
 
+/* M7.2 scroll-triggered treatment: an inner-scrollable wrap so the stage's
+ * viewport entrances fire by scrolling INSIDE the canvas, never the page.
+ * The frame's extra height gives the entrance room to travel both ways. */
+.workspace-stage-wrap[data-scroll="true"] {
+  overflow-y: auto;
+  max-height: min(64vh, 620px);
+}
+
+.workspace-stage-wrap[data-scroll="true"] .workspace-stage-frame {
+  min-height: 140vh;
+  display: grid;
+  place-content: center;
+}
+
 /* --- controls (now hosted in the information rail) ------------------------------- */
 .workspace-controls {
   border: 1px solid var(--rl-border);
@@ -274,6 +288,37 @@
   display: grid;
   gap: 4px;
   font-size: 0.9rem;
+}
+
+/* M7.2: provenance facts collapse behind an accessible details so the
+ * secondary rail serves the stage instead of replacing it. */
+.workspace-details {
+  border-top: 1px solid var(--rl-border);
+  padding-top: 0.35rem;
+}
+
+.workspace-details summary {
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--rl-text-muted);
+  padding: 0.2rem 0;
+  list-style-position: inside;
+}
+
+.workspace-details summary:hover {
+  color: var(--rl-text);
+}
+
+.workspace-details summary:focus-visible {
+  outline: var(--rl-focus, 2px solid var(--rl-accent));
+  outline-offset: 2px;
+}
+
+.workspace-details-body {
+  display: grid;
+  gap: 0.9rem;
+  padding: 0.5rem 0 0.25rem;
 }
 
 .workspace-fact-label {

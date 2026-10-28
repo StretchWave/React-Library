@@ -534,6 +534,73 @@ data-theme` scope
       `screenshots/m71-workspace-alert-390-mobile.png`,
       `screenshots/m71-gallery-1280-laptop.png`.
 
+## 5.10) M7.2 — Preview experience refinement & interactive gallery polish ✅
+
+- [x] In-app routing for every card (M7.2 core fix): the stretched open link
+      lives on every `GalleryCard` regardless of preview kind — local demos, heavy
+      posters, external records, static images, and non-runnable entries all route
+      to `#/preview/<id>`. `PreviewBox` no longer hosts any off-site anchor: the
+      official URL stays in the workspace's honest fallback card / detail pane, so
+      clicking a card never navigates away and never pretends a remote page is
+      running locally. Keyboard: the overlay link is the first tab stop on the card;
+      the hash deep links and back/forward behavior are untouched.
+- [x] De-cluttered preview frames: external/source-link tiles lost the hostname
+      and both explanatory lines (now one ↗ cue + one short label); heavy posters
+      lost the bold title + paragraph (now the poster background, one "Heavy
+      preview" chip, and a subtle ↗ glyph — the card link is the open affordance);
+      static tiles render the verified image without link chrome; unavailable
+      previews keep one restrained line. All explanatory copy lives in the workspace.
+- [x] Pointer-interactive mini stages: when a live stage is playing and the
+      entry's verified behaviors include a pointer-capable interaction
+      (cursor-reactive, hover, gesture, interactive-text, interactive-nav,
+      stateful), the stage publishes `data-interactive="true"`; gallery.css passes
+      pointer events through the scaler and retracts the card-open link to the
+      title strip (`:has` selector), so hover/cursor demos demonstrate themselves.
+      Click-triggered (e.g. Click Spark) and draggable effects keep the full-card
+      overlay — a click still opens the workspace consistently. Verified
+      implementations only; no invented interactions.
+- [x] Workspace hierarchy: provenance facts (source, license, retrieval,
+      dependencies, vendored files, related) collapsed behind an accessible
+      `<details>"Provenance & retrieval"` in the rail; identity, selection,
+      classification chips, and verified controls stay in the primary layer.
+- [x] Scroll-triggered treatment: scroll-stage entries get
+      `data-scroll="true"` on the stage wrap (inner-scrollable, full-viewport mode
+      only) with extra frame height so the entrance triggers inside the canvas;
+      Replay also resets the inner scroll position.
+- [x] Tests: every card routes in-app incl. external/no-anchor-in-card; heavy
+      poster has no duplicated title/note; interactive stage publishes
+      `data-interactive` (Glare Hover) while click-only stages do not (Click
+      Spark); scroll stage publishes `data-scroll` + scroll cue (Animated Content);
+      draggable cue fidelity (Elastic Slider); provenance `<details>` collapsed.
+      App suite grew 54 → 59 tests, all passing.
+- [x] Gate + evidence: `npm run verify` green (70/70 node tooling tests, 116/116
+      app tests, typecheck, build). Main bundle 439.16 kB / 102.44 gzip (M7.1
+      baseline 439.26 / 102.52 — net −0.1 kB: the de-cluttered tiles removed more
+      markup than the routing/interactive logic added). Showcase chunk unchanged and
+      still lazy (1,740.89 kB / 541.31 gzip); workspace chunk 12.96 kB / 3.69 gzip
+      (+0.36 kB for the provenance `<details>` and scroll-stage logic). No new
+      dependencies.
+
+- [x] Visual QA (browser, HMR dev server 5173 — DOM-level assertions):
+      desktop 1440×900 — 87/87 cards each with exactly one in-app `gallery-card-open`
+      link; external tile renders ↗ + "Open official preview" with no hostname and no
+      paragraph; heavy poster renders "Heavy preview" chip + ↗ with no title/note
+      paragraphs; a live Glare Hover stage after manual Play publishes
+      `data-interactive="true"`, stage computed `pointer-events: auto`, and the
+      card-open overlay's computed inset retracts to the 49.6px title strip (the
+      `:has` pipeline works in real Chromium); workspace `#/preview/shadcn-accordion`
+      — clicking the external card routes in-app (`#/preview/<id>`), honest card is
+      compact with the official link, provenance `<details>` closed by default and
+      containing the facts; `#/preview/react-bits-animated-content` — stage wrap
+      `data-scroll="true"` and inner-scrollable (clientHeight 574 < scrollHeight),
+      cue "Scroll inside the stage…", Replay resets the inner scroll from 725.6px
+      to 0; checkbox on an external card toggles selection while the hash stays
+      `#/gallery` (isolation on external tiles verified live). Mobile 390×844 — no
+      horizontal overflow, card fits (344.8px), tray compact. Laptop 1280×800 —
+      3-column grid, no overflow, fullscreen enabled, details collapsed. Pixel
+      screenshots were again blocked by an undrawn client window — recorded as a
+      limitation, never claimed.
+
 ## 6) Future work (explicitly not now)
 
 - Catalog JSON Schema file for cross-tool validation

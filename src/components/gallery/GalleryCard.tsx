@@ -1,17 +1,25 @@
-// Gallery card (M5.3; M7.1 minimal rewrite): exactly three visible elements —
-// the preview, the component name, and a selection checkbox. All metadata
-// (summary, source, category, aesthetics, dependencies, status) stays available
-// in the preview workspace rail and the browser detail pane; the grid stays
-// quiet so the previews carry the experience.
+// Gallery card (M5.3; M7.1 minimal rewrite; M7.2 routing fix): exactly three
+// visible elements — the preview, the component name, and a selection
+// checkbox. All metadata (summary, source, category, aesthetics, dependencies,
+// status) stays available in the preview workspace rail and the browser detail
+// pane; the grid stays quiet so the previews carry the experience.
 //
-// Open action: local entries (the 71 runnable previews) get a stretched link
-// over the whole card that opens the IN-APP preview workspace, so inspecting a
-// card never navigates away from the catalog. External entries keep their
-// honest, labeled off-site tile from PreviewBox (an in-app stage cannot exist
-// for them) — that tile is the card's accessible preview action, and the source
-// URL is the explicitly labeled official action. The checkbox is a sibling of
-// the stretched link (never a child), so toggling selection can never trigger
-// navigation.
+// Open action (M7.2): EVERY card's primary action is now the in-app preview
+// route #/preview/<id> — live local previews, heavy WebGL posters, external
+// references, static images, and entries with no runnable preview alike. A
+// stretched link covers the whole card so clicking anywhere opens the preview
+// workspace; the workspace (not the gallery card) owns the official-source
+// link for external entries, so clicking a card never navigates off-site and
+// never pretends a remote page is running locally. The checkbox is a sibling
+// of the stretched link (never a child), so toggling selection can never
+// trigger navigation.
+//
+// Interactive stages (M7.2): cards with a live, interactive-capable stage
+// (hover/cursor-reactive/text/stateful behaviors) let the pointer reach the
+// stage — the overlay link then retracts to the title strip via CSS (:has
+// selectors in gallery.css) so hover demos work while the card click stays
+// available in its lower region. Every card keeps a keyboard-reachable open
+// link regardless of kind.
 import type { CatalogEntry } from "../../catalog/types";
 import { PreviewBox, previewKind } from "./PreviewBox";
 
@@ -23,9 +31,6 @@ export interface GalleryCardProps {
 
 export function GalleryCard({ entry, selected = false, onToggleSelect }: GalleryCardProps) {
   const kind = previewKind(entry);
-  // Only entries with a runnable local stage get the stretched card link;
-  // external tiles keep their own (honest, off-site) anchor unaffected.
-  const cardOpensWorkspace = kind === "local-demo";
 
   return (
     <li
@@ -34,23 +39,17 @@ export function GalleryCard({ entry, selected = false, onToggleSelect }: Gallery
       data-preview-kind={kind}
     >
       <PreviewBox entry={entry} />
-      {cardOpensWorkspace ? (
-        <a
-          className="gallery-card-overlay"
-          href={`#/preview/${entry.id}`}
-          aria-label={`Open ${entry.name} in the preview workspace`}
-          data-testid="gallery-card-open"
-        />
-      ) : null}
+      <a
+        className="gallery-card-overlay"
+        href={`#/preview/${entry.id}`}
+        aria-label={`Open ${entry.name} in the preview workspace`}
+        data-testid="gallery-card-open"
+      />
       <h3 className="gallery-title">
-        {cardOpensWorkspace ? (
-          // The title is part of the card's single open action (inside the
-          // stretched link region but kept as inert text for screen readers, so
-          // the accessible name stays on the anchor itself).
-          <span aria-hidden="true">{entry.name}</span>
-        ) : (
-          entry.name
-        )}
+        {/* The title is part of the card's single open action (inside the
+        stretched link region but kept as inert text for screen readers, so
+        the accessible name stays on the anchor itself). */}
+        <span aria-hidden="true">{entry.name}</span>
       </h3>
       <label className="gallery-frame-select">
         <input

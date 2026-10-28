@@ -282,19 +282,35 @@ describe("App (M5.3 gallery)", () => {
     expect(screen.queryByRole("button", { name: /^Alert \b/ })).toBeNull();
   });
 
-  it("renders a preview card per entry with honest preview kinds", () => {
+  it("renders a preview card per entry and every card opens the in-app workspace (M7.2)", () => {
     renderApp();
     fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
     const grid = screen.getByRole("list", { name: /component gallery/i });
     expect(grid.querySelectorAll("li[data-entry-id]").length).toBe(87);
     // Seeded six render the vetted live demo; M6.6: react-bits + Magic UI run
-    // live in-app, the 16 shadcn doc-page items still link out officially.
+    // live in-app; the 16 shadcn doc-page items remain honest external tiles.
     expect(document.querySelector('li[data-preview-kind="local-demo"][data-entry-id="button"]')).toBeTruthy();
-    const official = screen.getAllByRole("link", { name: /Open official preview/ });
-    expect(official.length).toBe(16); // 16 shadcn doc pages remain external until M6.6-C token-bridge wrappers
-    expect(official.some((link) => (link.getAttribute("href") ?? "").includes("ui.shadcn.com"))).toBe(true);
+    expect(document.querySelectorAll("li[data-preview-kind=\"external\"], li[data-preview-kind=\"source-link\"]").length)
+      .toBe(16); // 16 shadcn doc pages stay external until M6.6-C token-bridge wrappers
     // M6.6: raw-WebGL react-bits variants run locally; no "View at source" remains.
     expect(screen.queryAllByRole("link", { name: /View at source/ }).length).toBe(0);
+  });
+
+  it("M7.2: every card's open action routes in-app, including external and non-runnable entries", () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    const openers = document.querySelectorAll<HTMLAnchorElement>("a[data-testid='gallery-card-open']");
+    expect(openers.length).toBe(87);
+    for (const opener of openers) {
+      const card = opener.closest("li[data-entry-id]") as HTMLElement | null;
+      expect(card).toBeTruthy();
+      expect(opener.getAttribute("href")).toBe(`#/preview/${card?.dataset.entryId}`);
+    }
+    // External tiles are quiet visuals — no off-site anchor anywhere in a card.
+    const externalCard = document.querySelector('li[data-preview-kind="external"]');
+    expect(externalCard).toBeTruthy();
+    expect(externalCard?.querySelector("a[target='_blank']")).toBeNull();
+    expect(externalCard?.textContent).not.toContain("ui.shadcn.com");
   });
 
   it("supports source filtering inside the gallery view", () => {
@@ -598,9 +614,12 @@ describe("App (M6.4 gallery motion)", () => {
     const card = cardFrame("react-bits-falling-text");
     expect(card?.getAttribute("data-heavy")).toBe("true");
     expect(screen.queryByRole("button", { name: "Play preview of Falling Text (React Bits)" })).toBeNull();
-    const open = card?.querySelector("a");
+    const open = card?.closest("li")?.querySelector("a[data-testid='gallery-card-open']");
     expect(open?.getAttribute("href")).toBe("#/preview/react-bits-falling-text");
     expect(card?.textContent).toContain("Heavy preview");
+    // M7.2 de-cluttered poster: no paragraph copy and no duplicated action link.
+    expect(card?.querySelector(".preview-mini-open-title")).toBeNull();
+    expect(card?.querySelector(".preview-mini-note")).toBeNull();
   });
 
   it("the gallery motion toggle pauses and persists", () => {
@@ -740,5 +759,66 @@ describe("App (M7.1 minimal gallery + behaviors)", () => {
     // The behavior-derived cue replaces the generic hint under the stage.
     const cue = await screen.findByTestId("preview-interaction-cue");
     expect(cue.textContent).toContain("Rest the pointer");
+  });
+
+  it("M7.2: drag cues match the verified draggable behavior", async () => {
+    window.location.hash = "/preview/react-bits-elastic-slider";
+    renderApp();
+    const cue = await screen.findByTestId("preview-interaction-cue");
+    expect(cue.textContent).toContain("Drag");
+  });
+
+  it("M7.2: live stages that respond to the pointer publish data-interactive", async () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    fireEvent.change(screen.getByLabelText("Filter by source library"), {
+      target: { value: "react-bits" },
+    });
+    fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "glare" } });
+    fireEvent.click(screen.getByRole("button", { name: "Play preview of Glare Hover (React Bits)" }));
+    await waitFor(() => {
+      const stage = document.querySelector('li[data-entry-id="react-bits-glare-hover"] .preview-mini-stage');
+      expect(stage?.getAttribute("data-interactive")).toBe("true");
+    });
+  });
+
+  it("M7.2: click-triggered stages keep the full-card click-to-open (no data-interactive)", async () => {
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Gallery" }));
+    fireEvent.change(screen.getByLabelText("Filter by source library"), {
+      target: { value: "react-bits" },
+    });
+    fireEvent.change(screen.getByLabelText("Search components"), { target: { value: "click-spark" } });
+    fireEvent.click(screen.getByRole("button", { name: "Play preview of Click Spark (React Bits)" }));
+    await waitFor(() => {
+      expect(
+        document.querySelector('li[data-entry-id="react-bits-click-spark"] .preview-mini-stage'),
+      ).toBeTruthy();
+    });
+    const stage = document.querySelector('li[data-entry-id="react-bits-click-spark"] .preview-mini-stage');
+    expect(stage?.getAttribute("data-interactive")).toBeNull();
+  });
+
+  it("M7.2: the workspace publishes an inner-scrollable stage for scroll-triggered entries", async () => {
+    window.location.hash = "/preview/react-bits-animated-content";
+    renderApp();
+    const wrap = await screen.findByTestId("preview-stage-wrap");
+    expect(wrap.getAttribute("data-scroll")).toBe("true");
+    // The behavior-derived cue tells the user to scroll inside the canvas.
+    const cue = await screen.findByTestId("preview-interaction-cue");
+    expect(cue.textContent).toContain("Scroll inside the stage");
+  });
+
+  it("M7.2: provenance facts stay available but collapsed in the workspace rail", async () => {
+    window.location.hash = "/preview/react-bits-dock";
+    renderApp();
+    const details = await screen.findByTestId("preview-details");
+    expect(details.querySelector("summary")?.textContent).toContain("Provenance");
+    // jsdom's <details> starts closed; the facts exist only inside its body.
+    expect((details as HTMLDetailsElement).open).toBe(false);
+    const body = details.querySelector(".workspace-details-body");
+    expect(body?.textContent).toContain("Vendored files");
+    // The rail keeps the primary identity/selection/controls above it.
+    expect(await screen.findByTestId("preview-rail")).toBeTruthy();
   });
 });

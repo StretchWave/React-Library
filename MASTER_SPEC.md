@@ -458,6 +458,27 @@ they conflict:
   existing stage modes, viewports, replay, fullscreen, controls, and honest fallback
   states are unchanged.
 
+**M7.2 refinement (2026-10-25).** Preview-experience polish on top of M7.1, no schema
+or dependency changes:
+
+- **Every card opens in-app** — the stretched `gallery-card-open` link exists on all
+  cards and always targets `#/preview/<id>`; `PreviewBox` no longer renders off-site
+  anchors inside the grid. External records are quiet honest tiles (↗ cue + short
+  label); their official URL appears only in the workspace honest card and detail
+  pane. Selection stays a sibling of the open action.
+- **Pointer-interactive mini stages** — when a playing live stage's entry carries a
+  verified pointer-capable behavior (`cursor-reactive`, `hover`, `gesture`,
+  `interactive-text`, `interactive-nav`, `stateful`), it publishes
+  `data-interactive="true"`; gallery CSS then passes the pointer through and retracts
+  the open link to the title strip. Click/drag-driven entries keep the full-card
+  overlay so a click still opens the workspace consistently.
+- **Workspace hierarchy** — provenance (source, license, retrieval, dependencies,
+  vendored files, related) collapses behind an accessible `<details>` in the rail;
+  identity, selection, classification chips, and verified controls stay primary.
+- **Scroll-aware stage** — entries classified `scroll` get an inner-scrollable stage
+  wrap (`data-scroll="true"`, full viewport only) so viewport entrances trigger inside
+  the canvas; Replay resets the inner scroll position.
+
 ## 11) Verification gates
 
 ```text

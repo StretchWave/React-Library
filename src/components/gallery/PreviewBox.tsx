@@ -1,20 +1,33 @@
-// Honest preview renderer (M5.3, extended M6.4 with lazy mini stages).
-// Policy: never execute ingested third-party code inside the main application
-// context. Live previews render only through reviewed wrappers:
+// Honest preview renderer (M5.3, extended M6.4 with lazy mini stages; M7.2 de-
+// cluttered). Policy: never execute ingested third-party code inside the main
+// application context. Live previews render only through reviewed wrappers:
 //   - vendored react-bits entries  → src/catalog/showcases registry (MiniStage)
 //   - seeded in-app components     → the vetted demo registry (MiniStage wraps
 //                                    the same demo used by the detail pane)
-// Every other entry renders a labeled, data-driven link or note:
-//   - "external"     → official hosted preview (verified URL from the record)
-//   - "source-link"  → clear fallback to the official source page
-//   - "static"       → permitted static resource (verified URL from the record)
-//   - "none"         → an explicit honest note from the record
+// Every other entry renders a compact, data-driven VISUAL tile — no hostnames,
+// no explanatory paragraphs, no duplicate open actions inside the grid:
+//   - "external"     → honest "official demo" tile (the source link lives in
+//                      the preview workspace's honest fallback card)
+//   - "source-link"  → the same honest tile, labeled "Source"
+//   - "static"       → the verified image alone (no link chrome)
+//   - "none"         → one short restrained line
+// Every card's open action is the gallery card's stretched link to the
+// in-app #/preview/<id> route (GalleryCard) — link tiles no longer navigate
+// off-site from the grid there.
 //
 // MiniStage playback policy (M6.4): stages auto-play only when the card is in
 // the viewport AND the global motion preference is playing; a manual Play
 // button covers environments without IntersectionObserver (and honors users
 // who start playback deliberately). Heavy entries never auto-play — their
 // safe, full-fidelity home is the preview workspace.
+//
+// M7.2 interactive stages: when a live stage is playing and the entry's VERIFIED
+// behavior tags include a pointer/hover/text-capable interaction (cursor-reactive,
+// hover, gesture, interactive-text, interactive-nav, stateful), the stage
+// publishes data-interactive="true"; gallery.css then lets the pointer reach
+// the demo (hover demos demonstrate themselves) while the card-open link
+// retracts to the title strip. Click-triggered and draggable effects keep the
+// full-card overlay — a click still opens the workspace consistently.
 //
 // The showcase registry is code-split (M6.6): mini stages pull it with a
 // dynamic import on first playback, so the vendored components and their
@@ -27,6 +40,22 @@ import { getDemo } from "../../catalog/demos";
 import { entryTypeOf, type CatalogEntry, type PreviewType } from "../../catalog/types";
 import type { ShowcaseValues } from "../../catalog/showcases";
 import { isMotionPlaying, subscribeMotion } from "../../lib/motion";
+
+/** Behavior ids whose live demos demonstrably respond to pointer/hover/typing
+ *  input (verified against the vendored implementations). anything driven by
+ *  clicks or drag-release is demoed in the workspace, not behind a card link. */
+const POINTER_INTERACTIVE_BEHAVIORS = new Set([
+  "cursor-reactive",
+  "hover",
+  "gesture",
+  "interactive-text",
+  "interactive-nav",
+  "stateful",
+]);
+
+function entrySupportsPointerInteraction(entry: CatalogEntry): boolean {
+  return (entry.behaviors ?? []).some((behavior) => POINTER_INTERACTIVE_BEHAVIORS.has(behavior));
+}
 
 type ShowcaseRegistry = typeof import("../../catalog/showcases");
 
@@ -62,18 +91,21 @@ const LINK_CARD_COPY: Record<"external" | "source-link", string> = {
 };
 
 interface MiniStageProps {
-  entryId: string;
   name: string;
   /** null while the showcase chunk is still loading (mini stages are
    *  code-split: the registry only loads when playback starts). */
   Component: ComponentType<ShowcaseValues> | null;
   heavy: boolean;
+  /** M7.2: the entry's verified behaviors allow pointer/hover interaction; the
+   *  stage publishes data-interactive while actually playing so gallery.css
+   *  can pass pointer events through and retract the card link. */
+  interactive: boolean;
   /** Invoked when playback starts (or is retried) so the host can fetch the
    *  code-split showcase component before the stage can render. */
   onPlaybackStart?: () => void;
 }
 
-function MiniStage({ entryId, name, Component, heavy, onPlaybackStart }: MiniStageProps) {
+function MiniStage({ name, Component, heavy, interactive, onPlaybackStart }: MiniStageProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const [autoVisible, setAutoVisible] = useState(false);
   const [manualPlay, setManualPlay] = useState(false);
@@ -114,18 +146,21 @@ function MiniStage({ entryId, name, Component, heavy, onPlaybackStart }: MiniSta
       data-heavy={heavy ? "true" : "false"}
     >
       {heavy ? (
+        // M7.2 poster state: component-specific atlas-backed tile, a single
+        // truthful chip, and no paragraph copy. The card's stretched link is
+        // the open affordance — no duplicated actions inside the frame.
         <div className="preview-mini-placeholder">
-          <span className="preview-mini-kindchip">heavy preview</span>
-          <a href={`#/preview/${entryId}`} className="preview-mini-open">
-            Open in preview workspace ↗
-          </a>
-          <p className="preview-mini-open-title">{name}</p>
-          <p className="preview-mini-note">
-            Heavy preview — it renders at full fidelity on demand in the workspace, never en masse in the grid.
-          </p>
+          <span className="preview-mini-kindchip">Heavy preview</span>
+          <span className="preview-mini-open" aria-hidden="true">
+            ↗
+          </span>
         </div>
       ) : Component && active ? (
-        <div className="preview-mini-stage" aria-label={`Live mini preview of ${name}`}>
+        <div
+          className="preview-mini-stage"
+          aria-label={`Live mini preview of ${name}`}
+          data-interactive={interactive ? "true" : undefined}
+        >
           <div className="preview-mini-scaler" aria-hidden="true">
             <Component />
           </div>
@@ -178,64 +213,57 @@ export function PreviewBox({ entry }: { entry: CatalogEntry }) {
     const heavy = Boolean(entry.heavy ?? showcase?.heavy);
     return (
       <MiniStage
-        entryId={entry.id}
         name={entry.name}
         Component={Component}
         heavy={heavy}
+        interactive={!heavy && entrySupportsPointerInteraction(entry)}
         onPlaybackStart={heavy ? undefined : requestComponent}
       />
     );
   }
 
   if (kind === "external" || kind === "source-link") {
+    // Honest, compact visual tile. The hostname and the official URL stay in
+    // the preview workspace's honest fallback card / detail pane — the card
+    // keeps one quiet cue, and the card's stretched link opens the workspace.
     const url = entry.preview?.url ?? entry.sourceUrl;
     if (!url) {
       return (
         <div className="preview-frame is-empty" data-preview-kind="none">
+          <span className="preview-frame-cue" aria-hidden="true">◦</span>
           <p>Preview link missing from the record.</p>
         </div>
       );
     }
     return (
-      <a
+      <div
         className="preview-frame is-link"
         data-preview-kind={kind}
-        href={url}
-        target="_blank"
-        rel="noreferrer noopener"
-        aria-label={`${LINK_CARD_COPY[kind]} for ${entry.name} (opens off-site)`}
+        title={`${LINK_CARD_COPY[kind]} — official link in the preview workspace`}
       >
+        <span className="preview-frame-cue" aria-hidden="true">↗</span>
         <span className="preview-frame-title">{LINK_CARD_COPY[kind]}</span>
-        <span className="preview-frame-hint">{new URL(url).hostname}</span>
-        <span className="preview-frame-hint">
-          Inspect it in-app with the Preview action below.
-        </span>
-      </a>
+      </div>
     );
   }
 
   if (kind === "static") {
     const url = entry.preview?.url ?? "";
     return (
-      <a
-        className="preview-frame is-static"
-        data-preview-kind="static"
-        href={url}
-        target="_blank"
-        rel="noreferrer noopener"
-      >
+      <div className="preview-frame is-static" data-preview-kind="static">
         {url ? (
           <img src={url} alt={`${entry.name} static preview`} loading="lazy" />
         ) : (
           <p>Static preview missing from the record.</p>
         )}
-      </a>
+      </div>
     );
   }
 
   const note = entry.preview?.note ?? "No preview is available for this entry yet.";
   return (
     <div className="preview-frame is-empty" data-preview-kind="none">
+      <span className="preview-frame-cue" aria-hidden="true">◦</span>
       <p>{note}</p>
     </div>
   );

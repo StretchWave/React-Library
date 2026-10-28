@@ -1,11 +1,18 @@
-// Preview workspace (M6.2; M7.4 visual redesign): a dedicated full-stage
-// preview where the component — not the chrome — is the main event. Runnable
-// entries render exclusively through src/catalog/showcases — vendored
-// third-party code never executes in the app outside those reviewed wrappers.
-// Entries without a runnable preview show an honest kind card with the official
-// link and the agent retrieval path. The canvas keeps its own stage background
-// (neutral/inverted/grid) so the application theme never recolors a component
-// preview. All styling uses --rl-* tokens only.
+// Preview workspace (M6.2; M7.4 visual redesign; M7.2 experience refinement):
+// a dedicated full-stage preview where the component — not the chrome — is the
+// main event. Runnable entries render exclusively through
+// src/catalog/showcases — vendored third-party code never executes in the app
+// outside those reviewed wrappers. Entries without a runnable preview show an
+// honest kind card with the official link and the agent retrieval path. The
+// canvas keeps its own stage background (neutral/inverted/grid) so the
+// application theme never recolors a component preview. All styling uses
+// --rl-* tokens only.
+// M7.2 hierarchy: the rail keeps the component identity, the selection toggle,
+// the classification chips and the verified controls first; provenance facts
+// (source, license, retrieval, dependencies, files, related) collapse behind
+// an accessible <details> so they never compete with the stage.
+// M7.2 behavior treatment: scroll-triggered entries get an inner-scrollable
+// wrap so the viewport entrance can be triggered without scrolling the app.
 import { Component, useRef, useState, type ReactNode } from "react";
 import {
   aestheticById,
@@ -275,10 +282,11 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
     );
   }
 
+  const isScrollStage = (entry.behaviors ?? []).includes("scroll");
+
   return (
     <main className="workspace-shell" data-testid="preview-workspace" aria-label={`Preview workspace for ${entry.name}`}>
-      <section className="workspace-main" aria-label="Live preview stage">
-        <div className="workspace-toolbar">
+      <section className="workspace-main" aria-label="Live preview stage">        <div className="workspace-toolbar">
           <label className="workspace-toolbar-field">
             Stage
             <select
@@ -311,7 +319,12 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
             type="button"
             className="workspace-replay"
             data-testid="preview-replay"
-            onClick={() => setReplayKey((current) => current + 1)}
+            onClick={() => {
+              setReplayKey((current) => current + 1);
+              // Scroll-triggered stages: reset the inner scroll position so a
+              // replay genuinely re-runs the viewport entrance.
+              stageRef.current?.scrollTo({ top: 0 });
+            }}
           >
             Replay
           </button>
@@ -327,7 +340,13 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
         </div>
         {runnable && showcase ? (
           <>
-            <div className="workspace-stage-wrap" data-stage={stageMode} data-testid="preview-stage-wrap" ref={stageRef}>
+            <div
+              className="workspace-stage-wrap"
+              data-stage={stageMode}
+              data-scroll={isScrollStage && viewport === "full" ? "true" : undefined}
+              data-testid="preview-stage-wrap"
+              ref={stageRef}
+            >
               <div
                 className="workspace-stage-frame"
                 key={replayKey}
@@ -342,8 +361,7 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
             </div>
             <p className="workspace-hint" data-testid="preview-interaction-cue">
               {cue ?? showcase.hint ?? "Press Replay to restart the animation."}
-            </p>
-          </>
+            </p>          </>
         ) : (
           <div className="workspace-honest" data-testid="preview-honest">
             <h2>{entry.name}</h2>
@@ -452,7 +470,10 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
           </div>
         ) : null}
 
-        {entry.source ? (
+        <details className="workspace-details" data-testid="preview-details">
+          <summary>Provenance & retrieval</summary>
+          <div className="workspace-details-body">
+            {entry.source ? (
           <div className="workspace-fact">
             <span className="workspace-fact-label">Source</span>
             <span>
@@ -524,6 +545,8 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
             </ul>
           </div>
         ) : null}
+          </div>
+        </details>
 
         <div className="workspace-links">
           <a href={`#/component/${entry.id}`} data-testid="preview-full-record">

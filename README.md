@@ -23,6 +23,7 @@ Schema: [`docs/SCHEMA.md`](./docs/SCHEMA.md)
 | Animation-first correction (M6): 87 real entries (all local records), 61 React Bits + 4 Magic UI items vendored from the official registries, 71 runnable live previews (65 showcase stages + 6 seeded demos, audit-verified M7), preview workspace `#/preview/<id>` with per-entry controls (lazy-loaded), gallery mini stages with a persisted play/pause toggle, heavy entries gated to the workspace | ✅ working (verify gate green; browser-verified) |
 | Visual overhaul (M7): gallery-first landing, preview-first cards, redesigned preview workspace with fullscreen, editable prompt pane, six restored appearance themes | ✅ working (105/105 app tests; DOM-based visual QA — see IMPLEMENTATION_CHECKLIST M7) |
 | Minimal gallery + interaction taxonomy (M7.1): three-element cards (preview · name · checkbox), 14–16rem previews in a spacious 1.4rem-gutter grid, 12 `taxonomy/behaviors.json` interaction behaviors classified on all 87 entries with an "Interaction" filter, `--behavior` lookup flag, and behavior-derived preview-stage cues | ✅ working (see IMPLEMENTATION_CHECKLIST M7.1) |
+| Preview experience refinement (M7.2): every card opens the in-app `#/preview/<id>` route (external/static/non-runnable included — no off-site navigation from the grid), de-cluttered link/static/poster frames, pointer-interactive mini stages for verified hover/cursor-reactive entries, collapsible provenance rail, and an inner-scrollable stage for scroll-triggered entries | ✅ working (59/59 app tests; visual QA — see IMPLEMENTATION_CHECKLIST M7.2) |
 
 ## Browse features
 
@@ -40,11 +41,13 @@ Schema: [`docs/SCHEMA.md`](./docs/SCHEMA.md)
   for all
   65 showcase-wrapped items plus the 6 seeded demos (auto-play on visibility, manual
   Play fallback), large 224–256px preview frames, and a deliberate poster state for
-  the 23 heavy entries (they run only in the preview workspace). The 16 shadcn
-  doc-page items show a clearly labeled off-site tile ("Open official preview") —
-  inspecting any card opens the in-app `#/preview/<id>` workspace instead of
-  navigating away, and the selection checkbox is a sibling of the open action so
-  selection never navigates. A persisted **Pause previews** toggle stops every mini stage.
+  the 23 heavy entries (they run only in the preview workspace). Every card's single
+  open action is the in-app `#/preview/<id>` workspace (M7.2) — external records
+  render as quiet honest tiles with the official link waiting in the workspace, so
+  clicking a card never navigates off-site. Cards whose live stage demonstrably
+  responds to the pointer (hover/cursor-reactive behaviors) accept pointer input
+  directly on the tile; selecting never navigates because the checkbox is a sibling
+  of the open action. A persisted **Pause previews** toggle stops every mini stage.
   Ingested third-party code is never executed in the app outside the reviewed
   showcase wrappers (M6.6: the registry loads on demand from a code-split chunk).
 - Preview workspace (`#/preview/<id>`, M7 redesign): full-stage live preview for
@@ -53,9 +56,12 @@ Schema: [`docs/SCHEMA.md`](./docs/SCHEMA.md)
   verified against the vendored sources (hosted in the information rail), an
   information rail (classification chips incl. interaction behaviors, source,
   license verbatim, retrieval, dependencies, vendored
-  paths, related components), the selection toggle, and a behavior-derived
-  interaction cue under the stage (e.g. cursor-reactive entries tell you to move the
-  pointer across the stage). Non-runnable records show
+  paths, related components — the provenance facts collapse behind an accessible
+  `<details>` since M7.2 so they never compete with the stage), the selection
+  toggle, and a behavior-derived interaction cue under the stage
+  (e.g. cursor-reactive entries tell you to move the pointer across the stage;
+  scroll-triggered entries get an inner-scrollable stage so the entrance triggers
+  without scrolling the page). Non-runnable records show
   an honest kind card with the official link instead of a fake stage.
 - Multi-selection (M5.4): card checkboxes, "Select all visible", persistent
   `rl.selection.v1` store (stale ids pruned), reorderable selection tray with
