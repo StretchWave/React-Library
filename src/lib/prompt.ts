@@ -6,6 +6,9 @@
 import type { CatalogEntry } from "../catalog/types";
 import { entryTypeOf } from "../catalog/types";
 import { sourceById } from "../catalog/client";
+import { previewModeLabel, previewStatusLabel, profileOf, requirementLabel } from "../catalog/preview";
+import type { AnnotationMap } from "./personal";
+import { annotationFor } from "./personal";
 
 export interface PromptOptions {
   /** Optional ISO timestamp; prompts stay deterministic without it. */
@@ -13,6 +16,8 @@ export interface PromptOptions {
   /** M7.5: an optional target-project name recorded in the prompt header so
    *  the consuming agent knows what it is assembling into. Deterministic. */
   targetProject?: string;
+  /** Local tags/notes are included without being written to the catalog. */
+  annotations?: AnnotationMap;
 }
 
 const RULES: string[] = [
@@ -25,8 +30,6 @@ const RULES: string[] = [
   "Keep the target project's design constraints coherent: match the recorded aesthetics/attributes of each component to the surrounding theme, and honor prefers-reduced-motion where the component animates continuously.",
   "After integration, verify every component: no console errors, correct behavior at 375/768/1280 viewport widths, and the attribution/license notices intact in the shipped code.",
 ];
-
-const WORKSPACE_PREVIEW: string = "live in the React Library preview workspace";
 
 function licenseLine(entry: CatalogEntry): string | null {
   const license = entry.license;
@@ -70,30 +73,19 @@ function externalSection(entry: CatalogEntry): string[] {
  *  its limitation and the official URL). Records without a `preview` object
  *  resolve through their entry type: locals run in-app, externals do not. */
 function previewLine(entry: CatalogEntry): string {
-  const kind = entry.preview?.type;
-  if (!kind) {
-    if (entryTypeOf(entry) === "external") {
-      return `- Preview: external only — rendered demo runs outside this app: ${entry.sourceUrl ?? "URL not recorded"}`;
-    }
-    return `- Preview: ${WORKSPACE_PREVIEW} (vetted in-app demo)`;
-  }
-  switch (kind) {
-    case "local-demo": {
-      const runtime = entry.runtime ? ` (runtime: ${entry.runtime})` : "";
-      return `- Preview: ${WORKSPACE_PREVIEW}${runtime}`;
-    }
-    case "external":
-      return `- Preview: external only — rendered demo runs outside this app: ${entry.preview?.url ?? "URL not recorded"}`;
-    case "source-link":
-      return `- Preview: vendored code is not runnable in this app — official demo only: ${entry.preview?.url ?? entry.sourceUrl ?? "URL not recorded"}`;
-    case "static":
-      return `- Preview: static resource — ${entry.preview?.url ?? "URL not recorded"}`;
-    default:
-      return "- Preview: none recorded for this entry yet";
-  }
+  const profile = profileOf(entry);
+  const requirements = profile.requires.length
+    ? `; requires ${profile.requires.map(requirementLabel).join(", ")}`
+    : "";
+  const reason = profile.failureReason ? `; ${profile.failureReason}` : "";
+  return (
+    `- Preview: ${previewModeLabel(entry)} (${previewStatusLabel(entry)}, ${profile.cost} cost${requirements})` +
+    `${reason}.` +
+    (profile.snapshotPath ? ` Captured fallback: ${profile.snapshotPath}.` : "")
+  );
 }
 
-function entrySection(entry: CatalogEntry, position: number): string[] {
+function entrySection(entry: CatalogEntry, position: number, annotation?: ReturnType<typeof annotationFor>): string[] {
   const type = entryTypeOf(entry);
   const lines: string[] = [
     `## ${position}. ${entry.name} (${entry.id}) — ${type === "external" ? "external reference" : "local"}`,
@@ -101,6 +93,9 @@ function entrySection(entry: CatalogEntry, position: number): string[] {
     `- Summary: ${entry.summary}`,
   ];
   if (entry.description) lines.push(`- Description: ${entry.description}`);
+  lines.push(
+    `- Classification: types ${(entry.types ?? []).join(", ") || "unrecorded"}; triggers ${(entry.triggers ?? []).join(", ") || "unrecorded"}; techniques ${(entry.techniques ?? []).join(", ") || "none"}`,
+  );
   lines.push(...(type === "external" ? externalSection(entry) : localPathsSection(entry)));
   lines.push(previewLine(entry));
   if (entry.heavy) {
@@ -120,16 +115,36 @@ function entrySection(entry: CatalogEntry, position: number): string[] {
   if ((entry.props ?? []).length > 0) {
     lines.push(`- Documented props: ${entry.props.map((prop) => `${prop.name}: ${prop.type}`).join("; ")}`);
   }
+  if (annotation?.manualTags.length) {
+    lines.push(`- User-confirmed manual tags: ${annotation.manualTags.join(", ")}`);
+  }
+  if (annotation?.note.trim()) lines.push(`- User note for this component: ${annotation.note.trim()}`);
   return lines;
 }
 
 /** Aggregated facts across the whole selection (deduplicated, order-stable). */
-function globalSections(entries: CatalogEntry[]): { notices: string[]; dependencies: string[] } {
+function globalSections(entries: CatalogEntry[]): {
+  notices: string[];
+  dependencies: string[];
+  constraints: string[];
+} {
   const notices: string[] = [];
+  const constraints: string[] = [];
   const dependencies = new Map<string, { reason?: string; usedBy: string[] }>();
   for (const entry of entries) {
     const license = entry.license;
     if (license?.note) notices.push(`- ${entry.name} (${entry.id}): ${license.note}`);
+    if (license?.spdx) constraints.push(`- ${entry.name} (${entry.id}): SPDX ${license.spdx}${license.attribution ? ` · attribution: ${license.attribution}` : ""}`);
+    if (entry.source) {
+      const source = sourceById(entry.source);
+      if (source?.license) constraints.push(`- ${entry.name} (${entry.id}) upstream license: ${source.license}`);
+      if (source?.limit) constraints.push(`- ${entry.name} (${entry.id}) retrieval limit: ${source.limit}`);
+    }
+    if (entry.previewProfile?.previewStatus !== "ready") {
+      constraints.push(
+        `- ${entry.name} (${entry.id}): preview ${entry.previewProfile?.previewStatus ?? "unknown"} — do not claim it was visually verified in this app.`,
+      );
+    }
     for (const dep of entry.dependencies ?? []) {
       const known = dependencies.get(dep.name);
       if (known) {
@@ -141,6 +156,7 @@ function globalSections(entries: CatalogEntry[]): { notices: string[]; dependenc
   }
   return {
     notices,
+    constraints,
     dependencies: [...dependencies.entries()].map(
       ([name, meta]) =>
         `- ${name}${meta.reason ? ` (${meta.reason})` : ""} — needed by ${meta.usedBy.join(", ")}`,
@@ -168,7 +184,7 @@ export function buildMasterPrompt(
   const header = [
     "# Master prompt — React Library component build",
     "",
-    `This prompt is assembled exclusively from the canonical React Library catalog (schema v2).`,
+    `This prompt is assembled exclusively from the canonical React Library catalog (schema v3).`,
     `Selected components: ${items.length}${options.generatedAt ? ` · generated at ${options.generatedAt}` : ""}${options.targetProject ? ` · target project: ${options.targetProject}` : ""}`,
     `Selection order below is the user-defined order (position 1 = first).`,
   ];
@@ -182,7 +198,7 @@ export function buildMasterPrompt(
     ].join("\n");
   }
 
-  const { notices, dependencies } = globalSections(items);
+  const { notices, dependencies, constraints } = globalSections(items);
 
   const lines: string[] = [
     ...header,
@@ -194,13 +210,23 @@ export function buildMasterPrompt(
   if (notices.length > 0) {
     lines.push("", "## License notices that must be carried into the target project", ...notices);
   }
+  if (constraints.length > 0) {
+    lines.push("", "## Constraints and honest preview notes", ...constraints);
+  }
   if (dependencies.length > 0) {
     lines.push("", "## Runtime dependencies required across the selection", ...dependencies);
   }
 
   lines.push("", "## Selected components (in selection order)");
   items.forEach((entry, index) => {
-    lines.push("", ...entrySection(entry, index + 1));
+    lines.push(
+      "",
+      ...entrySection(
+        entry,
+        index + 1,
+        options.annotations ? annotationFor(options.annotations, entry.id) : undefined,
+      ),
+    );
   });
 
   if (skipped.length > 0) {

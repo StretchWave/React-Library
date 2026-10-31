@@ -8,7 +8,7 @@ import StaggeredMenuRaw from "../../../catalog/components/react-bits/staggered-m
 import FlowingMenuRaw from "../../../catalog/components/react-bits/flowing-menu/FlowingMenu";
 import CardNavRaw from "../../../catalog/components/react-bits/card-nav/CardNav";
 import { defineShowcase, type Showcase } from "./types";
-import { CenteredStage } from "./helpers";
+import { CenteredStage, svgDataUri } from "./helpers";
 
 type Raw = ComponentType<Record<string, unknown>>;
 
@@ -38,7 +38,7 @@ export const navShowcases: Showcase[] = [
   defineShowcase(
     "react-bits-dock",
     ({ position, theme, magnification, distance }) => (
-      <CenteredStage style={{ minHeight: 300, paddingBottom: 84 }}>
+      <CenteredStage style={{ minHeight: 300, paddingBottom: 84, position: "relative" }}>
         <Dock
           items={DOCK_GLYPHS.map((d, index) => ({
             icon: <Glyph d={d} />,
@@ -69,7 +69,7 @@ export const navShowcases: Showcase[] = [
     ({ animationDuration, staggerDelay }) => (
       <div style={{ minHeight: 320, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
         <BubbleMenu
-          logo="RL"
+          logo={<span style={{ fontWeight: 700, letterSpacing: "-0.04em" }}>RL</span>}
           items={[
             { label: "Text", href: "#", ariaLabel: "Text components" },
             { label: "Motion", href: "#", ariaLabel: "Motion components" },
@@ -94,8 +94,12 @@ export const navShowcases: Showcase[] = [
   defineShowcase(
     "react-bits-staggered-menu",
     ({ displayItemNumbering, closeOnClickAway }) => (
-      <div style={{ minHeight: 340, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+      <div style={{ minHeight: 340, height: 340, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
         <StaggeredMenu
+          logoUrl={svgDataUri(110, 24, "#27272a", "#52525b", "React Library")}
+          menuButtonColor="#27272a"
+          openMenuButtonColor="#27272a"
+          accentColor="#7c3aed"
           items={[
             { label: "Overview", ariaLabel: "Overview", link: "#" },
             { label: "Components", ariaLabel: "Components", link: "#" },
@@ -153,7 +157,7 @@ export const navShowcases: Showcase[] = [
     ({ theme, defaultOpen }) => (
       <CenteredStage style={{ minHeight: 320, paddingBottom: 120 }}>
         <CardNav
-          logo="RL"
+          logo={<span style={{ fontWeight: 800, fontSize: 18 }}>RL</span>}
           logoAlt="React Library"
           items={[
             {

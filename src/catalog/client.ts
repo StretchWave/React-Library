@@ -8,6 +8,9 @@ import aestheticsJson from "../../taxonomy/aesthetics.json";
 import attributesJson from "../../taxonomy/attributes.json";
 import behaviorsJson from "../../taxonomy/behaviors.json";
 import sourcesJson from "../../taxonomy/sources.json";
+import typesJson from "../../taxonomy/types.json";
+import triggersJson from "../../taxonomy/triggers.json";
+import techniquesJson from "../../taxonomy/techniques.json";
 import type {
   AestheticDoc,
   AestheticsFile,
@@ -23,6 +26,10 @@ import type {
   ThemesFile,
   BehaviorDoc,
   BehaviorsFile,
+  ComponentTypesFile,
+  FacetDoc,
+  TechniquesFile,
+  TriggersFile,
 } from "./types";
 
 export const catalog = catalogJson as unknown as CatalogFile;
@@ -32,6 +39,9 @@ const aestheticsDoc = aestheticsJson as unknown as AestheticsFile;
 const attributesDoc = attributesJson as unknown as AttributesFile;
 const behaviorsDoc = behaviorsJson as unknown as BehaviorsFile;
 const sourcesDoc = sourcesJson as unknown as SourcesFile;
+const componentTypesDoc = typesJson as unknown as ComponentTypesFile;
+const triggersDoc = triggersJson as unknown as TriggersFile;
+const techniquesDoc = techniquesJson as unknown as TechniquesFile;
 
 export const entries: CatalogEntry[] = catalog.entries;
 export const themes: ThemeDoc[] = themesDoc.themes;
@@ -40,12 +50,18 @@ export const aesthetics: AestheticDoc[] = aestheticsDoc.aesthetics;
 export const attributes: AttributeDoc[] = attributesDoc.attributes;
 export const behaviors: BehaviorDoc[] = behaviorsDoc.behaviors;
 export const sources: SourceDoc[] = sourcesDoc.sources;
+export const componentTypes: FacetDoc[] = componentTypesDoc.types;
+export const triggers: FacetDoc[] = triggersDoc.triggers;
+export const techniques: FacetDoc[] = techniquesDoc.techniques;
 
 export const catalogCounts = {
   entries: entries.length,
   themes: themes.length,
   categories: categories.length,
   aesthetics: aesthetics.length,
+  types: componentTypes.length,
+  triggers: triggers.length,
+  techniques: techniques.length,
   sources: sources.length,
 } as const;
 
@@ -71,6 +87,18 @@ export function attributeById(id: string): AttributeDoc | undefined {
 
 export function behaviorById(id: string): BehaviorDoc | undefined {
   return behaviors.find((behavior) => behavior.id === id);
+}
+
+export function componentTypeById(id: string): FacetDoc | undefined {
+  return componentTypes.find((type) => type.id === id);
+}
+
+export function triggerById(id: string): FacetDoc | undefined {
+  return triggers.find((trigger) => trigger.id === id);
+}
+
+export function techniqueById(id: string): FacetDoc | undefined {
+  return techniques.find((technique) => technique.id === id);
 }
 
 export function sourceById(id: string): SourceDoc | undefined {

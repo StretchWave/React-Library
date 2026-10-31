@@ -130,7 +130,7 @@ export const magicuiShowcases: Showcase[] = [
     {
       controls: [{ id: "duration", label: "Hold (ms)", type: "number", default: 2500, min: 1000, max: 6000, step: 250 }],
       hint: "Words rotate on an interval; motion animates enter/exit transitions.",
-      stage: "inverted",
+      stage: "neutral",
     },
   ),
 ];

@@ -86,7 +86,10 @@
 .workspace-stage-wrap {
   border: 1px solid var(--rl-border);
   border-radius: var(--rl-radius);
-  background: var(--rl-surface-alt);
+  /* Opaque canvas: some themes' surface-alt is translucent (glass). Without an
+   * opaque base the app chrome shows through captured previews. */
+  background-color: var(--rl-surface);
+  background-image: linear-gradient(var(--rl-surface-alt), var(--rl-surface-alt));
   color: var(--rl-text);
   padding: 1.25rem;
   display: flex;
@@ -105,10 +108,11 @@
 }
 
 .workspace-stage-wrap[data-stage="grid"] {
-  background-color: var(--rl-surface-alt);
-  background-image: linear-gradient(var(--rl-border) 1px, transparent 1px),
+  background-color: var(--rl-surface);
+  background-image: linear-gradient(var(--rl-surface-alt), var(--rl-surface-alt)),
+    linear-gradient(var(--rl-border) 1px, transparent 1px),
     linear-gradient(90deg, var(--rl-border) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-size: auto, 24px 24px, 24px 24px;
 }
 
 .workspace-stage-frame {
@@ -145,7 +149,12 @@
 .workspace-stage-wrap[data-scroll="true"] .workspace-stage-frame {
   min-height: 140vh;
   display: grid;
-  place-content: center;
+  /* Keep the primary content visible at scroll-top: centering a 140vh canvas
+   * inside a 64vh scroll viewport hid every scroll-triggered demo behind
+   * ~300px of empty space. Start near the top and leave the rest of the
+   * canvas as scroll travel for the entrance animation. */
+  place-content: start center;
+  padding-top: 22vh;
 }
 
 /* --- controls (now hosted in the information rail) ------------------------------- */

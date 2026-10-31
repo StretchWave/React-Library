@@ -23,8 +23,16 @@ try {
   process.exit(1);
 }
 
-const { catalog, themes, categories, aesthetics, attributes, behaviors, sources } = loaded;
-const taxonomyResult = validateTaxonomy(themes, categories, { aesthetics, attributes, behaviors, sources });
+const { catalog, themes, categories, aesthetics, attributes, behaviors, sources, types, triggers, techniques } = loaded;
+const taxonomyResult = validateTaxonomy(themes, categories, {
+  aesthetics,
+  attributes,
+  behaviors,
+  sources,
+  types,
+  triggers,
+  techniques,
+});
 const themesDocForEntries = taxonomyResult.errors.length === 0 ? themes : { themes: [] };
 const categoriesDocForEntries = taxonomyResult.errors.length === 0 ? categories : { categories: [] };
 const catalogResult = validateCatalog(
@@ -36,6 +44,9 @@ const catalogResult = validateCatalog(
     attributes: { attributes: [] },
     behaviors: { behaviors: [] },
     sources: { sources: [] },
+    types: { types: [] },
+    triggers: { triggers: [] },
+    techniques: { techniques: [] },
   },
   { root, checkLinks: !skipLinks },
 );
@@ -48,7 +59,13 @@ if (errors.length > 0) {
 }
 
 const generatedAt = new Date().toISOString();
-const index = buildIndex(catalog, themes, categories, { aesthetics, attributes, behaviors, sources }, generatedAt);
+const index = buildIndex(
+  catalog,
+  themes,
+  categories,
+  { aesthetics, attributes, behaviors, sources, types, triggers, techniques },
+  generatedAt,
+);
 const file = writeIndex(root, index);
 
 const counts = index.counts;
@@ -57,5 +74,6 @@ console.log(
   `Wrote ${rel} — ` +
     `${counts.entries} entries (${counts.byEntryType.local} local / ${counts.byEntryType.external} external), ` +
     `${counts.themes} themes, ${counts.categories} categories, ` +
-    `${counts.aesthetics} aesthetics, ${counts.sources} sources (generatedAt ${generatedAt})`,
+    `${counts.aesthetics} aesthetics, ${counts.types} types, ${counts.triggers} triggers, ` +
+    `${counts.techniques} techniques, ${counts.sources} sources (generatedAt ${generatedAt})`,
 );

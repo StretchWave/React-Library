@@ -23,19 +23,19 @@ describe("searchEntries (app side)", () => {
     expect(ids).toContain("react-bits-split-text");
   });
 
-  it("matches across name/summary/tags/aliases", () => {
+  it("matches across name/summary/tags/aliases/classification", () => {
     // "input" is an exact alias of text-input and must outrank everything.
     expect(searchEntries(entries, "input")[0].id).toBe("text-input");
-    // "feedback": the seeded alert and its ingested shadcn counterpart both match.
-    expect(searchEntries(entries, "feedback").map((entry) => entry.id)).toEqual([
-      "alert",
-      "shadcn-alert",
-    ]);
-    // "label": exact alias of badge (80) outranks text-input (summary match, 35).
-    expect(searchEntries(entries, "label").map((entry) => entry.id)).toEqual([
-      "badge",
-      "text-input",
-    ]);
+    // "feedback" is a tag on both alerts and a component type on Animated List.
+    const feedback = searchEntries(entries, "feedback").map((entry) => entry.id);
+    expect(feedback.slice(0, 2)).toEqual(["alert", "shadcn-alert"]);
+    expect(feedback).toContain("react-bits-animated-list");
+    // "label": exact alias of badge outranks text-input's summary match.
+    const labels = searchEntries(entries, "label").map((entry) => entry.id);
+    expect(labels[0]).toBe("badge");
+    expect(labels).toContain("text-input");
+    // Arbitrary letter subsequences are not matches: "btn" is an alias only.
+    expect(searchEntries(entries, "btn").map((entry) => entry.id)).toEqual(["button"]);
   });
 
   it("filters by category and theme", () => {
@@ -47,7 +47,7 @@ describe("searchEntries (app side)", () => {
     expect(searchEntries(entries, "", { theme: "retro-terminal" })).toHaveLength(entries.length);
   });
 
-  it("applies the v2 filters (aesthetic, source, attribute, entryType)", () => {
+  it("applies the v3 facets and AND/OR semantics", () => {
     // With the M6 correction every React Bits item got vendored (local), so the
     // real catalog has no external references left; assert that honestly.
     const externals = searchEntries(entries, "", { entryType: "external" });
@@ -59,8 +59,28 @@ describe("searchEntries (app side)", () => {
       true,
     );
     expect(searchEntries(entries, "", { source: "shadcn" })).toHaveLength(16);
-    expect(searchEntries(entries, "", { aesthetic: "minimal" }).length).toBeGreaterThan(0);
-    expect(searchEntries(entries, "", { attribute: "particles" })).toEqual([]);
+    expect(searchEntries(entries, "", { source: "built-in" })).toHaveLength(6);
+    expect(searchEntries(entries, "", { vibe: "minimal" }).length).toBeGreaterThan(0);
+    expect(searchEntries(entries, "", { tech: "particles" })).toEqual([]);
+
+    const cursorBehaviors = searchEntries(entries, "", { behavior: "cursor-reactive" });
+    expect(cursorBehaviors).toHaveLength(13);
+    expect(cursorBehaviors.every((entry) => (entry.behaviors ?? []).includes("cursor-reactive"))).toBe(true);
+
+    const buttons = searchEntries(entries, "", { type: "button" });
+    expect(buttons.map((entry) => entry.id)).toEqual(expect.arrayContaining(["button", "shadcn-button"]));
+    const eitherType = searchEntries(entries, "", { type: ["button", "input"] });
+    expect(eitherType.length).toBeGreaterThan(buttons.length);
+    // OR within one group, AND across groups.
+    const hoverButtons = searchEntries(entries, "", { type: "button", trigger: "hover" });
+    expect(hoverButtons.length).toBeGreaterThan(0);
+    expect(hoverButtons.every((entry) => entry.types.includes("button") && entry.triggers.includes("hover"))).toBe(true);
+    expect(hoverButtons.length).toBeLessThanOrEqual(buttons.length);
+    const impossible = searchEntries(entries, "", { type: "button", trigger: "drag" });
+    expect(impossible).toEqual([]);
+
+    expect(searchEntries(entries, "", { previewMode: "external" })).toHaveLength(16);
+    expect(searchEntries(entries, "", { previewMode: "live" })).toHaveLength(71);
   });
 });
 
@@ -72,10 +92,16 @@ describe("hasActiveFilters", () => {
     expect(hasActiveFilters("", { theme: "classic-clean" })).toBe(true);
   });
 
-  it("detects the v2 filters", () => {
-    expect(hasActiveFilters("", { aesthetic: "minimal" })).toBe(true);
+  it("detects the v3 filters", () => {
+    expect(hasActiveFilters("", { vibe: "minimal" })).toBe(true);
     expect(hasActiveFilters("", { source: "shadcn" })).toBe(true);
-    expect(hasActiveFilters("", { attribute: "tailwind" })).toBe(true);
+    expect(hasActiveFilters("", { tech: "tailwind" })).toBe(true);
     expect(hasActiveFilters("", { entryType: "external" })).toBe(true);
+    expect(hasActiveFilters("", { type: "buttons" })).toBe(true);
+    expect(hasActiveFilters("", { trigger: "mount" })).toBe(true);
+    expect(hasActiveFilters("", { behavior: "hover" })).toBe(true);
+    expect(hasActiveFilters("", { technique: "stagger" })).toBe(true);
+    expect(hasActiveFilters("", { previewMode: "snapshot" })).toBe(true);
+    expect(hasActiveFilters("", { type: [] })).toBe(false);
   });
 });

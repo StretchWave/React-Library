@@ -106,7 +106,7 @@ export const textShowcases: Showcase[] = [
     "react-bits-shiny-text",
     ({ text, speed, glow, delay }) => (
       <CenteredStage>
-        <ShinyText text={String(text)} speed={Number(speed)} glow={Number(glow)} delay={Number(delay)} />
+        <ShinyText text={String(text)} speed={Number(speed)} glow={Number(glow)} delay={Number(delay)} color="#64748b" shineColor="#7c3aed" />
       </CenteredStage>
     ),
     { text: "Shiny text shimmer", speed: 3, glow: 0.5, delay: 0 },

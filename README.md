@@ -1,110 +1,136 @@
-# React Library — agent-first component catalog + themable gallery
+# React Library - agent-first visual component discovery
 
-An agent-first React component library: a canonical machine-readable catalog, theme
-taxonomy, and CLI tooling come first; a React app browses the same data with a
-themable component browser, a visual gallery with honest previews, multi-selection,
-and a master-prompt generator. Primary spec: `MASTER_SPEC.md` — see below.
+An agent-first React component catalog: canonical machine-readable data, strict
+taxonomies and zero-dependency tooling come first; the React app is a view of that
+data. The app is a gallery-first discovery workspace for real animated and interactive
+UI components, with honest previews, faceted search, collections, source coverage and
+a build-prompt studio.
 
-Spec: [`MASTER_SPEC.md`](./MASTER_SPEC.md) · Agent guide: [`AGENTS.md`](./AGENTS.md) ·
-Progress: [`IMPLEMENTATION_CHECKLIST.md`](./IMPLEMENTATION_CHECKLIST.md) ·
+Spec: [`MASTER_SPEC.md`](./MASTER_SPEC.md) | Agent guide: [`AGENTS.md`](./AGENTS.md) |
+Progress: [`IMPLEMENTATION_CHECKLIST.md`](./IMPLEMENTATION_CHECKLIST.md) |
 Schema: [`docs/SCHEMA.md`](./docs/SCHEMA.md)
 
 ## Status
 
-| Area | Status |
+| Area | State |
 |---|---|
-| Foundations: catalog schema v2, theme taxonomy, generator, validator, lookup CLI, AGENTS doc | ✅ working (55/55 tooling tests) |
-| App skeleton (M1): catalog-driven list + selection + detail empty state | ✅ working (verify gate green; browser-verified) |
-| Component browser (M2): search, taxonomy filters, full detail pane | ✅ working |
-| Theme engine + six real components + live previews (M3) | ✅ working |
-| Advanced interactions (M4): TabSheet arrow keys, copy-usage, hash deep links | ✅ working |
-| Catalog ingestion (M5.1–M5.2): schema v2, 9-source registry, 16 shadcn + 4 Magic UI vendored, 7 verified react-bits references | ✅ working — 33 real entries (26 local / 7 external) |
-| Gallery + honest previews (M5.3), multi-selection (M5.4), master prompt (M5.5) | ✅ working |
-| Animation-first correction (M6): 87 real entries (all local records), 61 React Bits + 4 Magic UI items vendored from the official registries, 71 runnable live previews (65 showcase stages + 6 seeded demos, audit-verified M7), preview workspace `#/preview/<id>` with per-entry controls (lazy-loaded), gallery mini stages with a persisted play/pause toggle, heavy entries gated to the workspace | ✅ working (verify gate green; browser-verified) |
-| Visual overhaul (M7): gallery-first landing, preview-first cards, redesigned preview workspace with fullscreen, editable prompt pane, six restored appearance themes | ✅ working (105/105 app tests; DOM-based visual QA — see IMPLEMENTATION_CHECKLIST M7) |
-| Minimal gallery + interaction taxonomy (M7.1): three-element cards (preview · name · checkbox), 14–16rem previews in a spacious 1.4rem-gutter grid, 12 `taxonomy/behaviors.json` interaction behaviors classified on all 87 entries with an "Interaction" filter, `--behavior` lookup flag, and behavior-derived preview-stage cues | ✅ working (see IMPLEMENTATION_CHECKLIST M7.1) |
-| Preview experience refinement (M7.2): every card opens the in-app `#/preview/<id>` route (external/static/non-runnable included — no off-site navigation from the grid), de-cluttered link/static/poster frames, pointer-interactive mini stages for verified hover/cursor-reactive entries, collapsible provenance rail, and an inner-scrollable stage for scroll-triggered entries | ✅ working (59/59 app tests; visual QA — see IMPLEMENTATION_CHECKLIST M7.2) |
-
-## Browse features
-
-- Catalog-driven component list with search (`/` to focus, `Esc` to clear) and
-  category/theme/behavior/aesthetic/source/availability filters, with a resettable empty state.
-- Detail pane per component: status chip, description, supported themes, props table,
-  aliases, tags, source/demo links, a11y notes — plus v2 provenance (entry type,
-  source library + official link, license, retrieval command, runtime dependencies,
-  manifest/implementation paths, aesthetics/attributes, interaction behaviors).
-- Live preview rendered in the active theme; **Copy usage** puts a ready-to-paste
-  snippet on your clipboard.
-- Gallery view (the app's default landing view since M7): minimal card grid
-  (M7.1) over the same filters — each card is exactly the preview, the component
-  name, and a selection checkbox, with honest previews per entry — live mini stages
-  for all
-  65 showcase-wrapped items plus the 6 seeded demos (auto-play on visibility, manual
-  Play fallback), large 224–256px preview frames, and a deliberate poster state for
-  the 23 heavy entries (they run only in the preview workspace). Every card's single
-  open action is the in-app `#/preview/<id>` workspace (M7.2) — external records
-  render as quiet honest tiles with the official link waiting in the workspace, so
-  clicking a card never navigates off-site. Cards whose live stage demonstrably
-  responds to the pointer (hover/cursor-reactive behaviors) accept pointer input
-  directly on the tile; selecting never navigates because the checkbox is a sibling
-  of the open action. A persisted **Pause previews** toggle stops every mini stage.
-  Ingested third-party code is never executed in the app outside the reviewed
-  showcase wrappers (M6.6: the registry loads on demand from a code-split chunk).
-- Preview workspace (`#/preview/<id>`, M7 redesign): full-stage live preview for
-  every runnable entry with stage background modes (neutral/inverted/grid),
-  viewport widths (full/1280/768/375), Replay, Fullscreen, per-entry controls
-  verified against the vendored sources (hosted in the information rail), an
-  information rail (classification chips incl. interaction behaviors, source,
-  license verbatim, retrieval, dependencies, vendored
-  paths, related components — the provenance facts collapse behind an accessible
-  `<details>` since M7.2 so they never compete with the stage), the selection
-  toggle, and a behavior-derived interaction cue under the stage
-  (e.g. cursor-reactive entries tell you to move the pointer across the stage;
-  scroll-triggered entries get an inner-scrollable stage so the entrance triggers
-  without scrolling the page). Non-runnable records show
-  an honest kind card with the official link instead of a fake stage.
-- Multi-selection (M5.4): card checkboxes, "Select all visible", persistent
-  `rl.selection.v1` store (stale ids pruned), reorderable selection tray with
-  availability flags; selection survives filters, view switches, and reloads.
-- Master prompt (M5.5): `#/prompt` studio assembling the build prompt only from
-  canonical records — selection order, license notices verbatim (e.g. react-bits'
-  MIT + Commons Clause), dependency union, local paths vs official retrieval, honest
-  skips — with one-click clipboard copy.
-- Hash deep links: `#/component/<id>`, `#/preview/<id>`, `#/gallery`, `#/prompt`
-  cooperate with the browser's back/forward buttons.
+| Canonical catalog | Schema **v3**, 87 real entries, sorted by id; `catalog/index.json` generated |
+| Discovery app | Browse gallery, Collections, Sources, Selected for AI and a table view with deep links |
+| Search + facets | Types, triggers, techniques, vibes, tech, category, source, entry type, preview mode and status; **AND across dimensions, OR within one** |
+| Previews | 71 published live previews, 16 honest external-preview records, 23 heavy workspace-only entries, 18 autoplay-eligible cards |
+| Personal data | Favorites, named collections, recents, manual tags, notes, saved filters and compare state in localStorage |
+| Sources | 12 documented sources with access/license/coverage records; reference-only ingestion never vendors restricted code |
+| Verification | `npm run verify` is the release gate; the browser audit is a separate real-Chrome/Edge check |
 
 ## Quickstart
 
 ```bash
-npm install          # after node_modules exist
-npm run validate     # validate catalog + taxonomy (incl. path existence)
-npm run generate     # regenerate catalog/index.json (derived — never hand-edit)
-npm run lookup -- button          # inspect a component
-npm run lookup -- --list          # list everything
-npm run lookup -- button --source shadcn --aesthetic minimal   # v2 filtered lookup
-npm run lookup -- --list --behavior scroll   # M7.1 interaction-behavior filter
-npm test             # zero-dependency tooling suites (node --test)
-npm run dev          # React app
-npm run verify       # full release gate
+npm install
+npm run validate                 # catalog + taxonomies + path checks
+npm run generate                 # regenerate catalog/index.json (never hand-edit it)
+npm run lookup -- button         # inspect one record
+npm run lookup -- --list         # list all records
+npm run lookup -- --list --type button --trigger hover  # v3 facets
+npm test                         # zero-dependency tooling suites
+npm run dev                      # React app
+npm run test:app                 # Vitest app suites
+npm run verify                   # validate + generate + node tests + app tests + typecheck + build
+npm run audit:previews           # real-browser preview + gallery audit (Node >= 22.12, Chrome/Edge)
 ```
 
-> PowerShell note: pass CLI args after `--`, e.g. `npm run lookup -- btn --json`.
+PowerShell: pass flags after `--`, for example
+`npm run lookup -- btn --json` or `npm run ingest-codepen -- --url=...`.
+
+## What the app does
+
+### Browse
+
+- Gallery-first wall with adaptive cards. Preview profiles publish compact, standard,
+  wide and showcase layouts, real aspect ratios and minimum dimensions.
+- `/` focuses search; `Esc` clears it or closes the mobile facet drawer.
+- Collapsible desktop facets and a mobile drawer. Every checkbox has an explicit
+  accessible name and result count.
+- Search combines exact id/alias/name signals with prefix, whole-token, substring and
+  token-level typo matching. It does not use arbitrary letter-subsequence matching.
+- Bulk selection, select-all-visible, compare, expand/collapse and a persistent
+  selection tray.
+- Favorites, recents, named collections and saved filters. Personal data is joined by
+  catalog id and never written back to the canonical catalog.
+
+### Previews
+
+- Every catalog entry carries a validated `previewProfile`: mode, layout, cost, aspect
+  ratio, dimensions, runtime requirements, snapshot/loop paths, autoplay permission,
+  status and an honest failure reason when relevant.
+- Cards run live only for low/medium-cost previews that allow autoplay and are visible.
+  Heavy, paused, reduced-motion, off-screen and static cards use published real
+  snapshots instead. Expansion lazily loads the full workspace.
+- Hovering a card for 350ms opens a larger native-scale preview beside it (700×470 on
+  desktop), so compact demos stay legible without leaving the wall. The panel is
+  interactive and stays open while you move into it; it dismisses on Escape, outside
+  click, page scroll, leaving both surfaces, or its close button. The card's
+  enlarged-preview control opens the same panel for keyboard and touch users: focus
+  moves into the panel, pointer movement no longer closes it, and Escape or the close
+  button returns focus to that control. Below 900×600 the control is hidden and Expand
+  remains the route. Low/medium entries
+  may run there even when gallery autoplay is off, while pause/reduced-motion/heavy
+  gates remain honest. External references get no panel, and Expand remains the full
+  workspace for scroll/fullscreen/control-heavy cases.
+- Real audit screenshots are published to `public/previews/`; no thumbnail is invented.
+- External references render an explicit external state, never a fake stage.
+- A global pause control, per-card retry/regeneration affordances, error boundaries and
+  explicit unavailable/external/error labels keep fallback content from pretending to
+  be successful live content.
+
+### Inspect and collect
+
+- Inspector overlays preserve the gallery route, filters and scroll position.
+- Browse filters and overlays are encoded in shareable hashes. Collections, Sources,
+  Selected and Table inspectors stay local to their view; only Browse writes
+  component/preview hashes.
+- Routes include `#/browse`, `#/component/:id`, `#/preview/:id`,
+  `#/collections/:id`, `#/sources/:id`, `#/selected`, `#/prompt`,
+  `#/browser/:id` and `#/filters` (mobile drawer).
+- Favorites, collections, recents, manual tag edits and notes persist locally.
+
+### Sources
+
+- Source coverage is derived from canonical entries plus the checked-in coverage
+  records in `taxonomy/sources.json`.
+- Counts expose discovered, imported, preview-ready, usable, locked, blocked and
+  review-needed states. `discovered` means "tracked by this project", not "the upstream
+  library is fully enumerated". Overall totals include built-in entries; review-needed
+  sums source-level records and entry-level `tagMeta.reviewNeeded` flags.
+- Reference-only sources link to the official channel and never claim a local import.
+
+### Selected for AI
+
+The prompt studio assembles a build prompt from canonical records only: selection order,
+license notices verbatim, dependency union, local paths vs official retrieval
+instructions, preview limitations, runtime constraints and local annotations. External
+entries are constrained to official retrieval channels.
 
 ## Catalog at a glance
 
-- Canonical data: `catalog/catalog.json` (schema v2 — `docs/SCHEMA.md`)
-- Derived index: `catalog/index.json` (generated)
-- Taxonomy: `taxonomy/themes.json` (6 appearance themes), `taxonomy/categories.json`
-  (24 categories), `taxonomy/aesthetics.json` (12 aesthetics), `taxonomy/behaviors.json`
-  (12 interaction behaviors — M7.1), `taxonomy/attributes.json`
-  (25 attributes), `taxonomy/sources.json` (9 researched sources + access/licensing facts)
-- Entries (87 total — 87 local / 0 external, M6.6-audited): the six in-app components,
-  61 vendored React Bits items and 4 Magic UI items (all live through showcases), and
-  16 shadcn doc-page items under `catalog/components/{shadcn,magic-ui,react-bits}/`.
-- The two theme systems are separate: the six `--rl-*` themes style this app;
-  `taxonomy/aesthetics.json` classifies the visual style of cataloged components and
-  `taxonomy/behaviors.json` classifies what user input drives their animation — a
-  cursor effect can be cursor-reactive and cyberpunk at once.
+- Canonical data: `catalog/catalog.json` (schema v3; see `docs/SCHEMA.md`).
+- Derived index: `catalog/index.json` (generated; never hand-edit).
+- 87 entries: 6 built-in components, 61 vendored React Bits items, 4 Magic UI items and
+  16 shadcn/ui items.
+- Preview status: **71 ready/live**, **16 external**, **0 unavailable**, **0 error**.
+  Costs: 48 low, 16 medium, 23 high. Layouts: 20 compact, 25 standard, 21 wide,
+  21 showcase. 23 entries are heavy and workspace-only in the gallery.
+- Taxonomies:
+  - 6 application appearance themes in `taxonomy/themes.json`
+  - 28 structural categories
+  - 23 component types
+  - 14 animation triggers
+  - 46 techniques
+  - 22 visual vibes (`taxonomy/aesthetics.json`)
+  - 29 technical/appearance attributes
+  - 12 interaction behaviors
+  - 12 sources with access, license, auth and coverage records
+- Two separate theme systems: the six `--rl-*` themes style the app; aesthetic/vibe
+  classifications describe cataloged components. They are never conflated in UI copy.
 
 ## Components (in-app, themeable demos)
 
@@ -117,33 +143,79 @@ npm run verify       # full release gate
 | TabSheet | `tabs` | navigation | beta |
 | TextInput | `text-input` | inputs | stable |
 
-All other entries are catalog data only: vendored implementations
-(`catalog/components/**` + `component.json` manifests, never rendered by the app
-bundle) or external references (official retrieval commands only).
+All other entries are catalog data: vendored implementations under
+`catalog/components/**` with manifests, or external references with official retrieval
+instructions. Vendored third-party code runs only through reviewed showcase wrappers,
+never as arbitrary code in the app shell.
 
-## Data sources & licensing
+## Data sources and licensing
 
 | Source | Access | License | Catalog treatment |
 |---|---|---|---|
-| shadcn/ui | official registry JSON + CLI | MIT | vendored (16 items) |
-| Magic UI | official shadcn-compatible registry | MIT | vendored (4 items) |
-| React Bits | official registry `reactbits.dev/r/{name}.json` | MIT + Commons Clause v1.0 | **reference-only** (7 entries) (no redistribution of the component source) |
-| Aceternity, Pryzm, 21st.dev, Originkit, Uiverse, HyperUI | see `taxonomy/sources.json` | mixed | researched; not yet ingested (checklist §6) |
+| shadcn/ui | official registry JSON | MIT | 16 vendored items; official doc-page previews |
+| Magic UI | official registry | MIT | 4 vendored items with live previews |
+| React Bits | official registry `reactbits.dev/r/{Name}-TS-CSS.json` | MIT + Commons Clause v1.0 | 61 vendored items with attribution; no resale/sub-licensing |
+| Uiverse | repo-curated | MIT, per-element attribution | reference/curation only |
+| HyperUI | repo-vendored | MIT | reference/curation only |
+| Aceternity UI | official docs | custom free license; source redistribution forbidden | reference-only; no vendoring |
+| 21st.dev | official registry | varies per component/creator | partial; verify per entry |
+| OriginKit | MCP | custom free tier | partial; credentials/MCP access not configured |
+| Pryzm | official docs | generator tool; exports belong to the user | reference-only |
+| CodePen | official embed/export | varies per author-owned pen | reference-only; saved example waiting on URL/author/license |
+| Ditther | effect generator | generator exports belong to the user | reference-only |
+| GetLayers | MCP | custom terms; source files/prompts/templates may not be redistributed | reference-only; credentials not configured |
 
-Research facts (verified 2026-10-24, with live URL evidence) live in
-`taxonomy/sources.json`; adapters: `npm run ingest-shadcn -- --write`,
-`npm run ingest-magicui -- --write` (dry-run default, idempotent).
+The checked-in truth, including blocked reasons and coverage dates, is
+`taxonomy/sources.json`. The app never turns a blocked or unverified source into a
+successful import.
 
-## Working features vs. future work
+### Ingestion commands
 
-- **Working now (all gated by `npm run verify`):** canonical catalog schema v2 +
-  validation (incl. external-ref rules and path existence), index generation,
-  lookup CLI (text/JSON/list/filters/exit-code contract), ingestion adapters,
-  55 zero-dependency tooling tests; React app: browser + gallery views over shared
-  filters, detail pane, theme engine (6 themes, persisted, auto), six themed
-  components with demos, live previews, copy-usage snippet, TabSheet arrow-key
-  navigation, deep links, multi-selection tray, master-prompt studio — plus 93 app
-  tests. Nothing here is faked; every ✅ above has recorded evidence.
-- **Future work (explicitly deferred, see checklist §6):** JSON Schema export,
-  multi-theme preview grid, further source ingestion (Uiverse/HyperUI etc.),
-  publishing pipeline.
+All adapters are zero-dependency Node scripts. Dry-run is the default; `--write`
+persists and remains idempotent. After any catalog write, run `npm run generate`.
+
+```bash
+npm run ingest-shadcn -- --write
+npm run ingest-magicui -- --write
+npm run ingest-reactbits -- --write
+npm run ingest-codepen -- --url=<verified-pen-url> --author=<name> --license=<id> --write
+npm run ingest-reference -- --source=getlayers --url=<official-url> --title="<title>" --write
+npm run classify -- --check          # classification/preview-profile drift check
+npm run capture:previews             # publish real audit snapshots
+```
+
+CodePen writes refuse until the author and verified license are supplied. The generic
+reference adapter records metadata only and never fetches or copies source files.
+
+## Preview audit
+
+`npm run audit:previews` self-starts Vite, drives installed Chrome/Edge headlessly over
+the DevTools protocol, and checks every workspace route plus every gallery card. It
+reports mount/runtime errors, failed requests, blank or collapsed stages, clipping,
+WebGL/context loss, pointer response and gallery state. Outputs:
+`audit/preview-audit.json`, `audit/PREVIEW_AUDIT.md` and per-entry screenshots under
+`audit/screenshots/`.
+
+Useful flags: `--only=<id,...>`, `--base-url=http://127.0.0.1:5173`,
+`--viewport=390x844`, `--reduced-motion` and `--help`. The audit is not part of
+`npm run verify` because it needs a real browser.
+
+## Working vs. future work
+
+Working now, with tests and the release gate: schema-v3 validation and index generation,
+lookup with v3 facets, deterministic assisted classification, real preview snapshots,
+shadcn/Magic UI/React Bits ingestion, CodePen/reference adapters, gallery discovery,
+collections, source coverage, compare, local annotations, prompt generation and the six
+themed in-app components.
+
+Explicitly deferred or blocked:
+
+- The saved CodePen Multi-Page View Transition example cannot be ingested until its
+  official URL, author and license are supplied.
+- OriginKit and GetLayers reference imports require credentials/MCP access that is not
+  configured.
+- Ditther and Pryzm are reference/effect sources, not React component registries.
+- JSON Schema export and a publishing pipeline remain future work.
+
+Nothing in this README is a placeholder claim: unimplemented or blocked work is named
+above and in `IMPLEMENTATION_CHECKLIST.md`.

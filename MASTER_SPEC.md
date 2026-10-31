@@ -1,6 +1,6 @@
 # MASTER_SPEC — Agent-First React Component Library
 
-> **Status:** Active primary specification, v1.0 — authored 2026-10-24.
+> **Status:** Active primary specification, v1.7 — authored 2026-10-24, updated 2026-10-29.
 > **Provenance:** The kickoff brief referenced a `MASTER_SPEC.md`, but the repository was
 > empty and no such file existed anywhere on this machine. Per user approval
 > ("Draft spec, then build"), this document was drafted from the kickoff brief and is
@@ -89,7 +89,7 @@ Rules: Windows-first paths with spaces are fine; npm is the only package manager
 no CSS framework; library components own a `<Comp>.css` file using **only**
 `--rl-*` variables for colors/radius/shadow/fonts (§6).
 
-## 5) Catalog schema (canonical, v1)
+## 5) Catalog schema (canonical, v3)
 
 Detailed reference with examples: `docs/SCHEMA.md`. Summary:
 
@@ -97,7 +97,7 @@ Detailed reference with examples: `docs/SCHEMA.md`. Summary:
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `schemaVersion` | `1` | yes | Integer; bump per §5.5. |
+| `schemaVersion` | `3` | yes | Integer; bump per §5.5. |
 | `meta.title`, `meta.description` | string | no | Free text. |
 | `entries` | Entry[] | yes | Must be **sorted by `id`** (lexicographic). |
 
@@ -122,6 +122,11 @@ Detailed reference with examples: `docs/SCHEMA.md`. Summary:
 | `links` | object | no* | `{ source?, demo?, docs? }` — repo-relative POSIX paths; **when present, each must exist on disk** (validator enforces). Sections marked *: links are optional from M1 and expected to be filled as files land (M3); `usedFrom` optional. |
 | `a11yNotes` | string | no | |
 | `usedFrom` | string[] | no | App entry points that import the component (§10.4). |
+| `types` | slug[] | yes (v3) | ≥ 1; ids from `taxonomy/types.json`. |
+| `triggers` | slug[] | yes (v3) | ≥ 1; ids from `taxonomy/triggers.json`. |
+| `techniques` | slug[] | yes (v3) | May be empty; ids from `taxonomy/techniques.json`. |
+| `tagMeta` | object | yes (v3) | `{ sourceProvided: string[], inferred: string[], reviewNeeded: boolean }`; values are `facet:id` provenance records. |
+| `previewProfile` | object | yes (v3) | Validated preview decision: mode, layout, cost, aspect ratio, dimensions, requirements, assets, autoplay permission, status and failure reason. See §5.4 v3 rules. |
 
 ### 5.3 Prop
 
@@ -176,13 +181,44 @@ Detailed reference with examples: `docs/SCHEMA.md`. Summary:
   `implementation`, `dependencies`, `license`, `aesthetics`, `attributes`, `syncedAt`,
   `behaviors`. External entries must not declare `localDir`/`manifest`/`implementation`
   — the validator errors when a non-redistributable source is given fabricated local paths.
+- **v3 (M9, discovery)** - three discovery taxonomies plus required provenance and
+  preview fields (see `docs/SCHEMA.md` for full rules):
+  - `taxonomy/types.json` — 23 component types (`button`, `card`, `background`,
+    `transition`, ...). Structural `category` stays for navigation; `types` is the
+    discovery facet.
+  - `taxonomy/triggers.json` — 14 animation triggers (`hover`, `click`, `scroll`,
+    `route-transition`, ...).
+  - `taxonomy/techniques.json` — 46 techniques (`fade`, `shader`, `particles`, ...).
+  - Entry fields `types` (non-empty), `triggers` (non-empty), `techniques` (may be
+    empty), `tagMeta` and `previewProfile` are **required** in schema v3.
+  - `tagMeta` records `sourceProvided` versus `inferred` facets with evidence and a
+    `reviewNeeded` flag. The deterministic classifier is idempotent; it never claims
+    behavior without evidence and never invents screenshots.
+  - `previewProfile` publishes the honest preview decision. `mode` is
+    `live | snapshot | loop | external | unavailable`; `layout` is
+    `compact | standard | wide | showcase`; `cost` is `low | medium | high`;
+    `previewStatus` is `ready | external | unavailable | error`. The profile also
+    carries `aspectRatio`, `minWidth`, `minHeight`, `gridColumnSpan`,
+    `gridRowSpan`, `expandedRecommended`, `requires`, `autoplayAllowed`,
+    `snapshotPath`, `loopPath` and an honest `failureReason`. External mode/status must
+    agree; unavailable mode/status requires a reason; snapshot/loop modes require their
+    real asset paths. Paths are repo-relative POSIX and existence-checked.
+  - Cards run live only for low/medium-cost autoplay previews that are visible and not
+    globally paused or reduced-motion. Heavy, static, off-screen and paused cards use
+    published real snapshots. External records render an explicit external state.
+  - `taxonomy/sources.json` coverage records may carry `discovered`, `usable`,
+    `locked`, `reviewNeeded`, `blocked` and `checkedAt`; imported and preview-ready
+    counts are derived from entries, never hard-coded. `discovered` means "tracked by
+    this project", not "the upstream library is fully enumerated".
 
 ### 5.5 Schema evolution
 
-Additive changes: bump `schemaVersion` minor-wise (e.g. `1` stays; changelog in
-`docs/SCHEMA.md`). Breaking changes: new major version + migration notes. The validator
-knows exactly the current version and rejects unknown fields? — **only warns** for
-unknown fields (forward-compat), **errors** on missing/invalid known fields.
+Additive changes: bump `schemaVersion` minor-wise and record them in the
+`docs/SCHEMA.md` changelog. Breaking changes require a new major version plus migration
+notes. Schema v3 made `types`, `triggers`, `techniques`, `tagMeta` and
+`previewProfile` required; the catalog was migrated in place and the classifier keeps
+those fields current. The validator knows exactly the current version, **warns** for
+unknown fields (forward-compat), and **errors** on missing/invalid known fields.
 
 ## 6) Theme taxonomy (initial, v1)
 
@@ -211,49 +247,85 @@ fallbacks (no webfont/network dependency).
 
 Shared library `scripts/lib/catalog.mjs` exposes (all pure unless noted):
 
-- `loadCatalog(root)` → `{ catalog, themes, categories, paths }` (fs).
-- `validateTaxonomy(themesDoc, categoriesDoc)` → `{ errors, warnings }`.
+- `loadCatalog(root)` → `{ catalog, themes, categories, aesthetics, attributes,
+  behaviors, sources, types, triggers, techniques, paths }` (fs).
+- `validateTaxonomy(themesDoc, categoriesDoc, { aesthetics, attributes, sources,
+  behaviors, types, triggers, techniques })` → `{ errors, warnings }`.
 - `validateCatalog(catalog, taxonomies, { root, checkLinks })` → `{ errors, warnings }`
-  — enforces §5 fully; link checks require `checkLinks` (auto-on when paths present
-  under `root` unless the CLI passes `--skip-links`).
-- `searchEntries(entries, query, { theme?, category? })` → ranked matches
-  (exact `id` > exact `alias` > substring across id/name/summary/tags/aliases;
-  case-insensitive; empty query = all, sorted by id).
-- `buildIndex(catalog, themes, categories, generatedAt)` → index object.
+  — enforces §5 fully; link checks require `checkLinks`.
+- `searchEntries(entries, query, { theme?, category?, aesthetic?/vibe?, source?,
+  attribute?/tech?, trigger?, behavior?, entryType?, type?, technique?, previewMode?,
+  availability? })` → ranked matches. `trigger` and `behavior` are independent
+  dimensions. Exact `id` > exact `alias` > prefix >
+  whole-token > substring > token-level typo. Filters are **AND across dimensions and
+  OR within one dimension**; empty query returns all entries sorted by id.
+- `buildIndex(catalog, themes, categories, generatedAt, ...)` → index object with
+  derived counts, taxonomy listings, source coverage and preview status counts.
 - `writeIndex(root, index)` → writes `catalog/index.json` pretty 2-space + `\n` (fs).
-- `formatEntryText(entry)` → human text block used by the lookup CLI.
+- `formatEntryText(entry)` → human text block used by the lookup CLI, including v3
+  types/triggers/techniques and preview-profile facts.
 
 ### 8.1 Commands
 
 | Command | Contract |
 |---|---|
-| `npm run validate` | Exits `0` clean, `1` with a sorted error report. Flags: `--check-index` (fail when `catalog/index.json` ≠ freshly derived), `--skip-links`. |
+| `npm run validate` | Exits `0` clean, `1` with a sorted error report. Flags: `--check-index` (fail when `catalog/index.json` ≠ freshly derived). Link checks run everywhere; the pre-M3 `--skip-links` flag is gone. |
 | `npm run generate` | Validates first (aborts on errors), rewrites `catalog/index.json`, prints counts + timestamp. |
 | `npm run lookup` | See §8.2. |
-| `npm test` | `node --test tests/` — zero-dep suites: catalog lib, validator rules, search, index build, CLI integration, CSS theming scan (M2+). |
+| `npm test` | `node --test "tests/*.test.mjs"` — zero-dep suites: catalog lib, validator rules, search, index build, ingest adapters, CLI integration, CSS theming scan. |
+| `npm run ingest-shadcn` / `ingest-magicui` / `ingest-reactbits` | Official-registry adapters; dry-run default, `--write` vendors/updates idempotently. |
+| `npm run ingest-codepen` | Author-owned CodePen references only. Requires official URL + author + verified license for `--write`; records the official embed URL and never scrapes. |
+| `npm run ingest-reference` | Metadata-only adapter for external reference sources; records official URL/terms and never copies source. |
+| `npm run classify` | Deterministic assisted classification + preview profiles; `--check` reports drift without writing. |
+| `npm run capture:previews` | Publishes real audit snapshots into `public/previews/`; never invents images. |
+| `npm run test:app` / `typecheck` / `build` | App test/build chain. |
+| `npm run verify` | Full release gate: validate --check-index → generate → node tests → app tests → typecheck → build. |
+| `npm run audit:previews` | Optional real-browser audit of every workspace route and gallery card. |
 
 ### 8.2 Lookup CLI output contract
 
-`npm run lookup -- <query> [--theme <id>] [--category <id>] [--json] [--list]`
+`npm run lookup -- <query> [--theme <id>] [--category <id>] [--type <component-type-id>]
+[--entry-type <local|external>] [--trigger <id>] [--technique <id>] [--vibe <id>]
+[--tech <id>] [--source <id>] [--behavior <id>] [--preview-mode <id>] [--json] [--list]`
 
+- Filters are AND across dimensions and OR within a repeated option (for example
+  `--type button --type input`). `--aesthetic` and `--attribute` are aliases for
+  `--vibe` and `--tech`; `--type local|external` remains accepted as a legacy
+  entry-type alias.
 - **Text mode** prints one block: name, status, category, summary, themes, aliases,
-  tags, version/addedDate, links (or `—` when absent), props.
-- **`--json`** prints a single JSON object (the entry or `{ query, matches: [...] }`
+  tags, version/addedDate, links (or `—` when absent), props, plus v2 provenance and v3
+  classification/preview facts.
+- **`--json`** prints a single JSON object (the entry or `{ query, count, matches }`
   when ambiguous). Nothing else on stdout.
-- **`--list`** prints `id — name — [category] — [status]` lines.
-- Exit codes: `0` found · `1` no match · `2` unknown `--theme`/`--category` · `64` usage error.
-- Matching rank: exact id > exact alias > ranked substring; ambiguous multiple matches
-  list candidates (top 10) with a refine hint.
+- **`--list`** prints `id — name — category — status — entry type` lines.
+- Exit codes: `0` found · `1` no match · `2` unknown filter id · `64` usage error.
+- Matching rank: exact id > exact alias > ranked fuzzy signals; ambiguous multiple
+  matches list candidates (top 10) with a refine hint.
 
 ### 8.3 Index contract (`catalog/index.json`)
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 3,
   "generatedAt": "ISO timestamp",
   "generator": "scripts/generate-index.mjs",
-  "counts": { "entries": 0, "themes": 0, "categories": 0 },
-  "taxonomies": { "themes": ["…"], "categories": ["…"] },
+  "counts": {
+    "entries": 0,
+    "themes": 0,
+    "categories": 0,
+    "aesthetics": 0,
+    "attributes": 0,
+    "behaviors": 0,
+    "types": 0,
+    "triggers": 0,
+    "techniques": 0,
+    "sources": 0,
+    "byEntryType": {},
+    "bySource": {},
+    "previewStatuses": { "ready": 0, "external": 0, "unavailable": 0, "error": 0 }
+  },
+  "taxonomies": { "themes": ["…"], "types": ["…"], "triggers": ["…"] },
+  "sourceCoverage": [ /* checked-in coverage records */ ],
   "entries": [ /* entry records, sorted by id, links included when present */ ]
 }
 ```
@@ -479,6 +551,54 @@ or dependency changes:
   wrap (`data-scroll="true"`, full viewport only) so viewport entrances trigger inside
   the canvas; Replay resets the inner scroll position.
 
+**Preview legibility refinement (2026-10-30).** Cards stay compact. After a 350ms
+hover on a hover-capable pointer, an interactive 700×470 panel opens beside the
+card (above/below when neither side fits) and runs the entry at native scale instead
+of the card's 0.72 shrink. Low/medium-cost local entries may run even when gallery
+autoplay is off; pause, reduced-motion, visibility, high-cost and heavy gates still
+apply. Heavy entries show their real snapshot, and external/unavailable entries get
+no panel. The panel is interactive and stays open while the pointer is inside it or
+the card; it dismisses on Escape, outside click, page scroll, leaving both surfaces,
+or its close button. A per-card enlarged-preview control (aria-expanded/aria-controls)
+opens the same panel for keyboard and touch users without replacing Expand: the panel
+is pinned, receives focus, ignores pointer-leave, and returns focus to the control when
+dismissed. The control is hidden below 900×600, where Expand remains the route. Expand
+remains the full-workspace route for scroll/fullscreen and control-heavy cases.
+
+### M9 — Visual discovery workspace (2026-10-29)
+
+User brief: make the library a personal, agent-first visual discovery tool rather than
+a component list. M9 keeps `catalog/catalog.json` canonical and extends the schema,
+tooling, app and docs together.
+
+1. **Schema v3 discovery facets** — required `types`, `triggers`, `techniques`,
+   `tagMeta` and `previewProfile`; new `taxonomy/types.json`, `triggers.json` and
+   `techniques.json`; deterministic assisted classification with evidence/provenance
+   and `reviewNeeded`; source coverage records for discovered/imported/preview-ready/
+   usable/locked/blocked/review-needed counts. No parallel catalog.
+2. **Honest preview profiles** — compact/standard/wide/showcase layouts, real aspect
+   ratios and dimensions, cost/autoplay permission, runtime requirements, real
+   snapshot/loop paths, preview status and failure reasons. Cards run only safe live
+   previews; heavy/off-screen/paused/reduced-motion cards use published real snapshots;
+   expansion lazily loads the workspace. External and unavailable states are explicit.
+   The capture script publishes real audit screenshots; no thumbnail is invented.
+3. **Discovery shell** — Browse/Collections/Sources/Selected/Table views; collapsible
+   desktop facets and mobile drawer; `/` search focus; AND-across/OR-within facet
+   search; bulk selection, compare, favorites, recents, named collections, saved
+   filters, local tags/notes and shareable hash/query state. Inspector overlays preserve
+   the current view, filters and scroll.
+4. **Source coverage and reference adapters** — shadcn/Magic UI/React Bits official
+   ingestion remains idempotent; `ingest-codepen` records author-owned pens only after
+   URL/author/license verification and never scrapes; `ingest-reference` records
+   metadata only for restricted sources. CodePen, OriginKit, GetLayers, Ditther and
+   Pryzm remain blocked/reference until their required access or metadata exists.
+5. **Prompt studio** — selected components, dependencies, local paths vs official
+   retrieval, licenses, constraints, preview notes and local annotations; no invented
+   behavior or source claims.
+6. **Release** — schema/validator/index/lookup/ingestion/tooling tests, app tests for
+   routing/persistence/coverage/preview decisions, responsive QA, real-browser audit
+   and full `npm run verify`.
+
 ## 11) Verification gates
 
 ```text
@@ -564,9 +684,18 @@ masquerades as working. When done, status flips to *working* with the evidence
   Bits variants plus the 16 shadcn and 4 Magic UI vendored items render live
   through reviewed wrappers; webgl entries auto-`heavy`; zero preview redirects
   remain in the catalog.
-- **v1.6 — 2026-10-25:** M7 visual overhaul milestone added (§16): gallery-first
+- **v1.6 — 2026-10-25:** M7 visual overhaul milestone added (§10): gallery-first
   default landing, preview-first gallery cards, redesigned preview workspace with
   fullscreen and rail-hosted controls, prompt studio polish (editable copy,
   wrapping pane, optional target-project line via `PromptOptions.targetProject`),
   shell art direction with the six appearance themes preserved, and a
   lazy-preview error boundary. No dependency-policy change.
+- **v1.7 — 2026-10-29:** M9 visual discovery workspace added; schema v3 required
+  `types`, `triggers`, `techniques`, `tagMeta` and `previewProfile`; new type/trigger/
+  technique taxonomies and source coverage records; deterministic assisted
+  classification; real snapshot publication and honest preview gating; Browse/
+  Collections/Sources/Selected/Table discovery views, AND/OR facets, shareable state,
+  favorites, collections, recents, saved filters, compare and local annotations;
+  lookup CLI v3 facet filters with repeated-option OR and independent trigger/
+  behavior dimensions; CodePen/reference ingestion adapters with verified-metadata
+  refusal rules. No dependency-policy change.

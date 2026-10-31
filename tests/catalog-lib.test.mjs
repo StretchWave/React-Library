@@ -1,7 +1,8 @@
 // Unit tests for scripts/lib/catalog.mjs (node:test, zero dependencies).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import {
@@ -24,9 +25,12 @@ const taxonomies = {
   attributes: seed.attributes,
   behaviors: seed.behaviors,
   sources: seed.sources,
+  types: seed.types,
+  triggers: seed.triggers,
+  techniques: seed.techniques,
 };
 
-/** Full-valid entry template for targeted rule-testing. */
+/** Full-valid schema-v3 entry template for targeted rule-testing. */
 function mkEntry(overrides = {}) {
   return {
     id: "sample",
@@ -41,6 +45,24 @@ function mkEntry(overrides = {}) {
     addedDate: "2026-10-24",
     externalDependencies: [],
     props: [],
+    types: ["display"],
+    triggers: ["static"],
+    techniques: [],
+    tagMeta: { sourceProvided: [], inferred: [], reviewNeeded: false },
+    previewProfile: {
+      mode: "live",
+      layout: "compact",
+      cost: "low",
+      aspectRatio: "4 / 3",
+      minWidth: 180,
+      minHeight: 160,
+      gridColumnSpan: 1,
+      gridRowSpan: 1,
+      expandedRecommended: false,
+      autoplayAllowed: false,
+      requires: [],
+      previewStatus: "ready",
+    },
     ...overrides,
   };
 }
@@ -60,7 +82,7 @@ function mkExternal(overrides = {}) {
 }
 
 function validate(entries, opts = {}) {
-  return validateCatalog({ schemaVersion: 2, entries }, taxonomies, opts);
+  return validateCatalog({ schemaVersion: 3, entries }, taxonomies, opts);
 }
 
 test("seed catalog and taxonomies validate cleanly", () => {
@@ -133,6 +155,7 @@ test("entry behaviors validate against the behavior taxonomy (M7.1 hole fixed)",
 
 test("multiple behavior classifications are legal and filter independently", () => {
   assert.deepEqual(searchEntries(seedEntries, "", { behavior: "scroll" }).length, 5);
+  // Behavior filtering is exact; trigger-only entries do not inflate the count.
   const cursor = searchEntries(seedEntries, "", { behavior: "cursor-reactive" });
   assert.equal(cursor.length, 13);
   // Multi-classification works both ways (cursor-reactive entries also appear
@@ -173,7 +196,7 @@ test("an alias may not collide with any entry id", () => {
 test("schema, status, version and date rules", () => {
   const { catalog: bad } = { catalog: { schemaVersion: 1, entries: [mkEntry({ status: "wip", version: "1.0", addedDate: "10-24-2026" })] } };
   const { errors } = validateCatalog(bad, taxonomies, { checkLinks: false });
-  assert.ok(errors.some((message) => message.includes("'schemaVersion' must be 2")));
+  assert.ok(errors.some((message) => message.includes("'schemaVersion' must be 3")));
   assert.ok(errors.some((message) => message.includes("'status' must be one of")));
   assert.ok(errors.some((message) => message.includes("'version' must be valid semver")));
   assert.ok(errors.some((message) => message.includes("'addedDate' must be YYYY-MM-DD")));
@@ -211,7 +234,7 @@ test("link existence: present files pass, missing files error (fs)", () => {
     mkdirSync(path.join(tmp, "src"), { recursive: true });
     writeFileSync(path.join(tmp, "src", "exists.tsx"), "export default () => null;\n");
     const catalog = {
-      schemaVersion: 2,
+      schemaVersion: 3,
       entries: [mkEntry({ links: { source: "src/exists.tsx", demo: "src/missing.tsx" } })],
     };
     const { errors } = validateCatalog(catalog, taxonomies, { root: tmp, checkLinks: true });
@@ -274,21 +297,35 @@ test("search: v2 filters (aesthetic, source, attribute, entryType)", () => {
 });
 
 test("index: deterministic shape and counts", () => {
-  const extras = { aesthetics: seed.aesthetics, attributes: seed.attributes, sources: seed.sources };
+  const extras = {
+    aesthetics: seed.aesthetics,
+    attributes: seed.attributes,
+    behaviors: seed.behaviors,
+    sources: seed.sources,
+    types: seed.types,
+    triggers: seed.triggers,
+    techniques: seed.techniques,
+  };
   const a = buildIndex(seed.catalog, seed.themes, seed.categories, extras, "2026-10-24T00:00:00.000Z");
   const b = buildIndex(seed.catalog, seed.themes, seed.categories, extras, "2027-01-01T00:00:00.000Z");
   delete a.generatedAt;
   delete b.generatedAt;
   assert.deepEqual(a, b);
-  assert.equal(a.schemaVersion, 2);
+  assert.equal(a.schemaVersion, 3);
   assert.deepEqual(a.counts, {
     entries: 87,
     themes: 6,
-    categories: 24,
-    aesthetics: 12,
-    sources: 9,
+    categories: 28,
+    aesthetics: 22,
+    attributes: 29,
+    behaviors: 12,
+    types: 23,
+    triggers: 14,
+    techniques: 46,
+    sources: 12,
     byEntryType: { local: 87, external: 0 },
     bySource: { shadcn: 16, "magic-ui": 4, "react-bits": 61 },
+    previewStatuses: { ready: 71, external: 16, unavailable: 0, error: 0 },
   });
   assert.equal(a.generator, "scripts/generate-index.mjs");
   assert.equal(a.entries.length, 87);
@@ -302,7 +339,8 @@ test("index: deterministic shape and counts", () => {
         entry.id === "react-bits-split-text" &&
         entry.entryType === "local" &&
         entry.runtime === "gsap" &&
-        entry.preview.type === "local-demo",
+        entry.preview.type === "local-demo" &&
+        entry.previewProfile.snapshotPath === "public/previews/react-bits-split-text.jpg",
     ),
   );
   assert.ok(
@@ -318,8 +356,12 @@ test("index: deterministic shape and counts", () => {
   assert.deepEqual(a.taxonomies.aesthetics, [
     "professional", "casual", "minimal", "luxury", "cyberpunk", "retro-synthwave",
     "brutalist", "organic", "futuristic", "gaming", "editorial", "playful",
+    "tron", "vaporwave", "retro-terminal", "retrofuturism", "y2k", "holographic",
+    "glassmorphism", "fantasy", "horror", "pixel-art",
   ]);
   assert.ok(a.taxonomies.sources.some((source) => source.id === "shadcn" && source.status === "available"));
+  assert.equal(a.sourceCoverage["react-bits"].imported, 61);
+  assert.equal(a.sourceCoverage["react-bits"].previewReady, 61);
 });
 
 test("index: counts external entries and per-source tally", () => {
@@ -454,7 +496,7 @@ test("formatEntryText surfaces v2 provenance for external entries", () => {
     aesthetics: ["cyberpunk"],
     attributes: ["dark", "animated"],
   }));
-  assert.ok(text.includes("Type: external"));
+  assert.ok(text.includes("Availability: external"));
   assert.ok(text.includes("Library source: shadcn (https://ui.shadcn.com"));
   assert.ok(text.includes("License:"));
   assert.ok(text.includes("External ID: example"));
@@ -462,4 +504,178 @@ test("formatEntryText surfaces v2 provenance for external entries", () => {
   assert.ok(text.includes("Preview: external https://example.com/demo"));
   assert.ok(text.includes("Aesthetics: cyberpunk"));
   assert.ok(text.includes("Attributes: dark, animated"));
+});
+
+// --- Schema v3: discovery facets, provenance and preview profiles ----------
+
+function withPreview(overrides = {}) {
+  const base = mkEntry().previewProfile;
+  return mkEntry({ previewProfile: { ...base, ...overrides } });
+}
+
+test("schema v3 requires types, triggers, tagMeta and previewProfile", () => {
+  const missing = mkEntry();
+  delete missing.types;
+  delete missing.triggers;
+  delete missing.tagMeta;
+  delete missing.previewProfile;
+  const { errors } = validate([missing]);
+  assert.ok(errors.some((message) => message.includes("'types' must be an array")));
+  assert.ok(errors.some((message) => message.includes("'triggers' must be an array")));
+  assert.ok(errors.some((message) => message.includes("'tagMeta' is required")));
+  assert.ok(errors.some((message) => message.includes("'previewProfile' is required")));
+});
+
+test("v3 facet arrays reject unknown ids, duplicates and empty required dimensions", () => {
+  const { errors } = validate([
+    mkEntry({
+      types: ["display", "not-a-type", "display"],
+      triggers: [],
+      techniques: ["not-a-technique", "fade"],
+    }),
+  ]);
+  assert.ok(errors.some((message) => message.includes('types "not-a-type" is not in the taxonomy')));
+  assert.ok(errors.some((message) => message.includes('duplicate types id "display"')));
+  assert.ok(errors.some((message) => message.includes("'triggers' must not be empty")));
+  assert.ok(errors.some((message) => message.includes('techniques "not-a-technique" is not in the taxonomy')));
+});
+
+test("tagMeta provenance must reference facets the entry actually declares", () => {
+  const bad = validate([
+    mkEntry({
+      aesthetics: ["minimal"],
+      tagMeta: {
+        sourceProvided: ["type:display", "trigger:static"],
+        inferred: ["vibe:minimal", "vibe:professional", "tech:dark"],
+        reviewNeeded: false,
+      },
+    }),
+  ]);
+  assert.ok(bad.errors.some((message) => message.includes('references vibe "professional"')));
+  assert.ok(bad.errors.some((message) => message.includes('references tech "dark"')));
+  const badShape = validate([
+    mkEntry({ tagMeta: { sourceProvided: ["Display"], inferred: [], reviewNeeded: "no" } }),
+  ]);
+  assert.ok(badShape.errors.some((message) => message.includes('must look like "facet:id"')));
+  assert.ok(badShape.errors.some((message) => message.includes("'reviewNeeded' must be boolean")));
+});
+
+test("previewProfile validates enums, dimensions, requirements and paths", () => {
+  const bad = validate([
+    withPreview({
+      mode: "hologram",
+      layout: "giant",
+      cost: "free",
+      previewStatus: "broken",
+      aspectRatio: "wide",
+      minWidth: 0,
+      minHeight: -1,
+      gridColumnSpan: 4,
+      gridRowSpan: 3,
+      expandedRecommended: "yes",
+      autoplayAllowed: "no",
+      requires: ["webgl", "magic"],
+      snapshotPath: "C:\\previews\\button.jpg",
+      failureReason: "",
+    }),
+  ]);
+  for (const expected of [
+    "'mode' must be one of",
+    "'layout' must be one of",
+    "'cost' must be one of",
+    "'previewStatus' must be one of",
+    "'aspectRatio' must look like",
+    "'minWidth' must be a positive integer",
+    "'minHeight' must be a positive integer",
+    "'gridColumnSpan' must be <= 3",
+    "'gridRowSpan' must be <= 2",
+    "'expandedRecommended' must be boolean",
+    "'autoplayAllowed' must be boolean",
+    'requirement "magic" is unknown',
+    "repo-relative with POSIX separators",
+    "'failureReason' must be a non-empty string",
+  ]) {
+    assert.ok(bad.errors.some((message) => message.includes(expected)), expected);
+  }
+});
+
+test("previewProfile couples mode, status, assets and failure reasons", () => {
+  const snapshot = validate([withPreview({ mode: "snapshot", previewStatus: "ready", snapshotPath: undefined })]);
+  assert.ok(snapshot.errors.some((message) => message.includes("snapshot preview mode requires 'snapshotPath'")));
+  const loop = validate([withPreview({ mode: "loop", previewStatus: "ready", loopPath: undefined })]);
+  assert.ok(loop.errors.some((message) => message.includes("loop preview mode requires 'loopPath'")));
+  const external = validate([withPreview({ mode: "external", previewStatus: "ready" })]);
+  assert.ok(external.errors.some((message) => message.includes('mode "external" requires previewStatus "external"')));
+  const unavailable = validate([withPreview({ mode: "unavailable", previewStatus: "unavailable" })]);
+  assert.ok(unavailable.errors.some((message) => message.includes("unavailable previews require a useful 'failureReason'")));
+});
+
+test("previewProfile duplicate requirements are warnings and missing assets fail link checks (fs)", () => {
+  const duplicate = validate([withPreview({ requires: ["webgl", "webgl"] })]);
+  assert.deepEqual(duplicate.errors, []);
+  assert.ok(duplicate.warnings.some((message) => message.includes('duplicate preview requirement "webgl"')));
+
+  const tmp = mkdtempSync(path.join(tmpdir(), "rl-preview-profile-"));
+  try {
+    mkdirSync(path.join(tmp, "public", "previews"), { recursive: true });
+    writeFileSync(path.join(tmp, "public", "previews", "sample.jpg"), "not-a-real-jpeg\n");
+    const present = validate([withPreview({ snapshotPath: "public/previews/sample.jpg" })], {
+      root: tmp,
+      checkLinks: true,
+    });
+    assert.deepEqual(present.errors, []);
+    const missing = validate([withPreview({ snapshotPath: "public/previews/missing.jpg" })], {
+      root: tmp,
+      checkLinks: true,
+    });
+    assert.ok(missing.errors.some((message) => message.includes("points to a missing file")));
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test("assisted classification and preview profiles are current and idempotent", () => {
+  const catalogFile = path.join(ROOT, "catalog", "catalog.json");
+  const before = readFileSync(catalogFile, "utf8");
+  const run = spawnSync(process.execPath, ["scripts/classify-catalog.mjs", "--check"], {
+    cwd: ROOT,
+    encoding: "utf8",
+  });
+  assert.equal(run.status, 0, `${run.stdout}\n${run.stderr}`);
+  assert.match(run.stdout, /classification|preview/i);
+  assert.equal(readFileSync(catalogFile, "utf8"), before, "--check must not write the catalog");
+});
+
+test("search facets: OR within a dimension and AND across dimensions", () => {
+  const types = searchEntries(seedEntries, "", { type: ["button", "input"] });
+  assert.ok(types.some((entry) => entry.types.includes("button")));
+  assert.ok(types.some((entry) => entry.types.includes("input")));
+
+  const triggers = searchEntries(seedEntries, "", { trigger: ["click", "hover"] });
+  const clickOnly = searchEntries(seedEntries, "", { trigger: "click" });
+  const hoverOnly = searchEntries(seedEntries, "", { trigger: "hover" });
+  assert.ok(triggers.length > clickOnly.length);
+  assert.ok(triggers.length > hoverOnly.length);
+
+  const narrowed = searchEntries(seedEntries, "", { type: ["button", "input"], trigger: "click" });
+  assert.ok(narrowed.length < types.length);
+  for (const entry of narrowed) {
+    assert.ok(entry.types.some((type) => type === "button" || type === "input"), entry.id);
+    assert.ok(entry.triggers.includes("click"), entry.id);
+  }
+
+  // Trigger and behavior are independent dimensions. A trigger filter must
+  // not leak entries that only carry the same value as a behavior (or vice versa).
+  const separated = [
+    mkEntry({ id: "trigger-click", triggers: ["click"], behaviors: ["hover"] }),
+    mkEntry({ id: "behavior-click", triggers: ["hover"], behaviors: ["click"] }),
+  ];
+  assert.deepEqual(
+    searchEntries(separated, "", { trigger: "click" }).map((entry) => entry.id),
+    ["trigger-click"],
+  );
+  assert.deepEqual(
+    searchEntries(separated, "", { behavior: "click" }).map((entry) => entry.id),
+    ["behavior-click"],
+  );
 });

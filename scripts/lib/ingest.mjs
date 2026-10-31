@@ -662,5 +662,409 @@ export function replaceEntry(catalog, entry) {
   if (existing < 0) return mergeEntry(catalog, entry);
   entries[existing] = entry;
   entries.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
-  return { catalog: { ...catalog, entries }, merged: true, reason: `entry "${entry.id}" replaced (react-bits vendored)` };
+  return { catalog: { ...catalog, entries }, merged: true, reason: `entry "${entry.id}" replaced (same source id)` };
+}
+
+// --- Reference-only source adapters (M7.6) ----------------------------------
+// CodePen, Aceternity, 21st.dev, OriginKit, Pryzm, Ditther, GetLayers and the
+// manual Uiverse/HyperUI sources stay external references. Nothing here fetches
+// or copies source: the official URL, terms and attribution are recorded, and
+// the app links out. This is the honest path for author-owned or restricted
+// material.
+const REFERENCE_THEMES = [
+  "brutalist-print",
+  "classic-clean",
+  "midnight-glass",
+  "neon-cyberpunk",
+  "retro-terminal",
+  "soft-pastel",
+];
+
+const DEDICATED_SOURCE_IDS = new Set(["shadcn", "magic-ui", "react-bits"]);
+
+const CATEGORY_TYPE = {
+  buttons: "button",
+  inputs: "input",
+  layout: "layout",
+  display: "display",
+  feedback: "feedback",
+  navigation: "navigation",
+  tabs: "tabs",
+  tooltips: "tooltip",
+  modals: "modal",
+  "hero-sections": "section",
+  "pricing-sections": "section",
+  footers: "section",
+  backgrounds: "background",
+  gradients: "gradient",
+  "text-effects": "text-effect",
+  loaders: "loader",
+  cursors: "cursor",
+  charts: "chart",
+  "3d-webgl": "scene",
+  "scroll-animations": "motion",
+  "page-sections": "section",
+  "page-layouts": "template",
+  templates: "template",
+  transitions: "transition",
+  "visual-effect-recipes": "visual-effect-recipe",
+  scenes: "scene",
+  motion: "motion",
+  "micro-interactions": "micro-interaction",
+};
+
+const TYPE_CATEGORY = {
+  button: "buttons",
+  input: "inputs",
+  card: "display",
+  navigation: "navigation",
+  "text-effect": "text-effects",
+  loader: "loaders",
+  background: "backgrounds",
+  gradient: "gradients",
+  section: "hero-sections",
+  template: "templates",
+  transition: "transitions",
+  scene: "3d-webgl",
+  "visual-effect-recipe": "visual-effect-recipes",
+  modal: "modals",
+  tooltip: "tooltips",
+  tabs: "tabs",
+  chart: "charts",
+  cursor: "cursors",
+  layout: "layout",
+  feedback: "feedback",
+  motion: "scroll-animations",
+  "micro-interaction": "micro-interactions",
+  display: "display",
+};
+
+const TRIGGER_BEHAVIOR = {
+  "automatic-loop": "auto",
+  mount: "auto",
+  hover: "hover",
+  click: "click",
+  "cursor-reactive": "cursor-reactive",
+  drag: "draggable",
+  scroll: "scroll",
+  "viewport-entry": "scroll",
+  gesture: "gesture",
+  physics: "auto",
+  keyboard: "stateful",
+  "route-transition": "click",
+  "state-change": "stateful",
+  static: "static",
+};
+
+const TECHNIQUE_TERMS = [
+  ["fade", "fade"],
+  ["slide", "slide"],
+  ["blur", "blur"],
+  ["glitch", "glitch"],
+  ["scroll", "scroll"],
+  ["rotate", "rotation"],
+  ["grain", "noise"],
+  ["noise", "noise"],
+  ["particle", "particles"],
+  ["gradient", "gradient-shift"],
+  ["glow", "glow"],
+  ["shimmer", "shimmer"],
+  ["stagger", "stagger"],
+  ["mask", "reveal-mask"],
+  ["elastic", "elastic"],
+  ["morph", "morphing"],
+  ["transition", "reveal-mask"],
+  ["dither", "dithering"],
+  ["pixel", "pixelation"],
+  ["wave", "wave"],
+  ["orbit", "orbit"],
+  ["depth", "depth"],
+  ["flip", "flip"],
+  ["marquee", "marquee"],
+  ["3d", "depth"],
+  ["glass", "glass"],
+  ["metal", "metallic"],
+  ["shader", "shader"],
+];
+
+/** Normalizes an arbitrary title into a stable kebab id segment. */
+export function slugifyTitle(value) {
+  return String(value ?? "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
+/** Parses only official CodePen pen URLs and returns the official embed URL. */
+export function parseCodePenUrl(input) {
+  let parsed;
+  try {
+    parsed = new URL(String(input));
+  } catch {
+    throw new Error("CodePen URL must be an absolute https://codepen.io/<user>/pen/<slug> URL");
+  }
+  const host = parsed.hostname.toLowerCase().replace(/^www\./, "");
+  if (parsed.protocol !== "https:" || host !== "codepen.io") {
+    throw new Error("CodePen URL must use the official codepen.io host over https");
+  }
+  const parts = parsed.pathname.split("/").filter(Boolean);
+  const penIndex = parts.indexOf("pen");
+  const user = parts[0];
+  const slug = penIndex >= 1 ? parts[penIndex + 1] : "";
+  if (!user || !slug) {
+    throw new Error("CodePen URL must look like https://codepen.io/<user>/pen/<slug>");
+  }
+  return {
+    url: `https://codepen.io/${encodeURIComponent(user)}/pen/${encodeURIComponent(slug)}`,
+    user,
+    slug,
+    embedUrl: `https://codepen.io/${encodeURIComponent(user)}/embed/${encodeURIComponent(slug)}?default-tab=result`,
+  };
+}
+
+function uniqueList(values) {
+  return [...new Set((values ?? []).filter((value) => typeof value === "string" && value.trim() !== ""))];
+}
+
+function inferReferenceFacets({ title, summary = "", categoryHint = "", types = [], triggers = [], techniques = [] }) {
+  const text = `${title} ${summary}`.toLowerCase();
+  const inferredTypes = [...types];
+  if (inferredTypes.length === 0) {
+    if (/transition|page change|route/.test(text)) inferredTypes.push("transition");
+    if (/background|particle|aurora|gradient field/.test(text)) inferredTypes.push("background");
+    if (/text|type|letter|word|font/.test(text)) inferredTypes.push("text-effect");
+    if (/loader|spinner|skeleton|progress/.test(text)) inferredTypes.push("loader");
+    if (/cursor/.test(text)) inferredTypes.push("cursor");
+    if (/gallery|3d|scene|sphere/.test(text)) inferredTypes.push("scene");
+    if (/card/.test(text)) inferredTypes.push("card");
+    if (/button/.test(text)) inferredTypes.push("button");
+    if (/input|field|slider|switch/.test(text)) inferredTypes.push("input");
+    if (/nav|menu|dock|breadcrumb/.test(text)) inferredTypes.push("navigation");
+    if (/modal|dialog/.test(text)) inferredTypes.push("modal");
+    if (/tooltip/.test(text)) inferredTypes.push("tooltip");
+    if (/chart|graph/.test(text)) inferredTypes.push("chart");
+    if (/section|hero|pricing|footer/.test(text)) inferredTypes.push("section");
+    if (/template|layout/.test(text)) inferredTypes.push("template");
+    if (inferredTypes.length === 0) {
+      const categoryType = CATEGORY_TYPE[categoryHint];
+      inferredTypes.push(categoryType || "display");
+    }
+  }
+  const inferredTriggers = [...triggers];
+  if (inferredTriggers.length === 0) {
+    if (/transition|page change|route/.test(text)) inferredTriggers.push("route-transition");
+    if (/scroll|reveal/.test(text)) inferredTriggers.push("scroll", "viewport-entry");
+    if (/hover/.test(text)) inferredTriggers.push("hover");
+    if (/cursor|mouse/.test(text)) inferredTriggers.push("cursor-reactive");
+    if (/drag/.test(text)) inferredTriggers.push("drag");
+    if (/click|toggle|switch|menu/.test(text)) inferredTriggers.push("click");
+    if (/loop|ambient|automatic|animated background|particle/.test(text)) inferredTriggers.push("automatic-loop");
+    if (inferredTriggers.length === 0) inferredTriggers.push("static");
+  }
+  const inferredTechniques = [...techniques];
+  if (inferredTechniques.length === 0) {
+    for (const [term, technique] of TECHNIQUE_TERMS) {
+      if (text.includes(term)) inferredTechniques.push(technique);
+    }
+  }
+  const category =
+    categoryHint ||
+    (inferredTypes.includes("transition") ? "transitions" : TYPE_CATEGORY[inferredTypes[0]] || "display");
+  return {
+    category,
+    types: uniqueList(inferredTypes),
+    triggers: uniqueList(inferredTriggers),
+    techniques: uniqueList(inferredTechniques),
+  };
+}
+
+function referenceBehaviors(triggers) {
+  return uniqueList(triggers.map((trigger) => TRIGGER_BEHAVIOR[trigger] ?? "static"));
+}
+
+/** Composes an external-only reference entry. Never writes local paths. */
+export function composeReferenceEntry({
+  sourceDoc,
+  url,
+  title,
+  summary,
+  category,
+  types = [],
+  triggers = [],
+  techniques = [],
+  aesthetics = [],
+  attributes = [],
+  externalId,
+  id,
+  author,
+  license,
+  licenseUrl,
+  previewUrl,
+  existingIds = [],
+  existingEntries = null,
+  fetchedAt,
+  themeIds = REFERENCE_THEMES,
+}) {
+  if (!sourceDoc || typeof sourceDoc !== "object") throw new Error("a reference entry requires a source record");
+  if (!/^https?:\/\//i.test(String(url ?? ""))) throw new Error("reference URL must be an absolute http(s) URL");
+  if (!title || !String(title).trim()) throw new Error("reference entries require an explicit title");
+  if (DEDICATED_SOURCE_IDS.has(sourceDoc.id)) {
+    throw new Error(`source "${sourceDoc.id}" has a dedicated ingestion adapter; use that instead`);
+  }
+  const safeTitle = String(title).trim();
+  const slug = slugifyTitle(externalId || safeTitle);
+  if (!slug) throw new Error("could not derive a stable id from the reference title");
+  const entryId = id || `${sourceDoc.id}-${slug}`;
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(entryId)) throw new Error(`reference id "${entryId}" must be a kebab slug`);
+  const facets = inferReferenceFacets({
+    title: safeTitle,
+    summary: summary || "",
+    categoryHint: category || "",
+    types,
+    triggers,
+    techniques,
+  });
+  // Idempotent re-runs must preserve the target entry's own aliases while still
+  // rejecting collisions with every other id/alias. The flattened `existingIds`
+  // form remains supported for callers/tests that do not have entry objects.
+  const claimed = new Set(existingIds);
+  for (const existing of existingEntries ?? []) {
+    if (!existing || existing.id === entryId) continue;
+    if (existing.id) claimed.add(existing.id);
+    for (const alias of existing.aliases ?? []) claimed.add(alias);
+  }
+  const aliases = uniqueList([slugifyTitle(externalId || ""), slug, slugifyTitle(safeTitle)]).filter(
+    (alias) => alias !== entryId && !claimed.has(alias),
+  );
+  const safeSummary = (summary || `${safeTitle}: external reference. Open the official source before reuse.`)
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 140);
+  const licenseNote =
+    sourceDoc.license ||
+    "License not verified. Consult the official source before copying or redistributing.";
+  const preview = previewUrl || url;
+  const entry = {
+    id: entryId,
+    name: safeTitle,
+    summary: safeSummary,
+    description:
+      `${safeTitle} is tracked as an external reference from ${sourceDoc.name}. ` +
+      `No source is stored or redistributed by this catalog. Open the official page and follow its terms.`,
+    category: facets.category,
+    themes: [...themeIds],
+    aliases,
+    tags: uniqueList([sourceDoc.id, "reference", ...facets.types, ...facets.triggers]),
+    status: "stable",
+    version: "0.1.0",
+    addedDate: fetchedAt,
+    externalDependencies: [],
+    props: [],
+    entryType: "external",
+    source: sourceDoc.id,
+    sourceUrl: url,
+    externalId: externalId || slug,
+    retrieval:
+      `Open the official source at ${url}. ` +
+      `${sourceDoc.limit || "Follow the source terms before copying or redistributing."}`,
+    preview: {
+      type: "source-link",
+      url: preview,
+      note: "External reference only; the official source renders the demo.",
+    },
+    license: {
+      spdx: license || "NOASSERTION",
+      attribution: author || undefined,
+      note: licenseNote,
+      url: licenseUrl || undefined,
+    },
+    aesthetics: uniqueList(aesthetics),
+    attributes: uniqueList(attributes),
+    behaviors: referenceBehaviors(facets.triggers),
+    types: facets.types,
+    triggers: facets.triggers,
+    techniques: facets.techniques,
+    tagMeta: {
+      sourceProvided: [],
+      inferred: uniqueList([
+        ...facets.types.map((value) => `type:${value}`),
+        ...facets.triggers.map((value) => `trigger:${value}`),
+        ...facets.techniques.map((value) => `technique:${value}`),
+        ...aesthetics.map((value) => `vibe:${value}`),
+        ...attributes.map((value) => `tech:${value}`),
+      ]),
+      reviewNeeded: true,
+    },
+    previewProfile: {
+      mode: "external",
+      layout: "wide",
+      cost: "low",
+      aspectRatio: "16 / 9",
+      minWidth: 360,
+      minHeight: 280,
+      gridColumnSpan: 2,
+      gridRowSpan: 1,
+      expandedRecommended: true,
+      requires: [],
+      autoplayAllowed: false,
+      previewStatus: "external",
+      failureReason: "External reference preview - open the official source instead of running it here.",
+    },
+    syncedAt: fetchedAt,
+  };
+  return entry;
+}
+
+/** CodePen-specific composition: only official pen/embed URLs, no scraping. */
+export function composeCodePenEntry(options) {
+  const info = parseCodePenUrl(options.url);
+  const title = options.title || titleForSlug(info.slug);
+  const entry = composeReferenceEntry({
+    ...options,
+    sourceDoc: options.sourceDoc,
+    url: info.url,
+    previewUrl: info.embedUrl,
+    title,
+    id: options.id || `codepen-${slugifyTitle(title)}`,
+    externalId: options.externalId || info.slug,
+    category: options.category || "transitions",
+    types: options.types?.length ? options.types : ["transition"],
+    triggers: options.triggers?.length ? options.triggers : ["route-transition"],
+    summary:
+      options.summary ||
+      `${title}: saved CodePen reference. Inspect the official pen and verify its license before reuse.`,
+  });
+  entry.retrieval =
+    `Open the official pen at ${info.url} or embed ${info.embedUrl}. ` +
+    "Export only when the author's license permits it; no bulk scraping.";
+  entry.tags = uniqueList([...entry.tags, "codepen", "pen"]);
+  return { entry, info };
+}
+
+/** Raises derived source coverage to match a newly imported reference entry.
+ *  `clearBlockedLabel` is used only when the exact blocked item was resolved. */
+export function updateSourceCoverage(
+  sourcesDoc,
+  sourceId,
+  { imported, checkedAt, clearBlockedLabel, note } = {},
+) {
+  if (!sourcesDoc || !Array.isArray(sourcesDoc.sources)) return sourcesDoc;
+  const nextSources = sourcesDoc.sources.map((source) => {
+    if (source.id !== sourceId) return source;
+    const coverage = { ...(source.coverage || {}) };
+    coverage.discovered = Math.max(coverage.discovered ?? 0, imported ?? 0);
+    coverage.usable = Math.max(coverage.usable ?? 0, imported ?? 0);
+    if (clearBlockedLabel) {
+      coverage.blocked = (coverage.blocked || []).filter((record) => record.label !== clearBlockedLabel);
+      coverage.locked = 0;
+      coverage.reviewNeeded = 0;
+    }
+    if (checkedAt) coverage.checkedAt = checkedAt;
+    if (note) coverage.note = note;
+    return { ...source, coverage };
+  });
+  return { ...sourcesDoc, sources: nextSources };
 }

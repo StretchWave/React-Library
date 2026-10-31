@@ -18,6 +18,24 @@ function makeEntry(overrides: Partial<CatalogEntry> = {}): CatalogEntry {
     addedDate: "2026-10-24",
     externalDependencies: [],
     props: [],
+    types: ["button"],
+    triggers: ["static"],
+    techniques: [],
+    tagMeta: { sourceProvided: [], inferred: [], reviewNeeded: false },
+    previewProfile: {
+      mode: "snapshot",
+      layout: "standard",
+      cost: "low",
+      aspectRatio: "4 / 3",
+      minWidth: 240,
+      minHeight: 220,
+      gridColumnSpan: 1,
+      gridRowSpan: 1,
+      expandedRecommended: false,
+      requires: [],
+      autoplayAllowed: false,
+      previewStatus: "ready",
+    },
     ...overrides,
   };
 }
@@ -61,7 +79,7 @@ describe("SelectionTray", () => {
     return screen.getByTestId("tray-count").textContent?.trim() ?? "";
   }
 
-  it("renders an empty state with disabled actions", () => {
+  it("stays out of the way while nothing is selected", () => {
     render(
       <SelectionTray
         items={[]}
@@ -72,15 +90,10 @@ describe("SelectionTray", () => {
         generateVisible
       />,
     );
-    expect(trayCount()).toBe("0");
-    expect((screen.getByRole("button", { name: "Clear all" }) as HTMLButtonElement).disabled).toBe(true);
-    expect(
-      (screen.getByRole("button", { name: "Generate master prompt" }) as HTMLButtonElement).disabled,
-    ).toBe(true);
-    expect(screen.getByText(/Nothing selected yet/)).toBeTruthy();
+    expect(screen.queryByTestId("selection-tray")).toBeNull();
   });
 
-  it("lists items in order with reorder and remove controls", () => {
+  it("shows a compact count and reveals the ordered list on demand", () => {
     const onRemove = vi.fn();
     const onMove = vi.fn();
     render(
@@ -93,13 +106,17 @@ describe("SelectionTray", () => {
         generateVisible
       />,
     );
+    expect(trayCount()).toBe("2");
+    expect(screen.queryByText(/Synthetic (One|Two)/)).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "2 selected — show details" }));
     const names = screen.getAllByText(/Synthetic (One|Two)/);
     expect(names).toHaveLength(2);
-    expect(trayCount()).toBe("2");
     fireEvent.click(screen.getByRole("button", { name: "Move Synthetic One later in the selection" }));
     expect(onMove).toHaveBeenCalledWith("synthetic-one", 1);
     fireEvent.click(screen.getByRole("button", { name: "Remove Synthetic Two from the selection" }));
     expect(onRemove).toHaveBeenCalledWith("synthetic-two");
+    fireEvent.click(screen.getByRole("button", { name: "2 selected — hide details" }));
+    expect(screen.queryByText(/Synthetic (One|Two)/)).toBeNull();
   });
 
   it("shows availability warnings for flagged items", () => {
@@ -113,6 +130,7 @@ describe("SelectionTray", () => {
         generateVisible={false}
       />,
     );
+    fireEvent.click(screen.getByRole("button", { name: "1 selected — show details" }));
     expect(
       screen.getByText("no local extension point recorded (manifest/implementation/source link)"),
     ).toBeTruthy();

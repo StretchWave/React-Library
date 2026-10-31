@@ -113,14 +113,16 @@ export const sectionShowcases: Showcase[] = [
   defineShowcase(
     "react-bits-stack",
     ({ layout, tilt, autoplay }) => (
-      <CenteredStage style={{ minHeight: 360, width: "100%" }}>
-        <Stack
-          cards={[0, 1, 2, 3].map((index) => <StackCard key={index} index={index} />)}
-          layout={String(layout)}
-          tilt={Number(tilt)}
-          autoplay={Boolean(autoplay)}
-          autoplayDelay={3400}
-        />
+      <CenteredStage style={{ minHeight: 360, height: 360, width: "100%" }}>
+        <div style={{ width: "min(340px, 90%)", height: 360 }}>
+          <Stack
+            cards={[0, 1, 2, 3].map((index) => <StackCard key={index} index={index} />)}
+            layout={String(layout)}
+            tilt={Number(tilt)}
+            autoplay={Boolean(autoplay)}
+            autoplayDelay={3400}
+          />
+        </div>
       </CenteredStage>
     ),
     { layout: "fan", tilt: 6, autoplay: true },
@@ -138,7 +140,7 @@ export const sectionShowcases: Showcase[] = [
   defineShowcase(
     "react-bits-dome-gallery",
     ({ maxVerticalRotationDeg, dragSensitivity }) => (
-      <CenteredStage style={{ minHeight: 380, width: "100%" }}>
+      <CenteredStage style={{ minHeight: 380, height: 380, width: "100%" }}>
         <DomeGallery
           images={[0, 1, 2, 3, 4, 5, 6, 7].map((index) => placeholderUri(index, 300, 300, `Item ${index + 1}`))}
           maxVerticalRotationDeg={Number(maxVerticalRotationDeg)}

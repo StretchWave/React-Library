@@ -36,10 +36,18 @@ try {
   fail(error.message);
 }
 
-const { catalog, themes, categories, aesthetics, attributes, behaviors, sources } = loaded;
+const { catalog, themes, categories, aesthetics, attributes, behaviors, sources, types, triggers, techniques } = loaded;
 
 // Validate taxonomies first so category/theme references resolve against full sets.
-const taxonomyResult = validateTaxonomy(themes, categories, { aesthetics, attributes, behaviors, sources });
+const taxonomyResult = validateTaxonomy(themes, categories, {
+  aesthetics,
+  attributes,
+  behaviors,
+  sources,
+  types,
+  triggers,
+  techniques,
+});
 errors.push(...taxonomyResult.errors);
 warnings.push(...taxonomyResult.warnings);
 
@@ -63,6 +71,9 @@ const entryTaxonomies = {
   attributes,
   behaviors,
   sources,
+  types,
+  triggers,
+  techniques,
 };
 const catalogResult = validateCatalog(catalog, entryTaxonomies, entryOptions);
 errors.push(...catalogResult.errors);
@@ -87,7 +98,21 @@ if (checkIndex) {
       errors.push(`catalog/index.json is not valid JSON: ${error.message}`);
     }
     if (stored) {
-      const derived = buildIndex(catalog, themes, categories, { aesthetics, attributes, behaviors, sources }, "STAMP");
+      const derived = buildIndex(
+        catalog,
+        themes,
+        categories,
+        {
+          aesthetics,
+          attributes,
+          behaviors,
+          sources,
+          types,
+          triggers,
+          techniques,
+        },
+        "STAMP",
+      );
       delete derived.generatedAt;
       if (JSON.stringify(derived) !== JSON.stringify(stored)) {
         errors.push("catalog/index.json is stale or divergent - run 'npm run generate'");
@@ -100,7 +125,7 @@ if (errors.length > 0) {
   console.log(`Catalog invalid: ${errors.length} error(s)${skipLinks ? " (link checks skipped)" : ""}`);
   for (const error of errors.sort()) console.log(`  ✗ ${error}`);
 } else {
-  const counts = `entries ${catalog.entries.length}, themes ${themes.themes.length}, categories ${categories.categories.length}, aesthetics ${(aesthetics.aesthetics || []).length}, behaviors ${(behaviors.behaviors || []).length}, sources ${(sources.sources || []).length}`;
+  const counts = `entries ${catalog.entries.length}, themes ${themes.themes.length}, categories ${categories.categories.length}, aesthetics ${(aesthetics.aesthetics || []).length}, types ${(types.types || []).length}, triggers ${(triggers.triggers || []).length}, techniques ${(techniques.techniques || []).length}, behaviors ${(behaviors.behaviors || []).length}, sources ${(sources.sources || []).length}`;
   console.log(
     `Catalog valid — ${counts}${checkIndex ? ", index up to date" : ""}${skipLinks ? " (link checks skipped)" : ""}`,
   );

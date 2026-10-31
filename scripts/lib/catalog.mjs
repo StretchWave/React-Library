@@ -4,11 +4,26 @@
 import path from "node:path";
 import { accessSync, readFileSync, writeFileSync } from "node:fs";
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export const STATUSES = ["stable", "beta", "experimental", "deprecated"];
 export const ENTRY_TYPES = ["local", "external"];
 export const PREVIEW_TYPES = ["local-demo", "static", "external", "source-link", "none"];
+export const PREVIEW_MODES = ["live", "snapshot", "loop", "external", "unavailable"];
+export const PREVIEW_LAYOUTS = ["compact", "standard", "wide", "showcase"];
+export const PREVIEW_COSTS = ["low", "medium", "high"];
+export const PREVIEW_STATUSES = ["ready", "external", "unavailable", "error"];
+export const PREVIEW_REQUIREMENTS = [
+  "webgl",
+  "canvas-2d",
+  "pointer",
+  "keyboard",
+  "scroll",
+  "gpu",
+  "user-input",
+  "reduced-motion",
+];
+export const SOURCE_STATUSES = ["available", "partial", "reference-only", "requires-auth", "unavailable"];
 export const THEME_BASES = ["light", "dark"];
 export const LINK_KEYS = ["source", "demo", "docs"];
 /** Independent attribute facets (taxonomy/attributes.json). */
@@ -77,6 +92,13 @@ const ENTRY_FIELDS = new Set([
   // --- M6 correction: expensive preview (workspace-only auto-play; gallery
   // cards render a placeholder until the user opens the preview workspace).
   "heavy",
+  // --- v3 (adaptive discovery): multi-dimensional classification, evidence
+  // provenance and a validated per-entry preview profile.
+  "types",
+  "triggers",
+  "techniques",
+  "tagMeta",
+  "previewProfile",
 ]);
 
 const TOP_LEVEL_FIELDS = new Set(["schemaVersion", "meta", "entries"]);
@@ -111,6 +133,9 @@ export function loadCatalog(root = repoRoot()) {
     attributes: path.join(root, "taxonomy", "attributes.json"),
     behaviors: path.join(root, "taxonomy", "behaviors.json"),
     sources: path.join(root, "taxonomy", "sources.json"),
+    types: path.join(root, "taxonomy", "types.json"),
+    triggers: path.join(root, "taxonomy", "triggers.json"),
+    techniques: path.join(root, "taxonomy", "techniques.json"),
   };
   return {
     catalog: readJsonFileSync(paths.catalog, "catalog"),
@@ -120,6 +145,9 @@ export function loadCatalog(root = repoRoot()) {
     attributes: readJsonFileSync(paths.attributes, "attribute taxonomy"),
     behaviors: readJsonFileSync(paths.behaviors, "behavior taxonomy"),
     sources: readJsonFileSync(paths.sources, "sources taxonomy"),
+    types: readJsonFileSync(paths.types, "component type taxonomy"),
+    triggers: readJsonFileSync(paths.triggers, "trigger taxonomy"),
+    techniques: readJsonFileSync(paths.techniques, "technique taxonomy"),
     paths,
   };
 }
@@ -263,6 +291,37 @@ export function validateTaxonomy(themesDoc, categoriesDoc, extras = {}) {
     }
   }
 
+  // --- v3 facets: component type, animation trigger and technique. Each is a
+  // simple { id, label, description? } vocabulary; descriptions are encouraged
+  // for triggers and types but optional for compact technique lists.
+  for (const [filename, key, doc] of [
+    ["taxonomy/types.json", "types", extras.types],
+    ["taxonomy/triggers.json", "triggers", extras.triggers],
+    ["taxonomy/techniques.json", "techniques", extras.techniques],
+  ]) {
+    if (!doc) continue;
+    const values = doc[key];
+    if (!Array.isArray(values) || values.length === 0) {
+      errors.push(`${filename}: '${key}' must be a non-empty array`);
+      continue;
+    }
+    const seen = new Set();
+    values.forEach((value, i) => {
+      const where = `${filename} ${key}[${i}]`;
+      if (!isPlainObject(value)) {
+        errors.push(`${where}: ${key.slice(0, -1)} must be an object`);
+        return;
+      }
+      if (!isSlugValue(value.id)) errors.push(`${where}: invalid id slug "${str(value.id)}"`);
+      if (seen.has(value.id)) errors.push(`${where}: duplicate id "${value.id}"`);
+      seen.add(value.id);
+      if (!isNonEmptyString(value.label)) errors.push(`${where}: 'label' must be a non-empty string`);
+      if ("description" in value && !isNonEmptyString(value.description)) {
+        errors.push(`${where}: 'description' must be a non-empty string when present`);
+      }
+    });
+  }
+
   const sources = extras.sources && extras.sources.sources;
   if (extras.sources) {
 
@@ -296,6 +355,40 @@ export function validateTaxonomy(themesDoc, categoriesDoc, extras = {}) {
         }
         if ("auth" in source && source.auth !== null && !isNonEmptyString(source.auth)) {
           errors.push(`${label}: 'auth' must be a non-empty string or null when present`);
+        }
+        if ("coverage" in source) {
+          const coverage = source.coverage;
+          if (!isPlainObject(coverage)) {
+            errors.push(`${label}: 'coverage' must be an object`);
+          } else {
+            for (const key of ["discovered", "usable", "locked", "reviewNeeded"]) {
+              if (!Number.isInteger(coverage[key]) || coverage[key] < 0) {
+                errors.push(`${label}: coverage '${key}' must be a non-negative integer`);
+              }
+            }
+            if (!Array.isArray(coverage.blocked)) {
+              errors.push(`${label}: coverage 'blocked' must be an array`);
+            } else {
+              coverage.blocked.forEach((blocked, blockedIndex) => {
+                const blockedAt = `${label} coverage.blocked[${blockedIndex}]`;
+                if (!isPlainObject(blocked)) {
+                  errors.push(`${blockedAt}: blocked record must be an object`);
+                  return;
+                }
+                if (!isNonEmptyString(blocked.label)) errors.push(`${blockedAt}: 'label' is required`);
+                if (!isNonEmptyString(blocked.reason)) errors.push(`${blockedAt}: 'reason' is required`);
+                if ("url" in blocked && blocked.url != null && !isHttpUrl(blocked.url)) {
+                  errors.push(`${blockedAt}: 'url' must be http(s) when present`);
+                }
+              });
+            }
+            if ("checkedAt" in coverage && !ISO_DATE_RE.test(str(coverage.checkedAt))) {
+              errors.push(`${label}: coverage 'checkedAt' must be YYYY-MM-DD`);
+            }
+            if ("note" in coverage && !isNonEmptyString(coverage.note)) {
+              errors.push(`${label}: coverage 'note' must be a non-empty string when present`);
+            }
+          }
         }
         if ("evaluatedAt" in extras.sources && !/^\d{4}-\d{2}-\d{2}$/.test(str(extras.sources.evaluatedAt))) {
           errors.push("taxonomy/sources.json: 'evaluatedAt' must be YYYY-MM-DD when present");
@@ -337,6 +430,9 @@ export function validateCatalog(catalog, taxonomies, { root = repoRoot(), checkL
   const attributeIds = new Set((taxonomies.attributes && taxonomies.attributes.attributes || []).map((a) => a.id));
   const behaviorIds = new Set((taxonomies.behaviors && taxonomies.behaviors.behaviors || []).map((b) => b.id));
   const sourceIds = new Set((taxonomies.sources && taxonomies.sources.sources || []).map((s) => s.id));
+  const typeIds = new Set((taxonomies.types && taxonomies.types.types || []).map((t) => t.id));
+  const triggerIds = new Set((taxonomies.triggers && taxonomies.triggers.triggers || []).map((t) => t.id));
+  const techniqueIds = new Set((taxonomies.techniques && taxonomies.techniques.techniques || []).map((t) => t.id));
 
   const entryIds = new Set();
   const aliasOwners = new Map();
@@ -700,6 +796,169 @@ export function validateCatalog(catalog, taxonomies, { root = repoRoot(), checkL
       }
     }
 
+    // --- v3 facets. Every schema-v3 entry must be filterable by type and at
+    // least one animation trigger; techniques may legitimately be empty for a
+    // static component. Taxonomy checks run only when the taxonomy is supplied
+    // so minimal test callers remain usable.
+    for (const [key, ids, required] of [
+      ["types", typeIds, true],
+      ["triggers", triggerIds, true],
+      ["techniques", techniqueIds, false],
+    ]) {
+      const values = entry[key];
+      if (!Array.isArray(values)) {
+        errors.push(`${label}: '${key}' must be an array of taxonomy slugs`);
+        continue;
+      }
+      if (required && values.length === 0) errors.push(`${label}: '${key}' must not be empty`);
+      const seen = new Set();
+      for (const value of values) {
+        if (!isSlugValue(value)) {
+          errors.push(`${label}: ${key} must be lowercase slugs (got "${str(value)}")`);
+          continue;
+        }
+        if (seen.has(value)) errors.push(`${label}: duplicate ${key} id "${value}"`);
+        seen.add(value);
+        if (ids.size > 0 && !ids.has(value)) {
+          errors.push(`${label}: ${key} "${value}" is not in the taxonomy (taxonomy/${key}.json)`);
+        }
+      }
+    }
+
+    if ("tagMeta" in entry) {
+      const meta = entry.tagMeta;
+      if (!isPlainObject(meta)) {
+        errors.push(`${label}: 'tagMeta' must be an object`);
+      } else {
+        const facetKeys = {
+          type: "types",
+          trigger: "triggers",
+          technique: "techniques",
+          vibe: "aesthetics",
+          tech: "attributes",
+          source: "source",
+        };
+        for (const key of ["sourceProvided", "inferred"]) {
+          if (!Array.isArray(meta[key])) {
+            errors.push(`${label}: tagMeta '${key}' must be an array`);
+            continue;
+          }
+          for (const tagged of meta[key]) {
+            if (!isNonEmptyString(tagged) || !/^[a-z-]+:[a-z0-9-]+$/.test(tagged)) {
+              errors.push(`${label}: tagMeta ${key} entries must look like "facet:id" (got "${str(tagged)}")`);
+              continue;
+            }
+            const [facet, value] = tagged.split(":");
+            if (!(facet in facetKeys)) {
+              errors.push(`${label}: tagMeta ${key} has unknown facet "${facet}"`);
+              continue;
+            }
+            if (facet === "source") continue;
+            const declared = entry[facetKeys[facet]];
+            if (!Array.isArray(declared) || !declared.includes(value)) {
+              errors.push(`${label}: tagMeta ${key} references ${facet} "${value}" which the entry does not declare`);
+            }
+          }
+        }
+        if (typeof meta.reviewNeeded !== "boolean") {
+          errors.push(`${label}: tagMeta 'reviewNeeded' must be boolean`);
+        }
+      }
+    } else {
+      errors.push(`${label}: 'tagMeta' is required in schema v3 (records source vs inferred tags)`);
+    }
+
+    if ("previewProfile" in entry) {
+      const profile = entry.previewProfile;
+      if (!isPlainObject(profile)) {
+        errors.push(`${label}: 'previewProfile' must be an object`);
+      } else {
+        if (!PREVIEW_MODES.includes(profile.mode)) {
+          errors.push(`${label}: previewProfile 'mode' must be one of ${PREVIEW_MODES.join(" | ")}`);
+        }
+        if (!PREVIEW_LAYOUTS.includes(profile.layout)) {
+          errors.push(`${label}: previewProfile 'layout' must be one of ${PREVIEW_LAYOUTS.join(" | ")}`);
+        }
+        if (!PREVIEW_COSTS.includes(profile.cost)) {
+          errors.push(`${label}: previewProfile 'cost' must be one of ${PREVIEW_COSTS.join(" | ")}`);
+        }
+        if (!PREVIEW_STATUSES.includes(profile.previewStatus)) {
+          errors.push(`${label}: previewProfile 'previewStatus' must be one of ${PREVIEW_STATUSES.join(" | ")}`);
+        }
+        if (!isNonEmptyString(profile.aspectRatio) || !/^\d+(?:\.\d+)?\s*[/:]\s*\d+(?:\.\d+)?$/.test(profile.aspectRatio)) {
+          errors.push(`${label}: previewProfile 'aspectRatio' must look like "4 / 3"`);
+        }
+        for (const key of ["minWidth", "minHeight", "gridColumnSpan", "gridRowSpan"]) {
+          if (!Number.isInteger(profile[key]) || profile[key] <= 0) {
+            errors.push(`${label}: previewProfile '${key}' must be a positive integer`);
+          }
+        }
+        if (profile.gridColumnSpan > 3) errors.push(`${label}: previewProfile 'gridColumnSpan' must be <= 3`);
+        if (profile.gridRowSpan > 2) errors.push(`${label}: previewProfile 'gridRowSpan' must be <= 2`);
+        if (typeof profile.expandedRecommended !== "boolean") {
+          errors.push(`${label}: previewProfile 'expandedRecommended' must be boolean`);
+        }
+        if (typeof profile.autoplayAllowed !== "boolean") {
+          errors.push(`${label}: previewProfile 'autoplayAllowed' must be boolean`);
+        }
+        if (!Array.isArray(profile.requires)) {
+          errors.push(`${label}: previewProfile 'requires' must be an array`);
+        } else {
+          const seenRequires = new Set();
+          for (const requirement of profile.requires) {
+            if (!PREVIEW_REQUIREMENTS.includes(requirement)) {
+              errors.push(`${label}: previewProfile requirement "${str(requirement)}" is unknown`);
+            }
+            if (seenRequires.has(requirement)) warnings.push(`${label}: duplicate preview requirement "${requirement}"`);
+            seenRequires.add(requirement);
+          }
+        }
+        for (const key of ["snapshotPath", "loopPath"]) {
+          if (!(key in profile) || profile[key] == null) continue;
+          if (!isNonEmptyString(profile[key])) {
+            errors.push(`${label}: previewProfile '${key}' must be a non-empty repo-relative path`);
+            continue;
+          }
+          if (profile[key].includes("\\") || path.isAbsolute(profile[key]) || profile[key].startsWith("/")) {
+            errors.push(`${label}: previewProfile '${key}' must be repo-relative with POSIX separators`);
+            continue;
+          }
+          if (checkLinks) {
+            try {
+              accessSync(path.resolve(root, profile[key]));
+            } catch {
+              errors.push(`${label}: previewProfile '${key}' points to a missing file (${profile[key]})`);
+            }
+          }
+        }
+        if (profile.mode === "snapshot" && !profile.snapshotPath) {
+          errors.push(`${label}: snapshot preview mode requires 'snapshotPath'`);
+        }
+        if (profile.mode === "loop" && !profile.loopPath) {
+          errors.push(`${label}: loop preview mode requires 'loopPath'`);
+        }
+        if (profile.previewStatus === "external" && profile.mode !== "external") {
+          errors.push(`${label}: previewStatus "external" requires mode "external"`);
+        }
+        if (profile.mode === "external" && profile.previewStatus !== "external") {
+          errors.push(`${label}: mode "external" requires previewStatus "external"`);
+        }
+        if (profile.mode === "unavailable") {
+          if (profile.previewStatus !== "unavailable") {
+            errors.push(`${label}: mode "unavailable" requires previewStatus "unavailable"`);
+          }
+          if (!isNonEmptyString(profile.failureReason)) {
+            errors.push(`${label}: unavailable previews require a useful 'failureReason'`);
+          }
+        }
+        if ("failureReason" in profile && !isNonEmptyString(profile.failureReason)) {
+          errors.push(`${label}: previewProfile 'failureReason' must be a non-empty string when present`);
+        }
+      }
+    } else {
+      errors.push(`${label}: 'previewProfile' is required in schema v3`);
+    }
+
     if (prevId && prevId > id) {
       errors.push(`${label}: entries must be sorted by id ("${prevId}" appears before "${id}")`);
     }
@@ -715,40 +974,163 @@ export function validateCatalog(catalog, taxonomies, { root = repoRoot(), checkL
   return { errors, warnings };
 }
 
-/** Ranked search: exact id > exact alias > id-prefix/id-substring > name > summary > tags > aliases.
- *  v2: optional filters aesthetic/source/attribute/entryType; aesthetics/attributes/source also rank in text search. */
-export function searchEntries(entries, query, { theme, category, aesthetic, source, attribute, behavior, entryType } = {}) {
+function filterValues(value) {
+  if (value == null || value === "") return [];
+  return (Array.isArray(value) ? value : [value]).map((item) => String(item)).filter(Boolean);
+}
+
+function includesAny(values, wanted) {
+  if (wanted.length === 0) return true;
+  return (values || []).some((value) => wanted.includes(value));
+}
+
+function normalizeSearch(value) {
+  return String(value ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function editDistance(a, b) {
+  if (a === b) return 0;
+  if (Math.abs(a.length - b.length) > 2) return 3;
+  const previous = Array.from({ length: b.length + 1 }, (_, index) => index);
+  for (let i = 1; i <= a.length; i += 1) {
+    let diagonal = previous[0];
+    previous[0] = i;
+    for (let j = 1; j <= b.length; j += 1) {
+      const above = previous[j];
+      previous[j] = Math.min(
+        previous[j] + 1,
+        previous[j - 1] + 1,
+        diagonal + (a[i - 1] === b[j - 1] ? 0 : 1),
+      );
+      diagonal = above;
+    }
+  }
+  return previous[b.length];
+}
+
+/** Field-level relevance. Deliberately avoids arbitrary subsequence hits:
+ *  "btn" should not match every "animated content" description just because
+ *  those letters occur in order. Typo tolerance is token-based instead. */
+function fuzzyScore(query, target) {
+  if (!target) return 0;
+  if (target === query) return 100;
+  const compactQuery = query.replace(/\s+/g, "");
+  const compactTarget = target.replace(/\s+/g, "");
+  if (compactTarget === compactQuery) return 95;
+  if (target.startsWith(query)) return 70;
+  if (` ${target} `.includes(` ${query} `)) return 60;
+  if (target.includes(query)) return 50;
+  if (query.length >= 5) {
+    for (const token of target.split(/\s+/)) {
+      const distance = editDistance(query, token);
+      if (distance <= 1) return 32;
+      if (query.length >= 7 && distance <= 2) return 22;
+    }
+  }
+  return 0;
+}
+
+/** Ranked fuzzy search with AND across dimensions and OR within one dimension.
+ *  Legacy single-value filters (category/aesthetic/behavior/source/attribute/
+ *  entryType) remain supported alongside v3 array filters. */
+export function searchEntries(
+  entries,
+  query,
+  {
+    theme,
+    category,
+    aesthetic,
+    source,
+    attribute,
+    behavior,
+    entryType,
+    type,
+    trigger,
+    technique,
+    vibe,
+    tech,
+    previewMode,
+    availability,
+  } = {},
+) {
   const all = [...entries].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  const wantedCategory = filterValues(category);
+  const wantedAesthetic = filterValues(vibe ?? aesthetic);
+  const wantedSource = filterValues(source);
+  const wantedAttribute = filterValues(tech ?? attribute);
+  const wantedTrigger = filterValues(trigger);
+  const wantedBehavior = filterValues(behavior);
+  const wantedEntryType = filterValues(entryType);
+  const wantedType = filterValues(type);
+  const wantedTechnique = filterValues(technique);
+  const wantedPreview = filterValues(previewMode);
+  const wantedAvailability = filterValues(availability);
+  const wantedTheme = filterValues(theme);
+
   const filtered = all.filter((entry) => {
-    if (theme && !entry.themes.includes(theme)) return false;
-    if (category && entry.category !== category) return false;
-    if (aesthetic && !(entry.aesthetics || []).includes(aesthetic)) return false;
-    if (attribute && !(entry.attributes || []).includes(attribute)) return false;
-    if (behavior && !(entry.behaviors || []).includes(behavior)) return false;
-    if (source && entry.source !== source) return false;
-    if (entryType && (entry.entryType ?? "local") !== entryType) return false;
+    if (wantedTheme.length > 0 && !wantedTheme.some((value) => entry.themes.includes(value))) return false;
+    if (wantedCategory.length > 0 && !wantedCategory.includes(entry.category)) return false;
+    if (!includesAny(entry.types, wantedType)) return false;
+    if (wantedTrigger.length > 0 && !includesAny(entry.triggers, wantedTrigger)) return false;
+    if (wantedBehavior.length > 0 && !includesAny(entry.behaviors, wantedBehavior)) return false;
+    if (!includesAny(entry.techniques, wantedTechnique)) return false;
+    if (!includesAny(entry.aesthetics, wantedAesthetic)) return false;
+    if (!includesAny(entry.attributes, wantedAttribute)) return false;
+    if (wantedSource.length > 0) {
+      const sourceHit = entry.source ? wantedSource.includes(entry.source) : wantedSource.includes("built-in");
+      if (!sourceHit) return false;
+    }
+    if (wantedEntryType.length > 0 && !wantedEntryType.includes(entry.entryType ?? "local")) return false;
+    if (wantedPreview.length > 0 && !wantedPreview.includes(entry.previewProfile?.mode)) return false;
+    if (wantedAvailability.length > 0) {
+      const availabilityValue = (entry.entryType ?? "local") + ":" + (entry.previewProfile?.previewStatus ?? "unknown");
+      if (!wantedAvailability.includes(availabilityValue)) return false;
+    }
     return true;
   });
-  const q = String(query ?? "").trim().toLowerCase();
+
+  const q = normalizeSearch(query);
   if (q === "") return filtered;
 
   const scored = [];
   for (const entry of filtered) {
+    const aliases = entry.aliases || [];
+    const types = entry.types || [];
+    const triggers = entry.triggers || [];
+    const techniques = entry.techniques || [];
+    const aesthetics = entry.aesthetics || [];
+    const attributes = entry.attributes || [];
+    const fields = [
+      [entry.id, 100],
+      [entry.name, 70],
+      [entry.summary, 48],
+      [entry.description, 36],
+      [aliases.join(" "), 55],
+      [entry.tags.join(" "), 34],
+      [types.join(" "), 32],
+      [triggers.join(" "), 30],
+      [techniques.join(" "), 30],
+      [aesthetics.join(" "), 24],
+      [attributes.join(" "), 22],
+      [entry.source ?? "", 18],
+    ];
     let score = 0;
-    if (entry.id === q) score = 100;
-    else if (entry.aliases.includes(q)) score = 80;
-    else if (entry.id.startsWith(q)) score = 60;
-    else if (entry.id.includes(q)) score = 50;
-    else if (entry.name.toLowerCase().includes(q)) score = 40;
-    else if (entry.summary.toLowerCase().includes(q)) score = 35;
-    else if (entry.tags.some((t) => t.includes(q))) score = 25;
-    else if (entry.aliases.some((a) => a.includes(q))) score = 20;
-    else if ((entry.aesthetics || []).some((a) => a.includes(q))) score = 15;
-    else if ((entry.attributes || []).some((a) => a.includes(q))) score = 12;
-    else if ((entry.behaviors || []).some((b) => b.includes(q) && b !== "auto")) score = 11;
-    else if (String(entry.source ?? "").includes(q)) score = 10;
-    else continue;
-    scored.push({ score, entry });
+    for (const [value, weight] of fields) {
+      const normalized = normalizeSearch(value);
+      if (!normalized) continue;
+      const fieldScore = fuzzyScore(q, normalized);
+      if (fieldScore > 0) score = Math.max(score, Math.round(fieldScore * (weight / 100)));
+    }
+    // Exact identity signals outrank partial field hits regardless of field
+    // order: an alias must beat a longer id that merely contains the query.
+    const exactAlias = aliases.some((alias) => normalizeSearch(alias) === q);
+    if (normalizeSearch(entry.id) === q) score = 100;
+    else if (exactAlias) score = Math.max(score, 95);
+    else if (normalizeSearch(entry.name) === q) score = Math.max(score, 90);
+    if (score > 0) scored.push({ score, entry });
   }
   scored.sort((a, b) => b.score - a.score || (a.entry.id < b.entry.id ? -1 : a.entry.id > b.entry.id ? 1 : 0));
   return scored.map((s) => s.entry);
@@ -761,10 +1143,30 @@ export function buildIndex(catalog, themesDoc, categoriesDoc, extras, generatedA
   const sourcesList = (extras.sources && extras.sources.sources) || [];
   const byEntryType = { local: 0, external: 0 };
   const bySource = {};
+  const previewStatuses = { ready: 0, external: 0, unavailable: 0, error: 0 };
+  const sourceCoverage = {};
   for (const entry of entries) {
     if ((entry.entryType ?? "local") === "external") byEntryType.external += 1;
     else byEntryType.local += 1;
     if (entry.source) bySource[entry.source] = (bySource[entry.source] ?? 0) + 1;
+    const status = entry.previewProfile?.previewStatus ?? "unavailable";
+    previewStatuses[status] = (previewStatuses[status] ?? 0) + 1;
+  }
+  for (const source of sourcesList) {
+    const imported = entries.filter((entry) => entry.source === source.id);
+    const coverage = source.coverage || {};
+    sourceCoverage[source.id] = {
+      discovered: coverage.discovered ?? imported.length,
+      imported: imported.length,
+      previewReady: imported.filter((entry) => entry.previewProfile?.previewStatus === "ready").length,
+      usable: coverage.usable ?? imported.length,
+      locked: coverage.locked ?? 0,
+      blocked: (coverage.blocked || []).length,
+      reviewNeeded:
+        (coverage.reviewNeeded ?? 0) +
+        imported.filter((entry) => entry.tagMeta?.reviewNeeded === true).length,
+      checkedAt: coverage.checkedAt ?? null,
+    };
   }
   return {
     schemaVersion: SCHEMA_VERSION,
@@ -775,9 +1177,15 @@ export function buildIndex(catalog, themesDoc, categoriesDoc, extras, generatedA
       themes: themesDoc.themes.length,
       categories: categoriesDoc.categories.length,
       aesthetics: (extras.aesthetics && extras.aesthetics.aesthetics || []).length,
+      attributes: (extras.attributes && extras.attributes.attributes || []).length,
+      behaviors: (extras.behaviors && extras.behaviors.behaviors || []).length,
+      types: (extras.types && extras.types.types || []).length,
+      triggers: (extras.triggers && extras.triggers.triggers || []).length,
+      techniques: (extras.techniques && extras.techniques.techniques || []).length,
       sources: sourcesList.length,
       byEntryType,
       bySource,
+      previewStatuses,
     },
     taxonomies: {
       themes: themesDoc.themes.map((t) => t.id),
@@ -785,8 +1193,22 @@ export function buildIndex(catalog, themesDoc, categoriesDoc, extras, generatedA
       aesthetics: (extras.aesthetics && extras.aesthetics.aesthetics || []).map((a) => a.id),
       attributes: (extras.attributes && extras.attributes.attributes || []).map((a) => a.id),
       behaviors: (extras.behaviors && extras.behaviors.behaviors || []).map((b) => b.id),
-      sources: sourcesList.map((s) => ({ id: s.id, name: s.name, status: s.status, url: s.url })),
+      types: (extras.types && extras.types.types || []).map((t) => t.id),
+      triggers: (extras.triggers && extras.triggers.triggers || []).map((t) => t.id),
+      techniques: (extras.techniques && extras.techniques.techniques || []).map((t) => t.id),
+      sources: sourcesList.map((s) => ({
+        id: s.id,
+        name: s.name,
+        status: s.status,
+        url: s.url,
+        license: s.license,
+        accessMethod: s.accessMethod,
+        auth: s.auth ?? null,
+        limit: s.limit ?? null,
+        coverage: sourceCoverage[s.id],
+      })),
     },
+    sourceCoverage,
     entries: structuredClone(entries),
   };
 }
@@ -808,7 +1230,12 @@ export function formatEntryText(entry) {
   const lines = [];
   lines.push(`${entry.name} (${entry.id}) v${entry.version} — ${entry.status} — added ${entry.addedDate}`);
   lines.push(`Category: ${entry.category}`);
-  lines.push(`Type: ${entryType}`);
+  if (Array.isArray(entry.types) && entry.types.length > 0) lines.push(`Types: ${entry.types.join(", ")}`);
+  if (Array.isArray(entry.triggers) && entry.triggers.length > 0) lines.push(`Triggers: ${entry.triggers.join(", ")}`);
+  if (Array.isArray(entry.techniques) && entry.techniques.length > 0) {
+    lines.push(`Techniques: ${entry.techniques.join(", ")}`);
+  }
+  lines.push(`Availability: ${entryType}`);
   lines.push(`Summary: ${entry.summary}`);
   if (entry.description) lines.push(`Description: ${entry.description}`);
   lines.push(`Themes: ${entry.themes.join(", ")}`);
@@ -834,6 +1261,21 @@ export function formatEntryText(entry) {
     lines.push(`Implementation: ${entry.implementation.join(", ")}`);
   }
   if (entry.preview) lines.push(`Preview: ${describePreview(entry.preview)}`);
+  if (entry.previewProfile) {
+    const profile = entry.previewProfile;
+    lines.push(
+      `Preview profile: ${profile.mode} / ${profile.layout} / ${profile.cost} / ${profile.previewStatus}` +
+        (profile.snapshotPath ? ` / snapshot ${profile.snapshotPath}` : "") +
+        (profile.failureReason ? ` / ${profile.failureReason}` : ""),
+    );
+  }
+  if (entry.tagMeta) {
+    lines.push(
+      `Tag provenance: ${entry.tagMeta.sourceProvided.length} source, ` +
+        `${entry.tagMeta.inferred.length} inferred, ` +
+        `${entry.tagMeta.reviewNeeded ? "review needed" : "reviewed"}`,
+    );
+  }
   lines.push(`Aliases: ${entry.aliases.length ? entry.aliases.join(", ") : dash}`);
   lines.push(`Tags: ${entry.tags.length ? entry.tags.join(", ") : dash}`);
   const links = entry.links ?? {};

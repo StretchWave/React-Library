@@ -4,3 +4,7 @@ coverage/
 *.log
 .DS_Store
 Thumbs.db
+
+# Preview-audit binary artifacts; keep audit/PREVIEW_AUDIT.md + preview-audit.json.
+audit/screenshots/
+audit/contact-*.html

@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 2,
-  "evaluatedAt": "2026-10-24",
-  "description": "Registry of component sources with their verified access methods and licensing facts (researched 2026-10-24). Statuses: available = code may be stored locally under a permissive license via an official channel; partial = usable with per-entry caveats; reference-only = metadata + official retrieval only, redistribution not permitted; requires-auth = credentials needed; unavailable = unusable. Entry counts are derived, not stored here - see catalog/index.json.",
+  "schemaVersion": 3,
+  "evaluatedAt": "2026-10-28",
+  "description": "Registry of component sources with verified access methods, licensing facts and tracked coverage. Statuses: available = code may be stored locally under a permissive license via an official channel; partial = usable with per-entry caveats; reference-only = metadata + official retrieval only, redistribution not permitted; requires-auth = credentials needed; unavailable = unusable. 'coverage' records what this project has actually enumerated; imported and preview-ready counts are derived from the canonical catalog by the index generator.",
   "statuses": [
     "available",
     "partial",
@@ -20,7 +20,16 @@
       "license": "MIT",
       "auth": "none",
       "limit": null,
-      "notes": "Open registry JSON verified live at https://ui.shadcn.com/r/styles/[style]/[item].json (registry-item schema). Official CLI: npx shadcn@latest add <registry-url>. Copy-paste is the distribution model, so vendoring selected items locally is permitted with attribution. Tailwind-based; components render in the app only via source-link fallback previews."
+      "notes": "Open registry JSON verified live at https://ui.shadcn.com/r/styles/[style]/[item].json (registry-item schema). Official CLI: npx shadcn@latest add <registry-url>. Copy-paste is the distribution model, so vendoring selected items locally is permitted with attribution. Tailwind-based; components render in the app only via source-link fallback previews.",
+      "coverage": {
+        "discovered": 16,
+        "usable": 16,
+        "locked": 0,
+        "reviewNeeded": 0,
+        "blocked": [],
+        "checkedAt": "2026-10-28",
+        "note": "Sixteen registry items are tracked. The official library is larger and is not claimed as fully enumerated here; the shadcn CLI remains the retrieval channel for untracked items."
+      }
     },
     {
       "id": "magic-ui",
@@ -32,7 +41,16 @@
       "license": "MIT",
       "auth": "none",
       "limit": null,
-      "notes": "150+ animated components, shadcn-registry compatible (retrieve via the shadcn CLI with Magic UI registry URLs). MIT; vendoring selected items locally is permitted. Tailwind + Motion based."
+      "notes": "150+ animated components, shadcn-registry compatible (retrieve via the shadcn CLI with Magic UI registry URLs). MIT; vendoring selected items locally is permitted. Tailwind + Motion based.",
+      "coverage": {
+        "discovered": 4,
+        "usable": 4,
+        "locked": 0,
+        "reviewNeeded": 0,
+        "blocked": [],
+        "checkedAt": "2026-10-28",
+        "note": "Four registry items are tracked; the full Magic UI catalogue is not claimed as enumerated."
+      }
     },
     {
       "id": "uiverse",
@@ -44,7 +62,21 @@
       "license": "MIT (community-made; keep per-element author attribution)",
       "auth": "none",
       "limit": "Fair-use policy restricts automated/bulk mirroring - hand-curate individual elements",
-      "notes": "Community-built elements in HTML/CSS/Tailwind/React. Galaxy repo states all elements are MIT-licensed. Ingested elements are hand-curated with author attribution and are previewable in-app as sandboxed CSS demos."
+      "notes": "Community-built elements in HTML/CSS/Tailwind/React. Galaxy repo states all elements are MIT-licensed. Ingested elements are hand-curated with author attribution and are previewable in-app as sandboxed CSS demos.",
+      "coverage": {
+        "discovered": 0,
+        "usable": 0,
+        "locked": 0,
+        "reviewNeeded": 0,
+        "blocked": [
+          {
+            "label": "Bulk catalogue",
+            "reason": "Fair-use policy prohibits automated bulk mirroring; individual hand-curation only."
+          }
+        ],
+        "checkedAt": "2026-10-28",
+        "note": "No Uiverse elements are currently imported. Curation remains manual by policy."
+      }
     },
     {
       "id": "hyperui",
@@ -56,7 +88,16 @@
       "license": "MIT",
       "auth": "none",
       "limit": null,
-      "notes": "Free Tailwind CSS v4 components for marketing/ecommerce/app UI. No registry API - retrieve from the official repo or the copy-paste site. Tailwind-based; app previews use source-link fallback."
+      "notes": "Free Tailwind CSS v4 components for marketing/ecommerce/app UI. No registry API - retrieve from the official repo or the copy-paste site. Tailwind-based; app previews use source-link fallback.",
+      "coverage": {
+        "discovered": 0,
+        "usable": 0,
+        "locked": 0,
+        "reviewNeeded": 0,
+        "blocked": [],
+        "checkedAt": "2026-10-28",
+        "note": "No HyperUI items are currently imported; the source has no registry and requires manual copying."
+      }
     },
     {
       "id": "react-bits",
@@ -68,7 +109,16 @@
       "license": "MIT + Commons Clause v1.0 (LICENSE.md verified 2026-10-24)",
       "auth": "none",
       "limit": "Commons Clause forbids selling, sublicensing, or redistributing the components themselves - alone, bundled, or ported. Application use is permitted.",
-      "notes": "Animation-first library (~230 components across text-animations/animations/components/backgrounds/micro). Official shadcn-compatible registry verified live at https://reactbits.dev/r/{Name}-{variant}.json with variants TS-CSS, TS-TW, JS-CSS, JS-TW per item. Vendoring policy (M6 correction): the TS-CSS variant is vendored for catalog previews and agent delivery - this is application use, not sale - with attribution and the no-resale clause recorded in every entry. Components whose variant is raw WebGL/Three.js are vendored but never advertised as live in this app's preview; official demo links stay attached."
+      "notes": "Animation-first library (~230 components across text-animations/animations/components/backgrounds/micro). Official shadcn-compatible registry verified live at https://reactbits.dev/r/{Name}-{variant}.json with variants TS-CSS, TS-TW, JS-CSS, JS-TW per item. Vendoring policy (M6 correction): the TS-CSS variant is vendored for catalog previews and agent delivery - this is application use, not sale - with attribution and the no-resale clause recorded in every entry. Components whose variant is raw WebGL/Three.js are vendored but never advertised as live in this app's preview; official demo links stay attached.",
+      "coverage": {
+        "discovered": 61,
+        "usable": 61,
+        "locked": 0,
+        "reviewNeeded": 0,
+        "blocked": [],
+        "checkedAt": "2026-10-28",
+        "note": "Sixty-one curated React Bits items are tracked. All remain subject to the MIT + Commons Clause no-resale restriction; source is not redistributed publicly."
+      }
     },
     {
       "id": "aceternity",
@@ -80,7 +130,21 @@
       "license": "Custom free license; source redistribution forbidden (licence page + third-party summaries)",
       "auth": "none to browse; Pro tier is paid",
       "limit": "No local storage or redistribution of source; third-party components within items may carry other licenses.",
-      "notes": "200+ animated Tailwind + Motion components. Catalog keeps reference metadata and official links; the agent must copy from the official source directly."
+      "notes": "200+ animated Tailwind + Motion components. Catalog keeps reference metadata and official links; the agent must copy from the official source directly.",
+      "coverage": {
+        "discovered": 0,
+        "usable": 0,
+        "locked": 0,
+        "reviewNeeded": 0,
+        "blocked": [
+          {
+            "label": "Source catalogue",
+            "reason": "License forbids local storage and redistribution; reference-only entries require individual official URLs."
+          }
+        ],
+        "checkedAt": "2026-10-28",
+        "note": "No Aceternity source is stored. An official URL per component is required before a reference entry can be added."
+      }
     },
     {
       "id": "21st-dev",
@@ -92,7 +156,21 @@
       "license": "varies per component/creator - verify per entry",
       "auth": "optional (account needed only to publish)",
       "limit": "Per-creator licensing; their terms forbid redistributing code from libraries that prohibit it.",
-      "notes": "Community registry of React components. Default to reference-only entries with the official component URL as the retrieval instruction; ingest locally only when the creator's license is verified permissive."
+      "notes": "Community registry of React components. Default to reference-only entries with the official component URL as the retrieval instruction; ingest locally only when the creator's license is verified permissive.",
+      "coverage": {
+        "discovered": 0,
+        "usable": 0,
+        "locked": 0,
+        "reviewNeeded": 0,
+        "blocked": [
+          {
+            "label": "Community catalogue",
+            "reason": "Per-creator licenses must be verified before any import."
+          }
+        ],
+        "checkedAt": "2026-10-28",
+        "note": "No 21st.dev item is imported because no contributor license has been verified yet."
+      }
     },
     {
       "id": "originkit",
@@ -104,7 +182,21 @@
       "license": "custom free tier - verify per component",
       "auth": "none to browse",
       "limit": "~50 free animated components; copy limits on the free tier; full catalogue is a paid upgrade.",
-      "notes": "Animated React/Framer components with an official MCP server for browsing/import (community-published gateway exists). Reference-first; ingest locally only if the per-component license is verified permissive."
+      "notes": "Animated React/Framer components with an official MCP server for browsing/import (community-published gateway exists). Reference-first; ingest locally only if the per-component license is verified permissive.",
+      "coverage": {
+        "discovered": 0,
+        "usable": 0,
+        "locked": 0,
+        "reviewNeeded": 1,
+        "blocked": [
+          {
+            "label": "MCP catalogue",
+            "reason": "Requires an OriginKit MCP connection/credentials; no credentialed source access is configured in this workspace."
+          }
+        ],
+        "checkedAt": "2026-10-28",
+        "note": "Official MCP is the preferred channel. The source remains reference-only until credentials and per-item license verification are available."
+      }
     },
     {
       "id": "pryzm",
@@ -116,7 +208,94 @@
       "license": "generator tool - exports belong to the user; gallery looks are remix references",
       "auth": "none",
       "limit": "No component code registry; visual gallery is for remixing, not redistribution.",
-      "notes": "Background/gradient/texture studio with a curated gallery. Use as background and gradient references; the agent recreates looks via the official studio or its exports instead of vendoring gallery assets."
+      "notes": "Background/gradient/texture studio with a curated gallery. Use as background and gradient references; the agent recreates looks via the official studio or its exports instead of vendoring gallery assets.",
+      "coverage": {
+        "discovered": 0,
+        "usable": 0,
+        "locked": 0,
+        "reviewNeeded": 1,
+        "blocked": [],
+        "checkedAt": "2026-10-28",
+        "note": "A visual reference source only. No component registry exists; generated exports are user-owned but gallery looks are not redistributed."
+      }
+    },
+    {
+      "id": "codepen",
+      "name": "CodePen",
+      "url": "https://codepen.io/",
+      "repo": null,
+      "accessMethod": "official-embed-export",
+      "status": "reference-only",
+      "license": "varies per pen (author-owned) - verify each pen",
+      "auth": "varies",
+      "limit": "Only official embed/export paths; no bulk scraping, private-pen access or unlicensed redistribution.",
+      "notes": "Saved pens can be referenced or embedded after author/license verification. The requested Multi-Page View Transition example needs its URL and license recorded before import.",
+      "coverage": {
+        "discovered": 1,
+        "usable": 0,
+        "locked": 1,
+        "reviewNeeded": 1,
+        "blocked": [
+          {
+            "label": "Saved Multi-Page View Transition example",
+            "reason": "The saved pen URL and author/license metadata were not supplied. Add them via scripts/ingest-codepen.mjs --url=<url> --write after verifying the pen license."
+          }
+        ],
+        "checkedAt": "2026-10-28",
+        "note": "CodePen pens are author-owned. Only the official embed/export path may be used; no bulk scraping or unlicensed copying."
+      }
+    },
+    {
+      "id": "ditther",
+      "name": "Ditther",
+      "url": "https://ditther.com/",
+      "repo": null,
+      "accessMethod": "effect-generator",
+      "status": "reference-only",
+      "license": "generator exports belong to the user; gallery looks remain reference material",
+      "auth": "none",
+      "limit": "Do not redistribute Ditther gallery effects, presets or prompts. Recreate effects explicitly.",
+      "notes": "Browser-based image-effect studio (dither, ASCII, halftone, VHS, glitch, chromatic shift). Use as a visual-effect reference, not as a component source.",
+      "coverage": {
+        "discovered": 0,
+        "usable": 0,
+        "locked": 0,
+        "reviewNeeded": 1,
+        "blocked": [
+          {
+            "label": "Effect catalogue",
+            "reason": "Ditther is an image-effect generator, not a React component registry; effects are reference-only until explicitly recreated."
+          }
+        ],
+        "checkedAt": "2026-10-28",
+        "note": "User-created exports may be used; Ditther gallery looks and prompts must not be redistributed."
+      }
+    },
+    {
+      "id": "getlayers",
+      "name": "GetLayers",
+      "url": "https://www.getlayers.ai/",
+      "repo": null,
+      "accessMethod": "mcp",
+      "status": "reference-only",
+      "license": "custom GetLayers terms; source files, prompts and templates may not be redistributed",
+      "auth": "account/MCP connection likely required",
+      "limit": "Never redistribute source files or prompts. Metadata and official retrieval links only.",
+      "notes": "Templates, sections, 3D scenes, backgrounds and gradients with an official MCP/design workflow. Restricted source and prompt redistribution.",
+      "coverage": {
+        "discovered": 0,
+        "usable": 0,
+        "locked": 0,
+        "reviewNeeded": 1,
+        "blocked": [
+          {
+            "label": "MCP/template library",
+            "reason": "GetLayers source files, prompts and templates may not be redistributed; credentialed MCP access is required for retrieval."
+          }
+        ],
+        "checkedAt": "2026-10-28",
+        "note": "Reference-only. Keep official links and retrieval instructions; never vendor GetLayers source files or prompts."
+      }
     }
   ]
 }

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 3,
+  "description": "Canonical animation-trigger facet (schema v3). This is intentionally separate from visual vibe, animation technique, technology and source. An entry may have several triggers, but every trigger must be evidenced by the component's behaviours, source or implementation.",
+  "triggers": [
+    { "id": "automatic-loop", "label": "Automatic loop", "description": "Runs continuously without user input." },
+    { "id": "mount", "label": "On mount", "description": "Plays once when it enters the DOM." },
+    { "id": "hover", "label": "Hover", "description": "Responds while the pointer rests over the element." },
+    { "id": "cursor-reactive", "label": "Cursor-reactive", "description": "Follows or reacts to pointer position." },
+    { "id": "click", "label": "Click / tap", "description": "Fires on a deliberate click or tap." },
+    { "id": "drag", "label": "Drag", "description": "Responds to pointer drag." },
+    { "id": "physics", "label": "Physics", "description": "Driven by a physics simulation." },
+    { "id": "scroll", "label": "Scroll position", "description": "Progress or content is driven by scroll position." },
+    { "id": "viewport-entry", "label": "Viewport entry", "description": "Triggers when the element enters the viewport." },
+    { "id": "gesture", "label": "Gesture", "description": "Pinch, wheel, swipe or another multi-input gesture." },
+    { "id": "keyboard", "label": "Keyboard", "description": "Responds to keyboard input." },
+    { "id": "state-change", "label": "State change", "description": "Transitions when component state changes." },
+    { "id": "route-transition", "label": "Route transition", "description": "Runs when navigating between views or pages." },
+    { "id": "static", "label": "Static", "description": "No animation trigger; informational or resting UI." }
+  ]
+}

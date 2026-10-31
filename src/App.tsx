@@ -1,17 +1,35 @@
-// App shell (M3; extended M5.3): catalog data remains the single source of
-// truth; this view composes the browser (search/filters/detail), the gallery
-// (visual card grid over the same filters), the taxonomy-driven theme engine
-// (ThemeProvider/ThemePicker), and live component previews.
-import { Component, useEffect, useMemo, useRef, useState, lazy, Suspense, type ReactNode } from "react";
+// App shell (schema v3 discovery workspace). Browse is the default visual wall;
+// Collections, Sources and Selected for AI are first-class views. URL hash owns
+// shareable filter state, while personal data stays in localStorage. The
+// canonical catalog remains the only source of component truth.
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DetailPane } from "./components/browser/DetailPane";
 import { EntryList } from "./components/browser/EntryList";
-import { FilterBar } from "./components/browser/FilterBar";
 import { PreviewPanel } from "./components/browser/PreviewPanel";
+import { FacetSidebar, type FacetKey } from "./components/browse/FacetSidebar";
+import { CollectionsView } from "./components/collections/CollectionsView";
+import { CompareDialog } from "./components/compare/CompareDialog";
 import { Gallery } from "./components/gallery/Gallery";
-import { PromptStudio } from "./components/prompt/PromptStudio";
-import { catalogCounts, entries, findEntry } from "./catalog/client";
-import { hasActiveFilters, searchEntries, type SearchFilters } from "./lib/search";
+import { InspectorPanel } from "./components/inspector/InspectorPanel";
+import { ExpandedPreview } from "./components/preview/ExpandedPreview";
+import { SelectedView } from "./components/selected/SelectedView";
+import { SourcesView } from "./components/sources/SourcesView";
+import {
+  aestheticById,
+  attributeById,
+  categoryById,
+  catalogCounts,
+  componentTypeById,
+  entries,
+  findEntry,
+  sourceById,
+  sources,
+  techniqueById,
+  triggerById,
+} from "./catalog/client";
+import type { CatalogEntry } from "./catalog/types";
 import { entryTypeOf } from "./catalog/types";
+import { hasActiveFilters, searchEntries, valuesOf, type SearchFilters } from "./lib/search";
 import {
   addIds,
   loadSelection,
@@ -19,64 +37,42 @@ import {
   saveSelection,
   toggleId,
 } from "./lib/selection";
+import {
+  addManualTag,
+  addToCollection,
+  annotationFor,
+  createCollection,
+  createSavedFilter,
+  deleteCollection,
+  loadAnnotations,
+  loadCollections,
+  loadFavorites,
+  loadRecent,
+  loadSavedFilters,
+  recordRecent,
+  removeFromCollection,
+  removeManualTag,
+  saveAnnotations,
+  saveCollections,
+  saveFavorites,
+  saveRecent,
+  saveSavedFilters,
+  setAnnotationConfirmed,
+  setAnnotationNote,
+  toggleFavorite,
+  type Collection,
+  type SavedFilter,
+} from "./lib/personal";
+import { buildHash, parseHash, type AppView, type RouteState } from "./lib/routing";
 import { ThemePicker } from "./theme/ThemePicker";
 import "./components/browser/browser.css";
 import "./components/browser/preview.css";
 import "./components/gallery/gallery.css";
 import "./components/preview/preview.css";
 import "./components/prompt/prompt.css";
+import "./styles/discovery.css";
 
-type View = "browser" | "gallery" | "prompt" | "preview";
-
-/** M6.2: the preview workspace (vendored showcases + animation engines) is a
- * heavy view, so it loads lazily — browser/gallery users never pay for it.
- * M7.2: a failed chunk (offline deploy, build mismatch) shows an actionable
- * retry card instead of a blank screen. */
-const PreviewWorkspace = lazy(() =>
-  import("./components/preview/PreviewWorkspace").then((module) => ({ default: module.PreviewWorkspace })),
-);
-
-class LazyLoadBoundary extends Component<
-  { children: ReactNode },
-  { failed: boolean }
-> {
-  state = { failed: false };
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-  render() {
-    if (!this.state.failed) return this.props.children;
-    return (
-      <div className="workspace-empty" data-testid="preview-load-error" aria-label="Preview workspace failed to load">
-        <h2>The preview workspace could not load</h2>
-        <p>
-          Its code-split chunk failed to fetch (offline, deploy mismatch, or a build
-          problem). Nothing was lost — the page itself is still running.
-        </p>
-        <button
-          type="button"
-          className="reset-filters"
-          onClick={() => this.setState({ failed: false })}
-        >
-          Retry load
-        </button>
-        <a href="#/gallery">Back to gallery</a>
-      </div>
-    );
-  }
-}
-
-/** Deep links look like `#/component/<id>` (M4), `#/gallery` (M5.3),
- * `#/preview/<id>` (M6.2), and `#/prompt` (M5.4). */
-function entryIdFromHash(): string | null {
-  const match = /#\/component\/([a-z0-9-]+)/.exec(window.location.hash);
-  return match ? match[1] : null;
-}
-
-function previewIdFromHash(): string | null {
-  const match = /#\/preview\/([a-z0-9-]+)/.exec(window.location.hash);
-  return match ? match[1] : null;
-}
+type View = AppView;
 
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -88,293 +84,601 @@ function isEditableTarget(target: EventTarget | null): boolean {
   );
 }
 
+function routeFromLocation(): RouteState {
+  return parseHash(typeof window === "undefined" ? "" : window.location.hash);
+}
+
+const FACET_FILTERS: Record<FacetKey, keyof SearchFilters> = {
+  types: "type",
+  triggers: "trigger",
+  techniques: "technique",
+  vibe: "vibe",
+  tech: "tech",
+  source: "source",
+  previewMode: "previewMode",
+  entryType: "entryType",
+  category: "category",
+};
+
+const PREVIEW_LABELS: Record<string, string> = {
+  live: "Live preview",
+  snapshot: "Snapshot",
+  loop: "Captured loop",
+  external: "External reference",
+  unavailable: "Unavailable",
+};
+
+function facetLabel(key: FacetKey, value: string): string {
+  if (key === "types") return componentTypeById(value)?.label ?? value;
+  if (key === "triggers") return triggerById(value)?.label ?? value;
+  if (key === "techniques") return techniqueById(value)?.label ?? value;
+  if (key === "vibe") return aestheticById(value)?.label ?? value;
+  if (key === "tech") return attributeById(value)?.label ?? value;
+  if (key === "source") return value === "built-in" ? "Built-in" : sourceById(value)?.name ?? value;
+  if (key === "category") return categoryById(value)?.label ?? value;
+  if (key === "previewMode") return PREVIEW_LABELS[value] ?? value;
+  if (key === "entryType") return value === "local" ? "Usable locally" : "Reference only";
+  return value;
+}
+
 export default function App() {
-  // M7: the visual gallery is the default landing view — the component browser
-  // stays one click away (and is still selected by #/component deep links).
-  const [view, setView] = useState<View>("gallery");
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("");
-  const [theme, setTheme] = useState("");
-  const [aesthetic, setAesthetic] = useState("");
-  const [behavior, setBehavior] = useState("");
-  const [source, setSource] = useState("");
-  const [entryType, setEntryType] = useState("");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const initialRoute = useMemo(routeFromLocation, []);
+  const [view, setView] = useState<View>(initialRoute.view);
+  const [query, setQuery] = useState(initialRoute.query);
+  const [filters, setFilters] = useState<SearchFilters>(initialRoute.filters);
+  const [facetsCollapsed, setFacetsCollapsed] = useState(false);
+  const [mobileFilters, setMobileFilters] = useState(Boolean(initialRoute.mobileFilters));
+  const [inspectorId, setInspectorId] = useState<string | null>(
+    initialRoute.componentId && findEntry(initialRoute.componentId) ? initialRoute.componentId : null,
+  );
+  const [expandedId, setExpandedId] = useState<string | null>(
+    initialRoute.expandedId && findEntry(initialRoute.expandedId) ? initialRoute.expandedId : null,
+  );
+  const [collectionId, setCollectionId] = useState<string | undefined>(initialRoute.collectionId);
+  const [sourceId, setSourceId] = useState<string | undefined>(initialRoute.sourceId);
+  const [browserSelectedId, setBrowserSelectedId] = useState<string | null>(
+    initialRoute.view === "browser" && initialRoute.componentId && findEntry(initialRoute.componentId)
+      ? initialRoute.componentId
+      : null,
+  );
+  const [promptFocus, setPromptFocus] = useState(Boolean(initialRoute.promptFocus));
+  const [compareOpen, setCompareOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
   const [selection, setSelection] = useState<string[]>(() =>
     loadSelection(new Set(entries.map((entry) => entry.id))),
   );
-  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>(loadFavorites);
+  const [recentIds, setRecentIds] = useState<string[]>(loadRecent);
+  const [collections, setCollections] = useState<Collection[]>(loadCollections);
+  const [annotations, setAnnotations] = useState(loadAnnotations);
+  const [savedFilters, setSavedFilters] = useState<SavedFilter[]>(loadSavedFilters);
+
+  useEffect(() => saveSelection(selection), [selection]);
+  useEffect(() => saveFavorites(favoriteIds), [favoriteIds]);
+  useEffect(() => saveRecent(recentIds), [recentIds]);
+  useEffect(() => saveCollections(collections), [collections]);
+  useEffect(() => saveAnnotations(annotations), [annotations]);
+  useEffect(() => saveSavedFilters(savedFilters), [savedFilters]);
+
+  const applyRoute = useCallback((route: RouteState) => {
+    setView(route.view);
+    setCollectionId(route.collectionId);
+    setSourceId(route.sourceId);
+    setPromptFocus(Boolean(route.promptFocus));
+    if (route.view === "browse") {
+      setQuery(route.query);
+      setFilters(route.filters);
+      setInspectorId(route.componentId && findEntry(route.componentId) ? route.componentId : null);
+      setExpandedId(route.expandedId && findEntry(route.expandedId) ? route.expandedId : null);
+    } else if (route.view === "browser") {
+      setInspectorId(route.componentId && findEntry(route.componentId) ? route.componentId : null);
+      setExpandedId(null);
+      if (route.componentId && findEntry(route.componentId)) setBrowserSelectedId(route.componentId);
+    } else {
+      setInspectorId(null);
+      setExpandedId(null);
+    }
+    if (route.mobileFilters) setMobileFilters(true);
+  }, []);
 
   useEffect(() => {
-    // "/" focuses search unless the user is already typing somewhere editable.
+    const onRouteChange = () => applyRoute(routeFromLocation());
+    window.addEventListener("hashchange", onRouteChange);
+    window.addEventListener("popstate", onRouteChange);
+    return () => {
+      window.removeEventListener("hashchange", onRouteChange);
+      window.removeEventListener("popstate", onRouteChange);
+    };
+  }, [applyRoute]);
+
+  // Keep browse filters shareable without polluting history on every keystroke.
+  useEffect(() => {
+    if (view !== "browse" || inspectorId || expandedId || mobileFilters) return;
+    const next = buildHash("browse", filters, query);
+    if (window.location.hash !== next) window.history.replaceState(null, "", next);
+  }, [view, filters, query, inspectorId, expandedId, mobileFilters]);
+
+  useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "/" && !isEditableTarget(event.target)) {
         event.preventDefault();
         searchInputRef.current?.focus();
       }
+      if (event.key === "Escape" && mobileFilters) setMobileFilters(false);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [mobileFilters]);
 
   useEffect(() => {
-    // Hash deep links: honor #/component/<id>, #/gallery, and #/prompt, and
-    // keep back/forward in sync. Filters and the selection survive view
-    // switches because both live in this shell (M5.4).
-    const syncFromHash = () => {
-      const id = entryIdFromHash();
-      if (id && findEntry(id)) {
-        setView("browser");
-        setSelectedId(id);
-        return;
+    if (view === "selected" && promptFocus) {
+      const timer = window.setTimeout(() => {
+        document.querySelector(".prompt-studio")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+        setPromptFocus(false);
+      }, 60);
+      return () => window.clearTimeout(timer);
+    }
+    return undefined;
+  }, [view, promptFocus]);
+
+  const navigate = useCallback(
+    (nextView: View, options: { collectionId?: string; sourceId?: string; promptFocus?: boolean } = {}) => {
+      setView(nextView);
+      setMobileFilters(false);
+      setCompareOpen(false);
+      setInspectorId(null);
+      setExpandedId(null);
+      setPromptFocus(Boolean(options.promptFocus));
+      if (nextView === "collections") setCollectionId(options.collectionId);
+      if (nextView === "sources") setSourceId(options.sourceId);
+      if (nextView !== "collections") setCollectionId(undefined);
+      if (nextView !== "sources") setSourceId(undefined);
+      const hash = buildHash(nextView, filters, query, {
+        collectionId: options.collectionId ?? null,
+        sourceId: options.sourceId ?? null,
+        promptFocus: options.promptFocus,
+      });
+      if (window.location.hash !== hash) window.location.hash = hash;
+    },
+    [filters, query],
+  );
+
+  const openBrowse = useCallback(() => navigate("browse"), [navigate]);
+
+  const openInspector = useCallback(
+    (id: string) => {
+      if (!findEntry(id)) return;
+      setExpandedId(null);
+      setCompareOpen(false);
+      setInspectorId(id);
+      setRecentIds((current) => recordRecent(current, id));
+      // Browse deep links preserve the discovery context. Collections, Sources,
+      // Selected and Table keep their own route and open the inspector locally.
+      if (view === "browse") {
+        const hash = buildHash("browse", filters, query, { componentId: id });
+        if (window.location.hash !== hash) window.location.hash = hash;
       }
-      const previewId = previewIdFromHash();
-      if (previewId) {
-        setView("preview");
-        setSelectedId(findEntry(previewId) ? previewId : null);
-        return;
+    },
+    [filters, query, view],
+  );
+
+  const closeInspector = useCallback(() => {
+    setInspectorId(null);
+    if (view === "browse") {
+      const hash = buildHash("browse", filters, query);
+      if (window.location.hash !== hash) window.history.replaceState(null, "", hash);
+    }
+  }, [filters, query, view]);
+
+  const openExpanded = useCallback(
+    (id: string) => {
+      if (!findEntry(id)) return;
+      setInspectorId(null);
+      setCompareOpen(false);
+      setExpandedId(id);
+      setRecentIds((current) => recordRecent(current, id));
+      if (view === "browse") {
+        const hash = buildHash("browse", filters, query, { expandedId: id });
+        if (window.location.hash !== hash) window.location.hash = hash;
       }
-      if (window.location.hash === "#/gallery") {
-        setView("gallery");
-        return;
-      }
-      if (window.location.hash === "#/prompt") {
-        setView("prompt");
-        return;
-      }
-      setView("gallery");
-      setSelectedId(null);
-    };
-    syncFromHash();
-    window.addEventListener("hashchange", syncFromHash);
-    return () => window.removeEventListener("hashchange", syncFromHash);
+    },
+    [filters, query, view],
+  );
+
+  const closeExpanded = useCallback(() => {
+    setExpandedId(null);
+    if (view === "browse") {
+      const hash = buildHash("browse", filters, query);
+      if (window.location.hash !== hash) window.history.replaceState(null, "", hash);
+    }
+  }, [filters, query, view]);
+
+  const toggleSelection = useCallback((id: string, next: boolean) => {
+    setSelection((previous) => (next ? toggleId(previous, id) : previous.filter((value) => value !== id)));
   }, []);
 
-  useEffect(() => {
-    // Persist the selection (pruned ids from a stale payload stay pruned).
-    saveSelection(selection);
-  }, [selection]);
+  const toggleFacet = useCallback((key: FacetKey, value: string) => {
+    const filterKey = FACET_FILTERS[key];
+    setFilters((current) => {
+      const existing = valuesOf(current[filterKey]);
+      const next = existing.includes(value)
+        ? existing.filter((candidate) => candidate !== value)
+        : [...existing, value];
+      const updated = { ...current };
+      if (next.length === 0) delete updated[filterKey];
+      else updated[filterKey] = next;
+      return updated;
+    });
+  }, []);
 
-  function selectEntry(id: string) {
-    window.location.hash = `/component/${id}`;
-    setView("browser");
-    setSelectedId(id);
-  }
-
-  function openGallery() {
-    window.location.hash = "/gallery";
-    setView("gallery");
-  }
-
-  function openBrowser() {
-    setView("browser");
-  }
-
-  function openPromptView() {
-    window.location.hash = "/prompt";
-    setView("prompt");
-  }
-
-  function openPrompt() {
-    window.location.hash = "/prompt";
-    setView("prompt");
-  }
-
-  function toggleSelection(id: string, next: boolean) {
-    setSelection((prev) => (next ? toggleId(prev, id) : prev.filter((candidate) => candidate !== id)));
-  }
-
-  function selectAllVisible() {
-    setSelection((prev) => addIds(prev, filtered.map((entry) => entry.id)));
-  }
-
-  function moveSelection(id: string, delta: -1 | 1) {
-    setSelection((prev) => moveSelectionId(prev, id, delta));
-  }
-
-  const filters: SearchFilters = { category, theme, aesthetic, behavior, source, entryType };
-  const filtersActive = hasActiveFilters(query, filters);
-  const filtered = useMemo(
-    () => searchEntries(entries, query, filters),
-    [query, category, theme, aesthetic, behavior, source, entryType],
+  const removeFacetChip = useCallback(
+    (key: FacetKey, value: string) => toggleFacet(key, value),
+    [toggleFacet],
   );
-  const selected = selectedId ? (entries.find((entry) => entry.id === selectedId) ?? null) : null;
-  const localCount = useMemo(
-    () => entries.filter((entry) => entryTypeOf(entry) === "local").length,
-    [],
-  );
-  const externalCount = entries.length - localCount;
 
-  function resetFilters() {
+  const resetFilters = useCallback(() => {
+    setFilters({});
     setQuery("");
-    setCategory("");
-    setTheme("");
-    setAesthetic("");
-    setBehavior("");
-    setSource("");
-    setEntryType("");
-  }
+  }, []);
+
+  const applySavedFilter = useCallback((saved: SavedFilter) => {
+    setView("browse");
+    setQuery(saved.query);
+    setFilters(saved.filters);
+    setMobileFilters(false);
+  }, []);
+
+  const saveCurrentFilter = useCallback(
+    (name: string) => {
+      setSavedFilters((current) => [createSavedFilter(name, query, filters), ...current]);
+    },
+    [filters, query],
+  );
+
+  const selectionItems = useMemo(
+    () =>
+      selection
+        .map((id) => findEntry(id))
+        .filter((entry): entry is CatalogEntry => Boolean(entry)),
+    [selection],
+  );
+  const filtered = useMemo(() => searchEntries(entries, query, filters), [query, filters]);
+  const filtersActive = hasActiveFilters(query, filters);
+  const selected = inspectorId ? findEntry(inspectorId) ?? null : null;
+  const expanded = expandedId ? findEntry(expandedId) ?? null : null;
+  const browserSelected = browserSelectedId ? findEntry(browserSelectedId) ?? null : null;
+  const annotation = selected ? annotationFor(annotations, selected.id) : undefined;
+  const favoriteSet = new Set(favoriteIds);
+  const localCount = useMemo(() => entries.filter((entry) => entryTypeOf(entry) === "local").length, []);
+
+  const activeChips = useMemo(() => {
+    const chips: Array<{ key: FacetKey; value: string; label: string }> = [];
+    (Object.keys(FACET_FILTERS) as FacetKey[]).forEach((key) => {
+      const filterKey = FACET_FILTERS[key];
+      for (const value of valuesOf(filters[filterKey])) {
+        chips.push({ key, value, label: facetLabel(key, value) });
+      }
+    });
+    return chips;
+  }, [filters]);
+
+  const allSourcesLabel = `${sources.length} sources`;
+  const tableEntry = browserSelected ?? filtered[0] ?? null;
 
   return (
-    <div className="app-shell">
-      <header className="app-header">
+    <div className={`app-shell view-${view}`}>
+      <header className="app-header app-header--discovery">
         <div className="app-heading">
           <span className="app-mark" aria-hidden="true">RL</span>
           <div>
             <h1 className="app-title">React Library</h1>
             <p className="app-tagline">
-              Agent-first component catalog — {catalogCounts.entries} components,{" "}
-              {catalogCounts.themes} themes
+              Agent-first visual catalog · {catalogCounts.entries} components · {allSourcesLabel}
             </p>
           </div>
         </div>
+        <div className="global-search" role="search">
+          <label className="visually-hidden" htmlFor="global-search-input">
+            Search the entire catalog
+          </label>
+          <span className="global-search-icon" aria-hidden="true">⌕</span>
+          <input
+            id="global-search-input"
+            ref={searchInputRef}
+            type="search"
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              if (view !== "browse") setView("browse");
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape" && query) {
+                event.stopPropagation();
+                setQuery("");
+              }
+            }}
+            placeholder="Search components, types, triggers, vibes..."
+            aria-keyshortcuts="/"
+            autoComplete="off"
+          />
+          {query ? (
+            <button type="button" className="global-search-clear" onClick={() => setQuery("")} aria-label="Clear search">
+              Clear
+            </button>
+          ) : (
+            <kbd className="global-search-key" aria-hidden="true">/</kbd>
+          )}
+        </div>
         <div className="app-header-actions">
+          <span className="header-stat" title="Local implementations">{localCount} local</span>
           <ThemePicker />
         </div>
       </header>
-      <nav className="app-views" aria-label="Catalog views">
+
+      <nav className="app-views app-views--discovery" aria-label="Catalog views">
         <div className="view-switcher" role="presentation">
           <button
             type="button"
-            className={`view-switch ${view === "gallery" ? "is-active" : ""}`}
-            aria-pressed={view === "gallery"}
-            onClick={openGallery}
+            className={view === "browse" ? "view-switch is-active" : "view-switch"}
+            aria-pressed={view === "browse"}
+            onClick={openBrowse}
           >
-            Gallery
+            Browse
           </button>
           <button
             type="button"
-            className={`view-switch ${view === "browser" ? "is-active" : ""}`}
+            className={view === "collections" ? "view-switch is-active" : "view-switch"}
+            aria-pressed={view === "collections"}
+            onClick={() => navigate("collections", { collectionId })}
+          >
+            Collections
+          </button>
+          <button
+            type="button"
+            className={view === "sources" ? "view-switch is-active" : "view-switch"}
+            aria-pressed={view === "sources"}
+            onClick={() => navigate("sources", { sourceId })}
+          >
+            Sources
+          </button>
+          <button
+            type="button"
+            className={view === "selected" ? "view-switch is-active" : "view-switch"}
+            aria-pressed={view === "selected"}
+            onClick={() => navigate("selected")}
+          >
+            Selected for AI
+            {selection.length > 0 ? <span className="view-switch-badge">{selection.length}</span> : null}
+          </button>
+          <button
+            type="button"
+            className={view === "browser" ? "view-switch is-active" : "view-switch"}
             aria-pressed={view === "browser"}
-            onClick={openBrowser}
+            onClick={() => navigate("browser")}
           >
-            Browser
-          </button>
-          <button
-            type="button"
-            className={`view-switch ${view === "prompt" ? "is-active" : ""}`}
-            aria-pressed={view === "prompt"}
-            onClick={openPromptView}
-          >
-            Prompt studio
+            Table
           </button>
         </div>
         <span className="view-counts">
-          {localCount} local · {externalCount} external · {selection.length} selected
+          {filtered.length !== entries.length && view === "browse" ? `${filtered.length} shown · ` : ""}
+          {favoriteIds.length} favorites · {selection.length} selected
         </span>
       </nav>
-      <main className={`app-main ${view === "browser" ? "is-catalog" : ""}`}>
-        {view === "gallery" ? (
+
+      <main
+        className={[
+          "app-main",
+          "app-main--discovery",
+          view === "browser" ? "is-catalog" : "",
+          facetsCollapsed ? "is-facets-collapsed" : "",
+        ].join(" ")}
+      >
+        {view === "browse" ? (
           <>
-            <section className="entry-nav" aria-label="Component gallery filters">
-              <FilterBar
-                query={query}
-                onQueryChange={setQuery}
-                category={category}
-                onCategoryChange={setCategory}
-                theme={theme}
-                onThemeChange={setTheme}
-                aesthetic={aesthetic}
-                onAestheticChange={setAesthetic}
-                behavior={behavior}
-                onBehaviorChange={setBehavior}
-                source={source}
-                onSourceChange={setSource}
-                entryType={entryType}
-                onEntryTypeChange={setEntryType}
-                searchInputRef={searchInputRef}
+            {mobileFilters ? (
+              <button
+                type="button"
+                className="facet-mobile-backdrop"
+                aria-label="Close filters"
+                onClick={() => setMobileFilters(false)}
               />
-            </section>
-            <Gallery
-              entries={filtered}
-              totalCount={catalogCounts.entries}
-              filtersActive={filtersActive}
-              onResetFilters={resetFilters}
-              selectedIds={selection}
-              selectionItems={selection
-                .map((id) => findEntry(id))
-                .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))}
-              onToggleSelect={toggleSelection}
-              onSelectAllVisible={selectAllVisible}
-              onRemoveSelection={(id) => toggleSelection(id, false)}
-              onMoveSelection={moveSelection}
-              onClearSelection={() => setSelection([])}
-              onGeneratePrompt={openPrompt}
-            />
+            ) : null}
+            <div className="facets-column">
+              <div className="facets-desktop-controls">
+                <button
+                  type="button"
+                  className="facets-collapse"
+                  aria-expanded={!facetsCollapsed}
+                  onClick={() => setFacetsCollapsed((value) => !value)}
+                >
+                  {facetsCollapsed ? "Show filters" : "Hide filters"}
+                </button>
+              </div>
+              <FacetSidebar
+                entries={entries}
+                filters={filters}
+                onToggleFacet={toggleFacet}
+                onClearFilters={resetFilters}
+                onClose={() => setMobileFilters(false)}
+                savedFilters={savedFilters}
+                onApplySavedFilter={applySavedFilter}
+                onDeleteSavedFilter={(id) => setSavedFilters((current) => current.filter((item) => item.id !== id))}
+                onSaveFilter={saveCurrentFilter}
+                mobileOpen={mobileFilters}
+              />
+            </div>
+            <div className="browse-content">
+              <div className="browse-toolbar">
+                <button
+                  type="button"
+                  className="browse-filters-mobile"
+                  onClick={() => setMobileFilters(true)}
+                >
+                  Filters{activeChips.length > 0 ? ` (${activeChips.length})` : ""}
+                </button>
+                <p className="browse-context">
+                  {filtersActive
+                    ? "Live results across every discovery dimension."
+                    : "Every component, classified by type, trigger, technique and vibe."}
+                </p>
+              </div>
+              {activeChips.length > 0 ? (
+                <section className="active-filters" aria-label="Active filters">
+                  {activeChips.map((chip) => (
+                    <button
+                      key={`${chip.key}:${chip.value}`}
+                      type="button"
+                      className="active-filter-chip"
+                      onClick={() => removeFacetChip(chip.key, chip.value)}
+                      aria-label={`Remove ${chip.label} filter`}
+                    >
+                      {chip.label}
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  ))}
+                  <button type="button" className="active-filters-clear" onClick={resetFilters}>
+                    Clear all
+                  </button>
+                </section>
+              ) : null}
+              <Gallery
+                entries={filtered}
+                totalCount={catalogCounts.entries}
+                filtersActive={filtersActive}
+                onResetFilters={resetFilters}
+                selectedIds={selection}
+                selectionItems={selectionItems}
+                favoriteIds={favoriteIds}
+                onToggleSelect={toggleSelection}
+                onToggleFavorite={(id) => setFavoriteIds((current) => toggleFavorite(current, id))}
+                onOpenEntry={openInspector}
+                onExpandEntry={openExpanded}
+                onSelectAllVisible={() => setSelection((current) => addIds(current, filtered.map((entry) => entry.id)))}
+                onRemoveSelection={(id) => toggleSelection(id, false)}
+                onMoveSelection={(id, delta) => setSelection((current) => moveSelectionId(current, id, delta))}
+                onClearSelection={() => setSelection([])}
+                onGeneratePrompt={() => navigate("selected", { promptFocus: true })}
+                onCompare={() => setCompareOpen(true)}
+              />
+            </div>
           </>
-        ) : view === "preview" ? (
-          <LazyLoadBoundary>
-            <Suspense
-              fallback={
-                <main className="workspace-empty" data-testid="preview-loading" aria-label="Preview workspace">
-                  Loading preview…
-                </main>
-              }
-            >
-              <PreviewWorkspace
-                entry={selected}
-                selected={selected ? selection.includes(selected.id) : undefined}
-                onToggleSelection={toggleSelection}
-              />
-            </Suspense>
-          </LazyLoadBoundary>
-        ) : view === "prompt" ? (
-          <PromptStudio
-            items={selection
-              .map((id) => findEntry(id))
-              .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))}
-            onBack={() => {
-              window.location.hash = "/gallery";
-              setView("gallery");
+        ) : view === "collections" ? (
+          <CollectionsView
+            entries={entries}
+            collections={collections}
+            favoriteIds={favoriteIds}
+            recentIds={recentIds}
+            focusCollectionId={collectionId}
+            onOpenEntry={openInspector}
+            onExpandEntry={openExpanded}
+            onCreateCollection={(name) => {
+              setCollections((current) => [createCollection(name), ...current]);
             }}
+            onDeleteCollection={(id) => setCollections((current) => deleteCollection(current, id))}
+            onRemoveFromCollection={(id, ids) => setCollections((current) => removeFromCollection(current, id, ids))}
+            onToggleFavorite={(id) => setFavoriteIds((current) => toggleFavorite(current, id))}
+            onNavigate={(id) => navigate("collections", { collectionId: id })}
+          />
+        ) : view === "sources" ? (
+          <SourcesView
+            entries={entries}
+            focusSourceId={sourceId}
+            onOpenEntry={openInspector}
+            onExpandEntry={openExpanded}
+            onNavigate={(id) => navigate("sources", { sourceId: id })}
+          />
+        ) : view === "selected" ? (
+          <SelectedView
+            items={selectionItems}
+            annotations={annotations}
+            onBack={openBrowse}
+            onOpenEntry={openInspector}
+            onExpandEntry={openExpanded}
+            onRemove={(id) => toggleSelection(id, false)}
+            onMove={(id, delta) => setSelection((current) => moveSelectionId(current, id, delta))}
+            onClear={() => setSelection([])}
+            onCompare={() => setCompareOpen(true)}
           />
         ) : (
           <>
-            <section className="entry-nav" aria-label="Component catalog">
-              <FilterBar
-                query={query}
-                onQueryChange={setQuery}
-                category={category}
-                onCategoryChange={setCategory}
-                theme={theme}
-                onThemeChange={setTheme}
-                aesthetic={aesthetic}
-                onAestheticChange={setAesthetic}
-                behavior={behavior}
-                onBehaviorChange={setBehavior}
-                source={source}
-                onSourceChange={setSource}
-                entryType={entryType}
-                onEntryTypeChange={setEntryType}
-                searchInputRef={searchInputRef}
-              />
+            <section className="entry-nav" aria-label="Component table">
               <EntryList
                 entries={filtered}
                 totalCount={catalogCounts.entries}
-                selectedId={selectedId}
-                onSelect={selectEntry}
+                selectedId={tableEntry?.id ?? null}
+                onSelect={(id) => {
+                  setBrowserSelectedId(id);
+                  setRecentIds((current) => recordRecent(current, id));
+                }}
                 filtersActive={filtersActive}
                 onResetFilters={resetFilters}
               />
             </section>
             <section className="detail-pane" aria-label="Component details">
               <DetailPane
-                entry={selected}
-                selected={selected ? selection.includes(selected.id) : undefined}
+                entry={tableEntry}
+                selected={tableEntry ? selection.includes(tableEntry.id) : undefined}
                 onToggleSelection={toggleSelection}
               />
-              {selected ? (
-                <p className="workspace-open-row">
-                  <a className="workspace-open" href={`#/preview/${selected.id}`}>
-                    Open full preview workspace ↗
-                  </a>
-                </p>
+              {tableEntry ? (
+                <div className="table-open-actions">
+                  <button type="button" onClick={() => openInspector(tableEntry.id)}>Open inspector</button>
+                  <button type="button" onClick={() => openExpanded(tableEntry.id)}>Open full preview</button>
+                </div>
               ) : null}
-              <PreviewPanel entry={selected} />
+              <PreviewPanel entry={tableEntry} />
             </section>
           </>
         )}
       </main>
+
+      {selection.length > 0 && view !== "browse" && view !== "selected" ? (
+        <div className="selection-dock" role="status">
+          <span>{selection.length} selected for AI</span>
+          <button type="button" onClick={() => navigate("selected")}>Open selected</button>
+          <button type="button" onClick={() => setSelection([])}>Clear</button>
+        </div>
+      ) : null}
+
+      {selected && annotation ? (
+        <InspectorPanel
+          entry={selected}
+          selected={selection.includes(selected.id)}
+          favorite={favoriteSet.has(selected.id)}
+          annotation={annotation}
+          collections={collections}
+          onClose={closeInspector}
+          onToggleSelect={toggleSelection}
+          onToggleFavorite={(id) => setFavoriteIds((current) => toggleFavorite(current, id))}
+          onExpand={openExpanded}
+          onAddToCollection={(id, ids) => setCollections((current) => addToCollection(current, id, ids))}
+          onAddManualTag={(id, tag) => setAnnotations((current) => addManualTag(current, id, tag))}
+          onRemoveManualTag={(id, tag) => setAnnotations((current) => removeManualTag(current, id, tag))}
+          onNoteChange={(id, note) => setAnnotations((current) => setAnnotationNote(current, id, note))}
+          onConfirmTags={(id) => setAnnotations((current) => setAnnotationConfirmed(current, id, true))}
+        />
+      ) : null}
+
+      {expanded ? (
+        <ExpandedPreview
+          entry={expanded}
+          selected={selection.includes(expanded.id)}
+          onToggleSelection={toggleSelection}
+          onClose={closeExpanded}
+        />
+      ) : null}
+
+      {compareOpen && selectionItems.length >= 2 ? (
+        <CompareDialog
+          entries={selectionItems}
+          onClose={() => setCompareOpen(false)}
+          onOpenEntry={(id) => {
+            setCompareOpen(false);
+            openInspector(id);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

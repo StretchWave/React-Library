@@ -1,13 +1,18 @@
 {
-  "schemaVersion": 2,
-  "generatedAt": "2026-10-25T09:25:36.553Z",
+  "schemaVersion": 3,
+  "generatedAt": "2026-10-31T03:16:01.263Z",
   "generator": "scripts/generate-index.mjs",
   "counts": {
     "entries": 87,
     "themes": 6,
-    "categories": 24,
-    "aesthetics": 12,
-    "sources": 9,
+    "categories": 28,
+    "aesthetics": 22,
+    "attributes": 29,
+    "behaviors": 12,
+    "types": 23,
+    "triggers": 14,
+    "techniques": 46,
+    "sources": 12,
     "byEntryType": {
       "local": 87,
       "external": 0
@@ -16,6 +21,12 @@
       "magic-ui": 4,
       "react-bits": 61,
       "shadcn": 16
+    },
+    "previewStatuses": {
+      "ready": 71,
+      "external": 16,
+      "unavailable": 0,
+      "error": 0
     }
   },
   "taxonomies": {
@@ -51,7 +62,11 @@
       "page-sections",
       "page-layouts",
       "motion",
-      "micro-interactions"
+      "micro-interactions",
+      "templates",
+      "transitions",
+      "visual-effect-recipes",
+      "scenes"
     ],
     "aesthetics": [
       "professional",
@@ -65,7 +80,17 @@
       "futuristic",
       "gaming",
       "editorial",
-      "playful"
+      "playful",
+      "tron",
+      "vaporwave",
+      "retro-terminal",
+      "retrofuturism",
+      "y2k",
+      "holographic",
+      "glassmorphism",
+      "fantasy",
+      "horror",
+      "pixel-art"
     ],
     "attributes": [
       "dark",
@@ -92,7 +117,11 @@
       "gsap",
       "motion",
       "canvas",
-      "ogl"
+      "ogl",
+      "javascript",
+      "svg",
+      "matter-js",
+      "html"
     ],
     "behaviors": [
       "auto",
@@ -108,62 +137,459 @@
       "stateful",
       "static"
     ],
+    "types": [
+      "button",
+      "input",
+      "card",
+      "navigation",
+      "text-effect",
+      "loader",
+      "background",
+      "gradient",
+      "section",
+      "template",
+      "transition",
+      "scene",
+      "visual-effect-recipe",
+      "modal",
+      "tooltip",
+      "tabs",
+      "chart",
+      "cursor",
+      "layout",
+      "feedback",
+      "motion",
+      "micro-interaction",
+      "display"
+    ],
+    "triggers": [
+      "automatic-loop",
+      "mount",
+      "hover",
+      "cursor-reactive",
+      "click",
+      "drag",
+      "physics",
+      "scroll",
+      "viewport-entry",
+      "gesture",
+      "keyboard",
+      "state-change",
+      "route-transition",
+      "static"
+    ],
+    "techniques": [
+      "fade",
+      "slide",
+      "reveal-mask",
+      "stagger",
+      "text-splitting",
+      "typewriter",
+      "scramble",
+      "morphing",
+      "parallax",
+      "particles",
+      "liquid",
+      "shader",
+      "glow",
+      "bloom",
+      "glitch",
+      "magnetic",
+      "trails",
+      "orbit",
+      "pixelation",
+      "dithering",
+      "blur",
+      "gradient-shift",
+      "noise",
+      "elastic",
+      "flip",
+      "marquee",
+      "rotation",
+      "draw-svg",
+      "distortion",
+      "displacement",
+      "reflection",
+      "wave",
+      "grid",
+      "spotlight",
+      "beam",
+      "physics",
+      "depth",
+      "count",
+      "shimmer",
+      "glass",
+      "iridescence",
+      "metallic",
+      "motion-blur",
+      "lightning",
+      "stack",
+      "hover-tilt"
+    ],
     "sources": [
       {
         "id": "shadcn",
         "name": "shadcn/ui",
         "status": "available",
-        "url": "https://ui.shadcn.com/"
+        "url": "https://ui.shadcn.com/",
+        "license": "MIT",
+        "accessMethod": "official-registry",
+        "auth": "none",
+        "limit": null,
+        "coverage": {
+          "discovered": 16,
+          "imported": 16,
+          "previewReady": 0,
+          "usable": 16,
+          "locked": 0,
+          "blocked": 0,
+          "reviewNeeded": 16,
+          "checkedAt": "2026-10-28"
+        }
       },
       {
         "id": "magic-ui",
         "name": "Magic UI",
         "status": "available",
-        "url": "https://magicui.design/"
+        "url": "https://magicui.design/",
+        "license": "MIT",
+        "accessMethod": "official-registry",
+        "auth": "none",
+        "limit": null,
+        "coverage": {
+          "discovered": 4,
+          "imported": 4,
+          "previewReady": 4,
+          "usable": 4,
+          "locked": 0,
+          "blocked": 0,
+          "reviewNeeded": 4,
+          "checkedAt": "2026-10-28"
+        }
       },
       {
         "id": "uiverse",
         "name": "Uiverse",
         "status": "available",
-        "url": "https://uiverse.io/"
+        "url": "https://uiverse.io/",
+        "license": "MIT (community-made; keep per-element author attribution)",
+        "accessMethod": "repo-curated",
+        "auth": "none",
+        "limit": "Fair-use policy restricts automated/bulk mirroring - hand-curate individual elements",
+        "coverage": {
+          "discovered": 0,
+          "imported": 0,
+          "previewReady": 0,
+          "usable": 0,
+          "locked": 0,
+          "blocked": 1,
+          "reviewNeeded": 0,
+          "checkedAt": "2026-10-28"
+        }
       },
       {
         "id": "hyperui",
         "name": "HyperUI",
         "status": "available",
-        "url": "https://hyperui.dev/"
+        "url": "https://hyperui.dev/",
+        "license": "MIT",
+        "accessMethod": "repo-vendored",
+        "auth": "none",
+        "limit": null,
+        "coverage": {
+          "discovered": 0,
+          "imported": 0,
+          "previewReady": 0,
+          "usable": 0,
+          "locked": 0,
+          "blocked": 0,
+          "reviewNeeded": 0,
+          "checkedAt": "2026-10-28"
+        }
       },
       {
         "id": "react-bits",
         "name": "React Bits",
         "status": "available",
-        "url": "https://reactbits.dev/"
+        "url": "https://reactbits.dev/",
+        "license": "MIT + Commons Clause v1.0 (LICENSE.md verified 2026-10-24)",
+        "accessMethod": "official-registry",
+        "auth": "none",
+        "limit": "Commons Clause forbids selling, sublicensing, or redistributing the components themselves - alone, bundled, or ported. Application use is permitted.",
+        "coverage": {
+          "discovered": 61,
+          "imported": 61,
+          "previewReady": 61,
+          "usable": 61,
+          "locked": 0,
+          "blocked": 0,
+          "reviewNeeded": 0,
+          "checkedAt": "2026-10-28"
+        }
       },
       {
         "id": "aceternity",
         "name": "Aceternity UI",
         "status": "reference-only",
-        "url": "https://ui.aceternity.com/"
+        "url": "https://ui.aceternity.com/",
+        "license": "Custom free license; source redistribution forbidden (licence page + third-party summaries)",
+        "accessMethod": "official-docs",
+        "auth": "none to browse; Pro tier is paid",
+        "limit": "No local storage or redistribution of source; third-party components within items may carry other licenses.",
+        "coverage": {
+          "discovered": 0,
+          "imported": 0,
+          "previewReady": 0,
+          "usable": 0,
+          "locked": 0,
+          "blocked": 1,
+          "reviewNeeded": 0,
+          "checkedAt": "2026-10-28"
+        }
       },
       {
         "id": "21st-dev",
         "name": "21st.dev",
         "status": "partial",
-        "url": "https://21st.dev/"
+        "url": "https://21st.dev/",
+        "license": "varies per component/creator - verify per entry",
+        "accessMethod": "official-registry",
+        "auth": "optional (account needed only to publish)",
+        "limit": "Per-creator licensing; their terms forbid redistributing code from libraries that prohibit it.",
+        "coverage": {
+          "discovered": 0,
+          "imported": 0,
+          "previewReady": 0,
+          "usable": 0,
+          "locked": 0,
+          "blocked": 1,
+          "reviewNeeded": 0,
+          "checkedAt": "2026-10-28"
+        }
       },
       {
         "id": "originkit",
         "name": "Originkit",
         "status": "partial",
-        "url": "https://www.originkit.dev/"
+        "url": "https://www.originkit.dev/",
+        "license": "custom free tier - verify per component",
+        "accessMethod": "mcp",
+        "auth": "none to browse",
+        "limit": "~50 free animated components; copy limits on the free tier; full catalogue is a paid upgrade.",
+        "coverage": {
+          "discovered": 0,
+          "imported": 0,
+          "previewReady": 0,
+          "usable": 0,
+          "locked": 0,
+          "blocked": 1,
+          "reviewNeeded": 1,
+          "checkedAt": "2026-10-28"
+        }
       },
       {
         "id": "pryzm",
         "name": "Pryzm",
         "status": "reference-only",
-        "url": "https://pryzm.design/"
+        "url": "https://pryzm.design/",
+        "license": "generator tool - exports belong to the user; gallery looks are remix references",
+        "accessMethod": "official-docs",
+        "auth": "none",
+        "limit": "No component code registry; visual gallery is for remixing, not redistribution.",
+        "coverage": {
+          "discovered": 0,
+          "imported": 0,
+          "previewReady": 0,
+          "usable": 0,
+          "locked": 0,
+          "blocked": 0,
+          "reviewNeeded": 1,
+          "checkedAt": "2026-10-28"
+        }
+      },
+      {
+        "id": "codepen",
+        "name": "CodePen",
+        "status": "reference-only",
+        "url": "https://codepen.io/",
+        "license": "varies per pen (author-owned) - verify each pen",
+        "accessMethod": "official-embed-export",
+        "auth": "varies",
+        "limit": "Only official embed/export paths; no bulk scraping, private-pen access or unlicensed redistribution.",
+        "coverage": {
+          "discovered": 1,
+          "imported": 0,
+          "previewReady": 0,
+          "usable": 0,
+          "locked": 1,
+          "blocked": 1,
+          "reviewNeeded": 1,
+          "checkedAt": "2026-10-28"
+        }
+      },
+      {
+        "id": "ditther",
+        "name": "Ditther",
+        "status": "reference-only",
+        "url": "https://ditther.com/",
+        "license": "generator exports belong to the user; gallery looks remain reference material",
+        "accessMethod": "effect-generator",
+        "auth": "none",
+        "limit": "Do not redistribute Ditther gallery effects, presets or prompts. Recreate effects explicitly.",
+        "coverage": {
+          "discovered": 0,
+          "imported": 0,
+          "previewReady": 0,
+          "usable": 0,
+          "locked": 0,
+          "blocked": 1,
+          "reviewNeeded": 1,
+          "checkedAt": "2026-10-28"
+        }
+      },
+      {
+        "id": "getlayers",
+        "name": "GetLayers",
+        "status": "reference-only",
+        "url": "https://www.getlayers.ai/",
+        "license": "custom GetLayers terms; source files, prompts and templates may not be redistributed",
+        "accessMethod": "mcp",
+        "auth": "account/MCP connection likely required",
+        "limit": "Never redistribute source files or prompts. Metadata and official retrieval links only.",
+        "coverage": {
+          "discovered": 0,
+          "imported": 0,
+          "previewReady": 0,
+          "usable": 0,
+          "locked": 0,
+          "blocked": 1,
+          "reviewNeeded": 1,
+          "checkedAt": "2026-10-28"
+        }
       }
     ]
+  },
+  "sourceCoverage": {
+    "shadcn": {
+      "discovered": 16,
+      "imported": 16,
+      "previewReady": 0,
+      "usable": 16,
+      "locked": 0,
+      "blocked": 0,
+      "reviewNeeded": 16,
+      "checkedAt": "2026-10-28"
+    },
+    "magic-ui": {
+      "discovered": 4,
+      "imported": 4,
+      "previewReady": 4,
+      "usable": 4,
+      "locked": 0,
+      "blocked": 0,
+      "reviewNeeded": 4,
+      "checkedAt": "2026-10-28"
+    },
+    "uiverse": {
+      "discovered": 0,
+      "imported": 0,
+      "previewReady": 0,
+      "usable": 0,
+      "locked": 0,
+      "blocked": 1,
+      "reviewNeeded": 0,
+      "checkedAt": "2026-10-28"
+    },
+    "hyperui": {
+      "discovered": 0,
+      "imported": 0,
+      "previewReady": 0,
+      "usable": 0,
+      "locked": 0,
+      "blocked": 0,
+      "reviewNeeded": 0,
+      "checkedAt": "2026-10-28"
+    },
+    "react-bits": {
+      "discovered": 61,
+      "imported": 61,
+      "previewReady": 61,
+      "usable": 61,
+      "locked": 0,
+      "blocked": 0,
+      "reviewNeeded": 0,
+      "checkedAt": "2026-10-28"
+    },
+    "aceternity": {
+      "discovered": 0,
+      "imported": 0,
+      "previewReady": 0,
+      "usable": 0,
+      "locked": 0,
+      "blocked": 1,
+      "reviewNeeded": 0,
+      "checkedAt": "2026-10-28"
+    },
+    "21st-dev": {
+      "discovered": 0,
+      "imported": 0,
+      "previewReady": 0,
+      "usable": 0,
+      "locked": 0,
+      "blocked": 1,
+      "reviewNeeded": 0,
+      "checkedAt": "2026-10-28"
+    },
+    "originkit": {
+      "discovered": 0,
+      "imported": 0,
+      "previewReady": 0,
+      "usable": 0,
+      "locked": 0,
+      "blocked": 1,
+      "reviewNeeded": 1,
+      "checkedAt": "2026-10-28"
+    },
+    "pryzm": {
+      "discovered": 0,
+      "imported": 0,
+      "previewReady": 0,
+      "usable": 0,
+      "locked": 0,
+      "blocked": 0,
+      "reviewNeeded": 1,
+      "checkedAt": "2026-10-28"
+    },
+    "codepen": {
+      "discovered": 1,
+      "imported": 0,
+      "previewReady": 0,
+      "usable": 0,
+      "locked": 1,
+      "blocked": 1,
+      "reviewNeeded": 1,
+      "checkedAt": "2026-10-28"
+    },
+    "ditther": {
+      "discovered": 0,
+      "imported": 0,
+      "previewReady": 0,
+      "usable": 0,
+      "locked": 0,
+      "blocked": 1,
+      "reviewNeeded": 1,
+      "checkedAt": "2026-10-28"
+    },
+    "getlayers": {
+      "discovered": 0,
+      "imported": 0,
+      "previewReady": 0,
+      "usable": 0,
+      "locked": 0,
+      "blocked": 1,
+      "reviewNeeded": 1,
+      "checkedAt": "2026-10-28"
+    }
   },
   "entries": [
     {
@@ -225,7 +651,40 @@
       ],
       "behaviors": [
         "static"
-      ]
+      ],
+      "types": [
+        "feedback"
+      ],
+      "triggers": [
+        "static"
+      ],
+      "techniques": [],
+      "aesthetics": [],
+      "attributes": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:feedback"
+        ],
+        "inferred": [
+          "trigger:static"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [],
+        "snapshotPath": "public/previews/alert.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "badge",
@@ -279,7 +738,40 @@
       ],
       "behaviors": [
         "static"
-      ]
+      ],
+      "types": [
+        "display"
+      ],
+      "triggers": [
+        "static"
+      ],
+      "techniques": [],
+      "aesthetics": [],
+      "attributes": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:display"
+        ],
+        "inferred": [
+          "trigger:static"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [],
+        "snapshotPath": "public/previews/badge.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "button",
@@ -348,7 +840,44 @@
       "behaviors": [
         "hover",
         "click"
-      ]
+      ],
+      "types": [
+        "button"
+      ],
+      "triggers": [
+        "hover",
+        "click"
+      ],
+      "techniques": [],
+      "aesthetics": [],
+      "attributes": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:button"
+        ],
+        "inferred": [
+          "trigger:hover",
+          "trigger:click"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/button.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "card",
@@ -415,7 +944,40 @@
       ],
       "behaviors": [
         "static"
-      ]
+      ],
+      "types": [
+        "layout"
+      ],
+      "triggers": [
+        "static"
+      ],
+      "techniques": [],
+      "aesthetics": [],
+      "attributes": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:layout"
+        ],
+        "inferred": [
+          "trigger:static"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [],
+        "snapshotPath": "public/previews/card.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "magic-ui-blur-fade",
@@ -484,7 +1046,60 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "scroll"
-      ]
+      ],
+      "types": [
+        "motion",
+        "transition"
+      ],
+      "triggers": [
+        "scroll",
+        "viewport-entry"
+      ],
+      "techniques": [
+        "blur",
+        "fade",
+        "reveal-mask"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:motion",
+          "vibe:minimal",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:animated",
+          "tech:scroll-driven"
+        ],
+        "inferred": [
+          "type:transition",
+          "trigger:scroll",
+          "trigger:viewport-entry",
+          "technique:blur",
+          "technique:fade",
+          "technique:reveal-mask"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "low",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "scroll"
+        ],
+        "snapshotPath": "public/previews/magic-ui-blur-fade.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "magic-ui-border-beam",
@@ -556,7 +1171,56 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "display",
+        "card"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "beam",
+        "gradient-shift",
+        "glow"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:display",
+          "vibe:futuristic",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:animated",
+          "tech:gradient"
+        ],
+        "inferred": [
+          "type:card",
+          "trigger:automatic-loop",
+          "technique:beam",
+          "technique:gradient-shift",
+          "technique:glow"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [],
+        "snapshotPath": "public/previews/magic-ui-border-beam.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "magic-ui-dot-pattern",
@@ -628,7 +1292,50 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "background"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "grid"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:minimal",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:static",
+          "tech:geometric"
+        ],
+        "inferred": [
+          "trigger:automatic-loop",
+          "technique:grid"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "medium",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [],
+        "snapshotPath": "public/previews/magic-ui-dot-pattern.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "magic-ui-word-rotate",
@@ -700,7 +1407,51 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "text-effect"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "rotation",
+        "typewriter"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:text-effect",
+          "vibe:editorial",
+          "vibe:minimal",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:animated"
+        ],
+        "inferred": [
+          "trigger:automatic-loop",
+          "technique:rotation",
+          "technique:typewriter"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [],
+        "snapshotPath": "public/previews/magic-ui-word-rotate.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-animated-content",
@@ -771,7 +1522,62 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "scroll"
-      ]
+      ],
+      "types": [
+        "motion",
+        "transition"
+      ],
+      "triggers": [
+        "scroll",
+        "viewport-entry"
+      ],
+      "techniques": [
+        "slide",
+        "blur",
+        "flip",
+        "reveal-mask",
+        "stagger"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:motion",
+          "vibe:minimal",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:gsap"
+        ],
+        "inferred": [
+          "type:transition",
+          "trigger:scroll",
+          "trigger:viewport-entry",
+          "technique:slide",
+          "technique:blur",
+          "technique:flip",
+          "technique:reveal-mask",
+          "technique:stagger"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "medium",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "scroll"
+        ],
+        "snapshotPath": "public/previews/react-bits-animated-content.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-animated-list",
@@ -847,7 +1653,61 @@
       "behaviors": [
         "auto",
         "stateful"
-      ]
+      ],
+      "types": [
+        "feedback",
+        "layout",
+        "micro-interaction"
+      ],
+      "triggers": [
+        "mount",
+        "state-change",
+        "keyboard"
+      ],
+      "techniques": [
+        "stagger",
+        "slide",
+        "elastic"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:feedback",
+          "vibe:playful",
+          "vibe:casual",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "type:layout",
+          "type:micro-interaction",
+          "trigger:mount",
+          "trigger:state-change",
+          "trigger:keyboard",
+          "technique:stagger",
+          "technique:slide",
+          "technique:elastic"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "low",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "keyboard"
+        ],
+        "snapshotPath": "public/previews/react-bits-animated-list.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-aurora",
@@ -913,7 +1773,56 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "background"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "gradient-shift",
+        "blur",
+        "shader"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:futuristic",
+          "vibe:organic",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:automatic-loop",
+          "technique:gradient-shift",
+          "technique:blur",
+          "technique:shader"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu"
+        ],
+        "snapshotPath": "public/previews/react-bits-aurora.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-ballpit",
@@ -980,7 +1889,62 @@
         "cursor-reactive",
         "interactive-3d",
         "auto"
-      ]
+      ],
+      "types": [
+        "background"
+      ],
+      "triggers": [
+        "cursor-reactive",
+        "automatic-loop",
+        "drag",
+        "click"
+      ],
+      "techniques": [
+        "physics",
+        "depth"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:playful",
+          "vibe:futuristic",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:cursor-reactive",
+          "trigger:automatic-loop",
+          "trigger:drag",
+          "trigger:click",
+          "technique:physics",
+          "technique:depth"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu",
+          "pointer",
+          "user-input"
+        ],
+        "snapshotPath": "public/previews/react-bits-ballpit.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-beams",
@@ -1046,7 +2010,56 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "background"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "beam",
+        "wave",
+        "shader"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:cyberpunk",
+          "vibe:futuristic",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:automatic-loop",
+          "technique:beam",
+          "technique:wave",
+          "technique:shader"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu"
+        ],
+        "snapshotPath": "public/previews/react-bits-beams.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-blob-cursor",
@@ -1120,7 +2133,60 @@
       "behaviors": [
         "cursor-reactive",
         "interactive-3d"
-      ]
+      ],
+      "types": [
+        "motion",
+        "cursor"
+      ],
+      "triggers": [
+        "cursor-reactive"
+      ],
+      "techniques": [
+        "liquid",
+        "metallic",
+        "trails",
+        "shader"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:motion",
+          "vibe:organic",
+          "vibe:playful",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl"
+        ],
+        "inferred": [
+          "type:cursor",
+          "trigger:cursor-reactive",
+          "technique:liquid",
+          "technique:metallic",
+          "technique:trails",
+          "technique:shader"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "high",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu",
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-blob-cursor.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-blur-text",
@@ -1192,7 +2258,56 @@
       "behaviors": [
         "scroll",
         "interactive-text"
-      ]
+      ],
+      "types": [
+        "text-effect"
+      ],
+      "triggers": [
+        "scroll",
+        "viewport-entry"
+      ],
+      "techniques": [
+        "blur",
+        "reveal-mask",
+        "stagger"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:text-effect",
+          "vibe:minimal",
+          "vibe:editorial",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:motion"
+        ],
+        "inferred": [
+          "trigger:scroll",
+          "trigger:viewport-entry",
+          "technique:blur",
+          "technique:reveal-mask",
+          "technique:stagger"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "medium",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "scroll"
+        ],
+        "snapshotPath": "public/previews/react-bits-blur-text.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-border-glow",
@@ -1259,7 +2374,57 @@
       "behaviors": [
         "cursor-reactive",
         "auto"
-      ]
+      ],
+      "types": [
+        "layout",
+        "card"
+      ],
+      "triggers": [
+        "cursor-reactive",
+        "automatic-loop"
+      ],
+      "techniques": [
+        "glow",
+        "gradient-shift",
+        "beam"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:layout",
+          "vibe:cyberpunk",
+          "vibe:futuristic",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "type:card",
+          "trigger:cursor-reactive",
+          "trigger:automatic-loop",
+          "technique:glow",
+          "technique:gradient-shift",
+          "technique:beam"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-border-glow.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-bubble-menu",
@@ -1333,7 +2498,54 @@
         "click",
         "stateful",
         "interactive-nav"
-      ]
+      ],
+      "types": [
+        "navigation"
+      ],
+      "triggers": [
+        "click",
+        "state-change"
+      ],
+      "techniques": [
+        "stagger",
+        "elastic"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:navigation",
+          "vibe:playful",
+          "vibe:casual",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:gsap"
+        ],
+        "inferred": [
+          "trigger:click",
+          "trigger:state-change",
+          "technique:stagger",
+          "technique:elastic"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "medium",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-bubble-menu.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-card-nav",
@@ -1410,7 +2622,55 @@
         "click",
         "stateful",
         "interactive-nav"
-      ]
+      ],
+      "types": [
+        "navigation",
+        "card"
+      ],
+      "triggers": [
+        "click",
+        "state-change"
+      ],
+      "techniques": [
+        "slide",
+        "stagger"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:navigation",
+          "vibe:professional",
+          "vibe:minimal",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "type:card",
+          "trigger:click",
+          "trigger:state-change",
+          "technique:slide",
+          "technique:stagger"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "low",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-card-nav.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-carousel",
@@ -1483,7 +2743,51 @@
       "behaviors": [
         "click",
         "stateful"
-      ]
+      ],
+      "types": [
+        "section"
+      ],
+      "triggers": [
+        "click",
+        "state-change"
+      ],
+      "techniques": [
+        "slide"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:section",
+          "vibe:editorial",
+          "vibe:minimal",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "trigger:click",
+          "trigger:state-change",
+          "technique:slide"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "low",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-carousel.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-chroma-grid",
@@ -1549,7 +2853,55 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "hover"
-      ]
+      ],
+      "types": [
+        "layout",
+        "card"
+      ],
+      "triggers": [
+        "hover",
+        "cursor-reactive"
+      ],
+      "techniques": [
+        "spotlight",
+        "grid"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:layout",
+          "vibe:cyberpunk",
+          "vibe:editorial",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "type:card",
+          "trigger:hover",
+          "trigger:cursor-reactive",
+          "technique:spotlight",
+          "technique:grid"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-chroma-grid.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-circular-gallery",
@@ -1621,7 +2973,62 @@
         "gesture",
         "interactive-3d",
         "auto"
-      ]
+      ],
+      "types": [
+        "section",
+        "scene"
+      ],
+      "triggers": [
+        "drag",
+        "gesture",
+        "mount"
+      ],
+      "techniques": [
+        "orbit",
+        "depth"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:section",
+          "vibe:editorial",
+          "vibe:luxury",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "type:scene",
+          "trigger:drag",
+          "trigger:gesture",
+          "trigger:mount",
+          "technique:orbit",
+          "technique:depth"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu",
+          "pointer",
+          "user-input"
+        ],
+        "snapshotPath": "public/previews/react-bits-circular-gallery.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-circular-text",
@@ -1693,7 +3100,50 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "text-effect"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "rotation",
+        "marquee"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:text-effect",
+          "vibe:editorial",
+          "vibe:playful",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:motion"
+        ],
+        "inferred": [
+          "trigger:automatic-loop",
+          "technique:rotation",
+          "technique:marquee"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "medium",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "snapshotPath": "public/previews/react-bits-circular-text.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-click-spark",
@@ -1759,7 +3209,54 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "click"
-      ]
+      ],
+      "types": [
+        "motion",
+        "micro-interaction"
+      ],
+      "triggers": [
+        "click"
+      ],
+      "techniques": [
+        "particles",
+        "trails"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:motion",
+          "vibe:gaming",
+          "vibe:playful",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "type:micro-interaction",
+          "trigger:click",
+          "technique:particles",
+          "technique:trails"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-click-spark.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-count-up",
@@ -1830,7 +3327,48 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "display"
+      ],
+      "triggers": [
+        "mount"
+      ],
+      "techniques": [
+        "count"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:display",
+          "vibe:minimal",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:motion"
+        ],
+        "inferred": [
+          "trigger:mount",
+          "technique:count"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "compact",
+        "cost": "medium",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [],
+        "snapshotPath": "public/previews/react-bits-count-up.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-counter",
@@ -1894,7 +3432,51 @@
       "behaviors": [
         "stateful",
         "auto"
-      ]
+      ],
+      "types": [
+        "display"
+      ],
+      "triggers": [
+        "state-change",
+        "mount"
+      ],
+      "techniques": [
+        "count",
+        "rotation"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:display",
+          "vibe:minimal",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "trigger:state-change",
+          "trigger:mount",
+          "technique:count",
+          "technique:rotation"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [],
+        "snapshotPath": "public/previews/react-bits-counter.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-decrypted-text",
@@ -1966,7 +3548,54 @@
       "behaviors": [
         "scroll",
         "interactive-text"
-      ]
+      ],
+      "types": [
+        "text-effect"
+      ],
+      "triggers": [
+        "scroll",
+        "viewport-entry"
+      ],
+      "techniques": [
+        "scramble",
+        "typewriter"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:text-effect",
+          "vibe:cyberpunk",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:motion",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:scroll",
+          "trigger:viewport-entry",
+          "technique:scramble",
+          "technique:typewriter"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "medium",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "scroll"
+        ],
+        "snapshotPath": "public/previews/react-bits-decrypted-text.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-dock",
@@ -2031,7 +3660,52 @@
       "behaviors": [
         "hover",
         "interactive-nav"
-      ]
+      ],
+      "types": [
+        "navigation"
+      ],
+      "triggers": [
+        "hover"
+      ],
+      "techniques": [
+        "magnetic",
+        "stagger"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:navigation",
+          "vibe:minimal",
+          "vibe:professional",
+          "vibe:playful",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "trigger:hover",
+          "technique:magnetic",
+          "technique:stagger"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "low",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-dock.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-dome-gallery",
@@ -2108,7 +3782,54 @@
         "draggable",
         "gesture",
         "interactive-3d"
-      ]
+      ],
+      "types": [
+        "scene"
+      ],
+      "triggers": [
+        "drag",
+        "gesture"
+      ],
+      "techniques": [
+        "depth",
+        "orbit"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:scene",
+          "vibe:futuristic",
+          "vibe:editorial",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "trigger:drag",
+          "trigger:gesture",
+          "technique:depth",
+          "technique:orbit"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "medium",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "pointer",
+          "user-input"
+        ],
+        "snapshotPath": "public/previews/react-bits-dome-gallery.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-dot-grid",
@@ -2178,7 +3899,55 @@
       "behaviors": [
         "cursor-reactive",
         "interactive-3d"
-      ]
+      ],
+      "types": [
+        "background"
+      ],
+      "triggers": [
+        "cursor-reactive"
+      ],
+      "techniques": [
+        "physics",
+        "grid"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:minimal",
+          "vibe:futuristic",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:cursor-reactive",
+          "technique:physics",
+          "technique:grid"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu",
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-dot-grid.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-elastic-slider",
@@ -2256,7 +4025,55 @@
         "draggable",
         "gesture",
         "stateful"
-      ]
+      ],
+      "types": [
+        "input"
+      ],
+      "triggers": [
+        "drag",
+        "gesture",
+        "state-change"
+      ],
+      "techniques": [
+        "elastic"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:input",
+          "vibe:playful",
+          "vibe:minimal",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:drag",
+          "trigger:gesture",
+          "trigger:state-change",
+          "technique:elastic"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer",
+          "user-input"
+        ],
+        "snapshotPath": "public/previews/react-bits-elastic-slider.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-fade-content",
@@ -2327,7 +4144,60 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "scroll"
-      ]
+      ],
+      "types": [
+        "motion",
+        "transition"
+      ],
+      "triggers": [
+        "scroll",
+        "viewport-entry"
+      ],
+      "techniques": [
+        "fade",
+        "blur",
+        "reveal-mask",
+        "stagger"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:motion",
+          "vibe:minimal",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:gsap"
+        ],
+        "inferred": [
+          "type:transition",
+          "trigger:scroll",
+          "trigger:viewport-entry",
+          "technique:fade",
+          "technique:blur",
+          "technique:reveal-mask",
+          "technique:stagger"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "medium",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "scroll"
+        ],
+        "snapshotPath": "public/previews/react-bits-fade-content.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-falling-text",
@@ -2401,7 +4271,52 @@
         "click",
         "draggable",
         "interactive-text"
-      ]
+      ],
+      "types": [
+        "text-effect"
+      ],
+      "triggers": [
+        "click",
+        "drag"
+      ],
+      "techniques": [
+        "physics"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:text-effect",
+          "vibe:playful",
+          "vibe:organic",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "trigger:click",
+          "trigger:drag",
+          "technique:physics"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "high",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "pointer",
+          "user-input"
+        ],
+        "snapshotPath": "public/previews/react-bits-falling-text.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-flowing-menu",
@@ -2477,7 +4392,53 @@
       "behaviors": [
         "hover",
         "interactive-nav"
-      ]
+      ],
+      "types": [
+        "navigation"
+      ],
+      "triggers": [
+        "hover"
+      ],
+      "techniques": [
+        "liquid",
+        "marquee",
+        "slide"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:navigation",
+          "vibe:editorial",
+          "vibe:luxury",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "trigger:hover",
+          "technique:liquid",
+          "technique:marquee",
+          "technique:slide"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "low",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-flowing-menu.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-fluid-glass",
@@ -2533,7 +4494,8 @@
       "heavy": true,
       "aesthetics": [
         "futuristic",
-        "organic"
+        "organic",
+        "glassmorphism"
       ],
       "attributes": [
         "react",
@@ -2547,7 +4509,65 @@
       "behaviors": [
         "draggable",
         "interactive-3d"
-      ]
+      ],
+      "types": [
+        "background",
+        "scene"
+      ],
+      "triggers": [
+        "drag",
+        "cursor-reactive"
+      ],
+      "techniques": [
+        "glass",
+        "liquid",
+        "shader",
+        "distortion"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:futuristic",
+          "vibe:organic",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "type:scene",
+          "trigger:drag",
+          "trigger:cursor-reactive",
+          "technique:glass",
+          "technique:liquid",
+          "technique:shader",
+          "technique:distortion",
+          "vibe:glassmorphism"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu",
+          "pointer",
+          "user-input"
+        ],
+        "snapshotPath": "public/previews/react-bits-fluid-glass.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-glare-hover",
@@ -2613,7 +4633,53 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "hover"
-      ]
+      ],
+      "types": [
+        "layout",
+        "card"
+      ],
+      "triggers": [
+        "hover"
+      ],
+      "techniques": [
+        "reflection",
+        "spotlight"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:layout",
+          "vibe:luxury",
+          "vibe:futuristic",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "type:card",
+          "trigger:hover",
+          "technique:reflection",
+          "technique:spotlight"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-glare-hover.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-glass-surface",
@@ -2669,7 +4735,8 @@
       "heavy": true,
       "aesthetics": [
         "luxury",
-        "minimal"
+        "minimal",
+        "glassmorphism"
       ],
       "attributes": [
         "react",
@@ -2682,7 +4749,59 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "static"
-      ]
+      ],
+      "types": [
+        "layout",
+        "card"
+      ],
+      "triggers": [
+        "static"
+      ],
+      "techniques": [
+        "glass",
+        "distortion",
+        "reflection"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:layout",
+          "vibe:luxury",
+          "vibe:minimal",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "type:card",
+          "trigger:static",
+          "technique:glass",
+          "technique:distortion",
+          "technique:reflection",
+          "vibe:glassmorphism"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "high",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu"
+        ],
+        "snapshotPath": "public/previews/react-bits-glass-surface.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-glitch-text",
@@ -2750,7 +4869,50 @@
       "behaviors": [
         "auto",
         "interactive-text"
-      ]
+      ],
+      "types": [
+        "text-effect"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "glitch",
+        "scramble"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:text-effect",
+          "vibe:cyberpunk",
+          "vibe:retro-synthwave",
+          "vibe:brutalist",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "trigger:automatic-loop",
+          "technique:glitch",
+          "technique:scramble"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [],
+        "snapshotPath": "public/previews/react-bits-glitch-text.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-gooey-nav",
@@ -2821,7 +4983,59 @@
         "hover",
         "interactive-nav",
         "stateful"
-      ]
+      ],
+      "types": [
+        "navigation"
+      ],
+      "triggers": [
+        "hover",
+        "state-change"
+      ],
+      "techniques": [
+        "morphing",
+        "liquid",
+        "elastic"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:navigation",
+          "vibe:playful",
+          "vibe:organic",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:hover",
+          "trigger:state-change",
+          "technique:morphing",
+          "technique:liquid",
+          "technique:elastic"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu",
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-gooey-nav.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-gradient-text",
@@ -2876,7 +5090,8 @@
       "runtime": "dom",
       "aesthetics": [
         "playful",
-        "cyberpunk"
+        "cyberpunk",
+        "holographic"
       ],
       "attributes": [
         "react",
@@ -2887,7 +5102,52 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "text-effect",
+        "gradient"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "gradient-shift",
+        "shimmer"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:text-effect",
+          "vibe:playful",
+          "vibe:cyberpunk",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "type:gradient",
+          "trigger:automatic-loop",
+          "technique:gradient-shift",
+          "technique:shimmer",
+          "vibe:holographic"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [],
+        "snapshotPath": "public/previews/react-bits-gradient-text.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-grid-motion",
@@ -2954,7 +5214,55 @@
       "behaviors": [
         "cursor-reactive",
         "auto"
-      ]
+      ],
+      "types": [
+        "background"
+      ],
+      "triggers": [
+        "cursor-reactive",
+        "automatic-loop"
+      ],
+      "techniques": [
+        "grid",
+        "parallax",
+        "spotlight"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:editorial",
+          "vibe:brutalist",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "trigger:cursor-reactive",
+          "trigger:automatic-loop",
+          "technique:grid",
+          "technique:parallax",
+          "technique:spotlight"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "medium",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-grid-motion.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-hyperspeed",
@@ -3012,7 +5320,8 @@
       "heavy": true,
       "aesthetics": [
         "futuristic",
-        "cyberpunk"
+        "cyberpunk",
+        "retrofuturism"
       ],
       "attributes": [
         "react",
@@ -3025,7 +5334,59 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "scene",
+        "background"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "motion-blur",
+        "trails",
+        "depth"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:scene",
+          "vibe:futuristic",
+          "vibe:cyberpunk",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "type:background",
+          "trigger:automatic-loop",
+          "technique:motion-blur",
+          "technique:trails",
+          "technique:depth",
+          "vibe:retrofuturism"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu"
+        ],
+        "snapshotPath": "public/previews/react-bits-hyperspeed.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-iridescence",
@@ -3078,7 +5439,8 @@
       "heavy": true,
       "aesthetics": [
         "futuristic",
-        "organic"
+        "organic",
+        "holographic"
       ],
       "attributes": [
         "react",
@@ -3093,7 +5455,62 @@
         "cursor-reactive",
         "interactive-3d",
         "auto"
-      ]
+      ],
+      "types": [
+        "scene",
+        "visual-effect-recipe"
+      ],
+      "triggers": [
+        "cursor-reactive",
+        "automatic-loop"
+      ],
+      "techniques": [
+        "iridescence",
+        "shader",
+        "liquid"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:scene",
+          "vibe:futuristic",
+          "vibe:organic",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "type:visual-effect-recipe",
+          "trigger:cursor-reactive",
+          "trigger:automatic-loop",
+          "technique:iridescence",
+          "technique:shader",
+          "technique:liquid",
+          "vibe:holographic"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu",
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-iridescence.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-lanyard",
@@ -3166,7 +5583,60 @@
         "draggable",
         "interactive-3d",
         "auto"
-      ]
+      ],
+      "types": [
+        "scene"
+      ],
+      "triggers": [
+        "drag",
+        "automatic-loop",
+        "physics"
+      ],
+      "techniques": [
+        "physics",
+        "depth"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:scene",
+          "vibe:futuristic",
+          "vibe:playful",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:drag",
+          "trigger:automatic-loop",
+          "trigger:physics",
+          "technique:physics",
+          "technique:depth"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu",
+          "pointer",
+          "user-input"
+        ],
+        "snapshotPath": "public/previews/react-bits-lanyard.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-laser-flow",
@@ -3235,7 +5705,56 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "background"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "beam",
+        "glow",
+        "shader"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:cyberpunk",
+          "vibe:futuristic",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:automatic-loop",
+          "technique:beam",
+          "technique:glow",
+          "technique:shader"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu"
+        ],
+        "snapshotPath": "public/previews/react-bits-laser-flow.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-letter-glitch",
@@ -3304,7 +5823,58 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "background",
+        "text-effect"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "glitch",
+        "scramble",
+        "noise"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:cyberpunk",
+          "vibe:brutalist",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "type:text-effect",
+          "trigger:automatic-loop",
+          "technique:glitch",
+          "technique:scramble",
+          "technique:noise"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu"
+        ],
+        "snapshotPath": "public/previews/react-bits-letter-glitch.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-lightning",
@@ -3370,7 +5940,54 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "background"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "lightning",
+        "glow"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:cyberpunk",
+          "vibe:gaming",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:automatic-loop",
+          "technique:lightning",
+          "technique:glow"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu"
+        ],
+        "snapshotPath": "public/previews/react-bits-lightning.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-magnet",
@@ -3432,7 +6049,53 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "cursor-reactive"
-      ]
+      ],
+      "types": [
+        "motion",
+        "micro-interaction"
+      ],
+      "triggers": [
+        "cursor-reactive"
+      ],
+      "techniques": [
+        "magnetic",
+        "elastic"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:motion",
+          "vibe:playful",
+          "vibe:minimal",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "type:micro-interaction",
+          "trigger:cursor-reactive",
+          "technique:magnetic",
+          "technique:elastic"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-magnet.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-magnet-lines",
@@ -3501,7 +6164,55 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "cursor-reactive"
-      ]
+      ],
+      "types": [
+        "background"
+      ],
+      "triggers": [
+        "cursor-reactive"
+      ],
+      "techniques": [
+        "magnetic",
+        "rotation"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:futuristic",
+          "vibe:minimal",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:cursor-reactive",
+          "technique:magnetic",
+          "technique:rotation"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu",
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-magnet-lines.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-masonry",
@@ -3573,7 +6284,51 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "hover"
-      ]
+      ],
+      "types": [
+        "section"
+      ],
+      "triggers": [
+        "hover"
+      ],
+      "techniques": [
+        "stagger",
+        "reveal-mask"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:section",
+          "vibe:editorial",
+          "vibe:casual",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "trigger:hover",
+          "technique:stagger",
+          "technique:reveal-mask"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "low",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-masonry.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-meta-balls",
@@ -3644,7 +6399,61 @@
         "cursor-reactive",
         "interactive-3d",
         "auto"
-      ]
+      ],
+      "types": [
+        "motion",
+        "visual-effect-recipe"
+      ],
+      "triggers": [
+        "cursor-reactive",
+        "mount"
+      ],
+      "techniques": [
+        "liquid",
+        "physics",
+        "shader"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:motion",
+          "vibe:organic",
+          "vibe:playful",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "type:visual-effect-recipe",
+          "trigger:cursor-reactive",
+          "trigger:mount",
+          "technique:liquid",
+          "technique:physics",
+          "technique:shader"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu",
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-meta-balls.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-metallic-paint",
@@ -3700,7 +6509,8 @@
       "heavy": true,
       "aesthetics": [
         "futuristic",
-        "luxury"
+        "luxury",
+        "holographic"
       ],
       "attributes": [
         "react",
@@ -3713,7 +6523,59 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "background",
+        "visual-effect-recipe"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "metallic",
+        "liquid",
+        "shader"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:futuristic",
+          "vibe:luxury",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "type:visual-effect-recipe",
+          "trigger:automatic-loop",
+          "technique:metallic",
+          "technique:liquid",
+          "technique:shader",
+          "vibe:holographic"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu"
+        ],
+        "snapshotPath": "public/previews/react-bits-metallic-paint.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-noise",
@@ -3777,7 +6639,50 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "background",
+        "visual-effect-recipe"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "noise"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:brutalist",
+          "vibe:organic",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "type:visual-effect-recipe",
+          "trigger:automatic-loop",
+          "technique:noise"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "medium",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [],
+        "snapshotPath": "public/previews/react-bits-noise.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-particles",
@@ -3843,7 +6748,56 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "background"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "particles",
+        "depth",
+        "glow"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:minimal",
+          "vibe:futuristic",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:automatic-loop",
+          "technique:particles",
+          "technique:depth",
+          "technique:glow"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu"
+        ],
+        "snapshotPath": "public/previews/react-bits-particles.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-pixel-card",
@@ -3898,7 +6852,9 @@
       "runtime": "dom",
       "aesthetics": [
         "gaming",
-        "retro-synthwave"
+        "retro-synthwave",
+        "pixel-art",
+        "y2k"
       ],
       "attributes": [
         "react",
@@ -3911,7 +6867,58 @@
       "behaviors": [
         "cursor-reactive",
         "hover"
-      ]
+      ],
+      "types": [
+        "layout",
+        "card"
+      ],
+      "triggers": [
+        "cursor-reactive",
+        "hover"
+      ],
+      "techniques": [
+        "pixelation",
+        "stagger"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:layout",
+          "vibe:gaming",
+          "vibe:retro-synthwave",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "type:card",
+          "trigger:cursor-reactive",
+          "trigger:hover",
+          "technique:pixelation",
+          "technique:stagger",
+          "vibe:pixel-art",
+          "vibe:y2k"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-pixel-card.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-pixel-transition",
@@ -3966,7 +6973,9 @@
       "runtime": "dom",
       "aesthetics": [
         "retro-synthwave",
-        "gaming"
+        "gaming",
+        "pixel-art",
+        "y2k"
       ],
       "attributes": [
         "react",
@@ -3979,7 +6988,60 @@
       "behaviors": [
         "hover",
         "click"
-      ]
+      ],
+      "types": [
+        "layout",
+        "transition",
+        "card"
+      ],
+      "triggers": [
+        "hover",
+        "click"
+      ],
+      "techniques": [
+        "pixelation",
+        "reveal-mask"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:layout",
+          "vibe:retro-synthwave",
+          "vibe:gaming",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "type:transition",
+          "type:card",
+          "trigger:hover",
+          "trigger:click",
+          "technique:pixelation",
+          "technique:reveal-mask",
+          "vibe:pixel-art",
+          "vibe:y2k"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-pixel-transition.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-ribbons",
@@ -4045,7 +7107,56 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "motion"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "trails",
+        "wave",
+        "elastic"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:motion",
+          "vibe:futuristic",
+          "vibe:editorial",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:automatic-loop",
+          "technique:trails",
+          "technique:wave",
+          "technique:elastic"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "high",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu"
+        ],
+        "snapshotPath": "public/previews/react-bits-ribbons.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-rotating-text",
@@ -4118,7 +7229,50 @@
       "behaviors": [
         "auto",
         "interactive-text"
-      ]
+      ],
+      "types": [
+        "text-effect"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "rotation",
+        "flip"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:text-effect",
+          "vibe:minimal",
+          "vibe:editorial",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:motion"
+        ],
+        "inferred": [
+          "trigger:automatic-loop",
+          "technique:rotation",
+          "technique:flip"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "medium",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [],
+        "snapshotPath": "public/previews/react-bits-rotating-text.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-scrambled-text",
@@ -4192,7 +7346,56 @@
         "click",
         "interactive-text",
         "auto"
-      ]
+      ],
+      "types": [
+        "text-effect"
+      ],
+      "triggers": [
+        "click",
+        "automatic-loop",
+        "cursor-reactive"
+      ],
+      "techniques": [
+        "distortion",
+        "displacement"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:text-effect",
+          "vibe:cyberpunk",
+          "vibe:brutalist",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:gsap"
+        ],
+        "inferred": [
+          "trigger:click",
+          "trigger:automatic-loop",
+          "trigger:cursor-reactive",
+          "technique:distortion",
+          "technique:displacement"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "medium",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-scrambled-text.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-shiny-text",
@@ -4259,7 +7462,52 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "text-effect"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "shimmer",
+        "gradient-shift",
+        "reflection"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:text-effect",
+          "vibe:luxury",
+          "vibe:playful",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:automatic-loop",
+          "technique:shimmer",
+          "technique:gradient-shift",
+          "technique:reflection"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [],
+        "snapshotPath": "public/previews/react-bits-shiny-text.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-split-text",
@@ -4334,7 +7582,50 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "text-effect"
+      ],
+      "triggers": [
+        "mount"
+      ],
+      "techniques": [
+        "text-splitting",
+        "stagger"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:text-effect",
+          "vibe:editorial",
+          "vibe:playful",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:gsap"
+        ],
+        "inferred": [
+          "trigger:mount",
+          "technique:text-splitting",
+          "technique:stagger"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "medium",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [],
+        "snapshotPath": "public/previews/react-bits-split-text.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-spotlight-card",
@@ -4400,7 +7691,51 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "cursor-reactive"
-      ]
+      ],
+      "types": [
+        "layout"
+      ],
+      "triggers": [
+        "cursor-reactive"
+      ],
+      "techniques": [
+        "spotlight",
+        "glow"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:layout",
+          "vibe:minimal",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "trigger:cursor-reactive",
+          "technique:spotlight",
+          "technique:glow"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-spotlight-card.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-stack",
@@ -4473,7 +7808,59 @@
         "draggable",
         "gesture",
         "stateful"
-      ]
+      ],
+      "types": [
+        "section"
+      ],
+      "triggers": [
+        "click",
+        "drag",
+        "gesture",
+        "state-change"
+      ],
+      "techniques": [
+        "stack",
+        "elastic"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:section",
+          "vibe:playful",
+          "vibe:casual",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:motion"
+        ],
+        "inferred": [
+          "trigger:click",
+          "trigger:drag",
+          "trigger:gesture",
+          "trigger:state-change",
+          "technique:stack",
+          "technique:elastic"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "pointer",
+          "user-input"
+        ],
+        "snapshotPath": "public/previews/react-bits-stack.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-staggered-menu",
@@ -4547,7 +7934,54 @@
         "click",
         "stateful",
         "interactive-nav"
-      ]
+      ],
+      "types": [
+        "navigation"
+      ],
+      "triggers": [
+        "click",
+        "state-change"
+      ],
+      "techniques": [
+        "stagger",
+        "slide"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:navigation",
+          "vibe:minimal",
+          "vibe:editorial",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:gsap"
+        ],
+        "inferred": [
+          "trigger:click",
+          "trigger:state-change",
+          "technique:stagger",
+          "technique:slide"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "medium",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-staggered-menu.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-star-border",
@@ -4616,7 +8050,60 @@
         "hover",
         "auto",
         "click"
-      ]
+      ],
+      "types": [
+        "layout",
+        "card"
+      ],
+      "triggers": [
+        "hover",
+        "automatic-loop",
+        "click"
+      ],
+      "techniques": [
+        "glow",
+        "orbit",
+        "trails"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:layout",
+          "vibe:futuristic",
+          "vibe:cyberpunk",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "type:card",
+          "trigger:hover",
+          "trigger:automatic-loop",
+          "trigger:click",
+          "technique:glow",
+          "technique:orbit",
+          "technique:trails"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-star-border.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-stepper",
@@ -4689,7 +8176,53 @@
       "behaviors": [
         "click",
         "stateful"
-      ]
+      ],
+      "types": [
+        "input"
+      ],
+      "triggers": [
+        "click",
+        "state-change"
+      ],
+      "techniques": [
+        "slide",
+        "elastic"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:input",
+          "vibe:minimal",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "trigger:click",
+          "trigger:state-change",
+          "technique:slide",
+          "technique:elastic"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-stepper.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-text-pressure",
@@ -4755,7 +8288,51 @@
       "behaviors": [
         "cursor-reactive",
         "interactive-text"
-      ]
+      ],
+      "types": [
+        "text-effect"
+      ],
+      "triggers": [
+        "cursor-reactive"
+      ],
+      "techniques": [
+        "distortion",
+        "morphing"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:text-effect",
+          "vibe:brutalist",
+          "vibe:editorial",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "trigger:cursor-reactive",
+          "technique:distortion",
+          "technique:morphing"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-text-pressure.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-text-type",
@@ -4815,7 +8392,8 @@
       "runtime": "gsap",
       "aesthetics": [
         "retro-synthwave",
-        "brutalist"
+        "brutalist",
+        "retro-terminal"
       ],
       "attributes": [
         "react",
@@ -4828,7 +8406,49 @@
       "behaviors": [
         "auto",
         "interactive-text"
-      ]
+      ],
+      "types": [
+        "text-effect"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "typewriter"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:text-effect",
+          "vibe:retro-synthwave",
+          "vibe:brutalist",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:gsap"
+        ],
+        "inferred": [
+          "trigger:automatic-loop",
+          "technique:typewriter",
+          "vibe:retro-terminal"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "medium",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [],
+        "snapshotPath": "public/previews/react-bits-text-type.jpg",
+        "autoplayAllowed": true,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-tilted-card",
@@ -4895,7 +8515,57 @@
       "behaviors": [
         "cursor-reactive",
         "hover"
-      ]
+      ],
+      "types": [
+        "layout",
+        "card"
+      ],
+      "triggers": [
+        "cursor-reactive",
+        "hover"
+      ],
+      "techniques": [
+        "hover-tilt",
+        "reflection",
+        "depth"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:layout",
+          "vibe:futuristic",
+          "vibe:editorial",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated"
+        ],
+        "inferred": [
+          "type:card",
+          "trigger:cursor-reactive",
+          "trigger:hover",
+          "technique:hover-tilt",
+          "technique:reflection",
+          "technique:depth"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "standard",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 240,
+        "minHeight": 220,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [
+          "pointer"
+        ],
+        "snapshotPath": "public/previews/react-bits-tilted-card.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "react-bits-waves",
@@ -4961,7 +8631,56 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "background"
+      ],
+      "triggers": [
+        "automatic-loop"
+      ],
+      "techniques": [
+        "wave",
+        "shader",
+        "elastic"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:background",
+          "vibe:organic",
+          "vibe:minimal",
+          "tech:react",
+          "tech:typescript",
+          "tech:css",
+          "tech:animated",
+          "tech:webgl",
+          "tech:canvas"
+        ],
+        "inferred": [
+          "trigger:automatic-loop",
+          "technique:wave",
+          "technique:shader",
+          "technique:elastic"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "showcase",
+        "cost": "high",
+        "aspectRatio": "16 / 9",
+        "minWidth": 440,
+        "minHeight": 360,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 2,
+        "expandedRecommended": true,
+        "requires": [
+          "webgl",
+          "gpu"
+        ],
+        "snapshotPath": "public/previews/react-bits-waves.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "shadcn-accordion",
@@ -5031,7 +8750,53 @@
       "behaviors": [
         "click",
         "stateful"
-      ]
+      ],
+      "types": [
+        "layout"
+      ],
+      "triggers": [
+        "click",
+        "state-change"
+      ],
+      "techniques": [
+        "slide",
+        "reveal-mask"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:layout",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:animated",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:click",
+          "trigger:state-change",
+          "technique:slide",
+          "technique:reveal-mask"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "wide",
+        "cost": "low",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-alert",
@@ -5097,7 +8862,46 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "static"
-      ]
+      ],
+      "types": [
+        "feedback"
+      ],
+      "triggers": [
+        "static"
+      ],
+      "techniques": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:feedback",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:static",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:static"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-avatar",
@@ -5166,7 +8970,46 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "static"
-      ]
+      ],
+      "types": [
+        "display"
+      ],
+      "triggers": [
+        "static"
+      ],
+      "techniques": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:display",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:static",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:static"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-badge",
@@ -5236,7 +9079,47 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "static"
-      ]
+      ],
+      "types": [
+        "display"
+      ],
+      "triggers": [
+        "static"
+      ],
+      "techniques": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:display",
+          "vibe:professional",
+          "vibe:minimal",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:static",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:static"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-breadcrumb",
@@ -5305,7 +9188,46 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "interactive-nav"
-      ]
+      ],
+      "types": [
+        "navigation"
+      ],
+      "triggers": [
+        "static"
+      ],
+      "techniques": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:navigation",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:static",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:static"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "wide",
+        "cost": "low",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-button",
@@ -5375,7 +9297,48 @@
       "behaviors": [
         "hover",
         "click"
-      ]
+      ],
+      "types": [
+        "button"
+      ],
+      "triggers": [
+        "hover",
+        "click"
+      ],
+      "techniques": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:button",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:static",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:hover",
+          "trigger:click"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-card",
@@ -5441,7 +9404,46 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "static"
-      ]
+      ],
+      "types": [
+        "layout"
+      ],
+      "triggers": [
+        "static"
+      ],
+      "techniques": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:layout",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:static",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:static"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-dialog",
@@ -5511,7 +9513,53 @@
       "behaviors": [
         "click",
         "stateful"
-      ]
+      ],
+      "types": [
+        "modal"
+      ],
+      "triggers": [
+        "click",
+        "state-change"
+      ],
+      "techniques": [
+        "fade",
+        "slide"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:modal",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:animated",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:click",
+          "trigger:state-change",
+          "technique:fade",
+          "technique:slide"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "wide",
+        "cost": "low",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-dropdown-menu",
@@ -5582,7 +9630,53 @@
         "click",
         "stateful",
         "interactive-nav"
-      ]
+      ],
+      "types": [
+        "navigation"
+      ],
+      "triggers": [
+        "click",
+        "state-change"
+      ],
+      "techniques": [
+        "fade",
+        "slide"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:navigation",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:animated",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:click",
+          "trigger:state-change",
+          "technique:fade",
+          "technique:slide"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "wide",
+        "cost": "low",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-input",
@@ -5648,7 +9742,46 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "stateful"
-      ]
+      ],
+      "types": [
+        "input"
+      ],
+      "triggers": [
+        "state-change"
+      ],
+      "techniques": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:input",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:static",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:state-change"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-progress",
@@ -5717,7 +9850,46 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "stateful"
-      ]
+      ],
+      "types": [
+        "loader"
+      ],
+      "triggers": [
+        "state-change"
+      ],
+      "techniques": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:loader",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:animated",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:state-change"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-skeleton",
@@ -5783,7 +9955,49 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "auto"
-      ]
+      ],
+      "types": [
+        "loader"
+      ],
+      "triggers": [
+        "mount"
+      ],
+      "techniques": [
+        "shimmer"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:loader",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:animated",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:mount",
+          "technique:shimmer"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-switch",
@@ -5853,7 +10067,51 @@
       "behaviors": [
         "click",
         "stateful"
-      ]
+      ],
+      "types": [
+        "input"
+      ],
+      "triggers": [
+        "click",
+        "state-change"
+      ],
+      "techniques": [
+        "slide"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:input",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:animated",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:click",
+          "trigger:state-change",
+          "technique:slide"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-table",
@@ -5919,7 +10177,46 @@
       "syncedAt": "2026-10-24",
       "behaviors": [
         "static"
-      ]
+      ],
+      "types": [
+        "layout"
+      ],
+      "triggers": [
+        "static"
+      ],
+      "techniques": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:layout",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:static",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:static"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "wide",
+        "cost": "low",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-tabs",
@@ -5989,7 +10286,53 @@
       "behaviors": [
         "click",
         "stateful"
-      ]
+      ],
+      "types": [
+        "tabs"
+      ],
+      "triggers": [
+        "click",
+        "state-change"
+      ],
+      "techniques": [
+        "fade",
+        "slide"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:tabs",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:animated",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:click",
+          "trigger:state-change",
+          "technique:fade",
+          "technique:slide"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "wide",
+        "cost": "low",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "shadcn-tooltip",
@@ -6059,7 +10402,51 @@
       "behaviors": [
         "hover",
         "stateful"
-      ]
+      ],
+      "types": [
+        "tooltip"
+      ],
+      "triggers": [
+        "hover",
+        "state-change"
+      ],
+      "techniques": [
+        "fade"
+      ],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:tooltip",
+          "vibe:professional",
+          "tech:react",
+          "tech:typescript",
+          "tech:tailwind",
+          "tech:light",
+          "tech:dark",
+          "tech:animated",
+          "tech:rounded"
+        ],
+        "inferred": [
+          "trigger:hover",
+          "trigger:state-change",
+          "technique:fade"
+        ],
+        "reviewNeeded": true
+      },
+      "previewProfile": {
+        "mode": "external",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [],
+        "autoplayAllowed": false,
+        "previewStatus": "external",
+        "failureReason": "External reference preview - the official source is linked instead of being run in this app."
+      }
     },
     {
       "id": "tabs",
@@ -6112,7 +10499,49 @@
       "behaviors": [
         "click",
         "stateful"
-      ]
+      ],
+      "types": [
+        "navigation",
+        "tabs"
+      ],
+      "triggers": [
+        "click",
+        "state-change",
+        "keyboard"
+      ],
+      "techniques": [],
+      "aesthetics": [],
+      "attributes": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:navigation"
+        ],
+        "inferred": [
+          "type:tabs",
+          "trigger:click",
+          "trigger:state-change",
+          "trigger:keyboard"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "wide",
+        "cost": "low",
+        "aspectRatio": "16 / 9",
+        "minWidth": 360,
+        "minHeight": 280,
+        "gridColumnSpan": 2,
+        "gridRowSpan": 1,
+        "expandedRecommended": true,
+        "requires": [
+          "pointer",
+          "keyboard"
+        ],
+        "snapshotPath": "public/previews/tabs.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     },
     {
       "id": "text-input",
@@ -6189,7 +10618,40 @@
       ],
       "behaviors": [
         "stateful"
-      ]
+      ],
+      "types": [
+        "input"
+      ],
+      "triggers": [
+        "state-change"
+      ],
+      "techniques": [],
+      "aesthetics": [],
+      "attributes": [],
+      "tagMeta": {
+        "sourceProvided": [
+          "type:input"
+        ],
+        "inferred": [
+          "trigger:state-change"
+        ],
+        "reviewNeeded": false
+      },
+      "previewProfile": {
+        "mode": "live",
+        "layout": "compact",
+        "cost": "low",
+        "aspectRatio": "4 / 3",
+        "minWidth": 180,
+        "minHeight": 160,
+        "gridColumnSpan": 1,
+        "gridRowSpan": 1,
+        "expandedRecommended": false,
+        "requires": [],
+        "snapshotPath": "public/previews/text-input.jpg",
+        "autoplayAllowed": false,
+        "previewStatus": "ready"
+      }
     }
   ]
 }

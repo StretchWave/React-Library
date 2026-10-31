@@ -5,17 +5,26 @@ Status legend: **[x] done (verified)** · **[~] partial** · **[ ] pending** ·
 
 ## 0) Snapshot
 
+Current state (2026-10-30):
+
 | Area | Status | Evidence |
 |---|---|---|
-| Foundations (schema, taxonomy, tooling, docs) | ✅ done | `node --test tests/*.test.mjs` → 29/29 pass; `validate` OK (6/6/6); `generate` writes index; `lookup` text+JSON verified |
-| M1 App skeleton | ✅ done | `npm run verify` full chain green (29 tooling + 5 app tests, typecheck, vite build); dev-server smoke test + screenshots |
-| M2 Component browser | ✅ done | 20/20 app tests + 32/32 node tests; dev-server walkthrough: search → "1 of 6 components" → TextInput detail fully rendered (screenshot) |
-| M3 Theme engine + previews + components | ✅ done | verify full-chain green **without --skip-links** (32/32 node, 50/50 app, typecheck, build); browser-verified: Midnight Glass scope restyles app + chat-free preview (screenshot) |
-| M4 Advanced interactions | ✅ done | verify full-chain green **flagless** (32/32 node, 54/54 app, typecheck, build); browser-verified: `#/component/tabs` deep link, copy-usage "Copied ✓" feedback, TabSheet ←/→/Home/End roving focus + selection-follows-focus (screenshot) |
-| M5 Real ingestion + gallery + selection + master prompt | ✅ complete — schema v2; catalog 33 real entries (26 local / 7 external); gallery + honest previews; multi-selection tray; master-prompt studio (`#/prompt`); browser smoke verified; README/AGENTS docs current | verify green: 55/55 node (+9 prompt), 93/93 app, typecheck, build (320.16 kB js); react-bits/aceternity/pryzm → reference-only per license research |
+| Foundations + schema v3 | ✅ done | 87 catalog entries validate; generated index schemaVersion 3; lookup text/JSON v3 facets verified |
+| Discovery app (M9) | ✅ done | Browse/Collections/Sources/Selected/Table views; AND/OR facets; shareable hashes; favorites, collections, recents, saved filters, compare and annotations |
+| Honest previews | ✅ done | 71 ready/live entries with real snapshots, 16 external, 0 unavailable/error; 23 heavy, 18 autoplay-eligible; gallery cards gate live previews and expansion is lazy |
+| Source coverage | ✅ done | 12 documented sources; derived counts 88 discovered / 87 imported / 71 preview-ready / 87 usable / 1 locked / 7 blocked / 25 review-needed |
+| App tests | ✅ done | 139/139 Vitest tests across 24 files (latest run; includes routing, personal persistence, source coverage, preview decisions, hover previews and discovery integration) |
+| Tooling tests | ✅ done | `npm test`: **94/94** pass; includes catalog v3 validation, search AND/OR parity, ingest adapters, classification idempotency and CLI contracts |
+| M8 Preview audit + repair | ✅ done | `npm run audit:previews`: 87/87 workspace routes + 87 gallery cards, 0 requires-repair, 0 gallery problems; WebGL, pointer, reduced-motion and 390x844 resize probes |
+| Release gate | ✅ done | `npm run verify` green: validate --check-index, generate, **94/94** node tests, **139/139** app tests, typecheck, production build |
 
-Placeholders: none. (TabSheet arrow-key navigation shipped in M4 — catalog `a11yNotes`
-and description updated at v0.3.0; `--skip-links` was removed at M3.)
+Blocked, not placeholders: the saved CodePen Multi-Page View Transition example still
+needs an official URL, author and verified license; OriginKit/GetLayers reference imports
+need credentials/MCP access. Ditther/Pryzm are reference/effect sources, not React
+component registries.
+
+Placeholders: **none**. (TabSheet arrow-key navigation shipped in M4; `--skip-links`
+was removed at M3.)
 
 ## Decisions log
 
@@ -99,6 +108,65 @@ and description updated at v0.3.0; `--skip-links` was removed at M3.)
   carries at least one behavior. Behavior labels drive the preview stage's
   interaction cue — the cue describes verified input only (no invented interactions).
 
+- 2026-10-29 — **M9 schema-v3 discovery decisions:** schema v3 requires `types`,
+  `triggers`, `techniques`, `tagMeta` and `previewProfile`. `category` remains the
+  structural bucket; `types` answers "what is it", `triggers` "what starts the motion",
+  `techniques` "how it moves", `behaviors` "what input drives it", `aesthetics` "visual
+  vibe" and `attributes` independent appearance/motion/tech traits. Search is AND across
+  dimensions, OR within one. The classifier records source-provided vs inferred
+  provenance and never claims behavior without evidence.
+- 2026-10-30 — **Preview capture regression fixed:** theme tokens were only applied to
+  the inner `.theme-scope`, so overlays portaled to `document.body` (expanded preview,
+  inspector, compare) resolved `--rl-*` to nothing and painted transparent. The audit
+  then photographed the browse page through the open dialog and those recursive images
+  were published as component snapshots. Tokens now apply on `<html>`, and the stage
+  canvas keeps an opaque `--rl-surface` base (with `--rl-surface-alt` layered over it)
+  so translucent glass themes cannot leak app chrome into captures.
+- 2026-10-30 — **Preview legibility (user feedback):** card previews stay compact, but
+  a 350ms hover on a hover-capable pointer opens an interactive 700×470 panel beside
+  the card and runs the entry at native scale. `preferredPreviewKind`/`canShowLive`
+  gain a deliberate `forceLive` option so low/medium local demos can run even when
+  gallery autoplay is off; pause, reduced-motion, visibility, high-cost and heavy
+  gates still apply. Heavy entries show the real snapshot, external/unavailable ones
+  get no panel, and the panel stays open while the pointer is inside it or the card.
+  Escape, outside click, page scroll, leaving both surfaces, or the close button
+  dismiss it; Expand remains the full workspace for scroll/fullscreen and control-heavy
+  cases. New tests: HoverPreview (7) and preview gating (1); full `npm run verify`
+  green (94/94 node, 136/136 app, typecheck, build).
+- 2026-10-31 — **Keyboard/touch access to the enlarged preview:** each gallery card
+  gains an enlarged-preview control (`aria-expanded`/`aria-controls`). It pins the
+  panel, moves focus into the `role="region"` preview, ignores pointer movement, and
+  returns focus to the control on Escape or close-button dismissal. Expand keeps its
+  own unchanged action. The control is hidden below 900×600, where the panel cannot
+  fit and Expand remains the route. New GalleryCard tests (2) plus the pinned
+  HoverPreview case (1); full `npm run verify` green (94/94 node, 139/139 app,
+  typecheck, build).
+- 2026-10-30 — **Selection tray compacted (user feedback):** the empty tray no longer
+  renders at all, and a non-empty selection collapses to a small sticky dock with the
+  count, Generate and Clear. The ordered list, reorder/remove controls and availability
+  notes stay behind an expandable chevron, so the M5.4 review workflow is preserved
+  without covering the gallery. Focused tests: `SelectionTray` (7) + `App` (18) green;
+  typecheck green.
+- 2026-10-29 — **Preview honesty decision:** every ready local preview publishes a real
+  audit snapshot even when the card may run live. Cards run only low/medium-cost
+  autoplay previews that are visible and not paused/reduced-motion; heavy, off-screen,
+  paused and static cards use snapshots. External records stay external. Expanded
+  workspaces are lazy-loaded. No fallback is presented as successful live content.
+- 2026-10-29 — **Personal-data boundary:** favorites, collections, recents, saved
+  filters, manual tags and notes live in localStorage and are joined by catalog id.
+  They are never duplicated into canonical entries. Browse writes filter/overlay state
+  to the hash; inspectors from Collections/Sources/Selected/Table remain local to those
+  views.
+- 2026-10-29 — **Reference-ingestion boundary:** CodePen writes require an official pen
+  URL, author and verified license, and record the official embed URL only. The generic
+  reference adapter records metadata/official retrieval only and rejects dedicated
+  registries. OriginKit/GetLayers remain blocked without credentials/MCP; Ditther/Pryzm
+  remain reference/effect sources, not component registries.
+- 2026-10-29 — **Source coverage semantics:** `discovered` means "tracked by this
+  project", not complete upstream enumeration. Imported/preview-ready counts derive from
+  entries; locked/blocked/review-needed remain explicit so the UI cannot turn a blocked
+  source into a successful import.
+
 ## 1) Foundations — agent-first base (milestone complete ✅)
 
 - [x] Draft `MASTER_SPEC.md` (mission, schema v1, theme/category taxonomies, tooling
@@ -160,8 +228,9 @@ detail shows chip/meta/themes/props table (screenshot recorded).
 
 ## 4) M3 — Theme engine + live previews + component suite ✅
 
-- [x] ThemeProvider reads taxonomy themes (not hardcoded) and applies the token map to a
-      `[data-theme]` scoped container; app chrome + components consume `--rl-*`
+- [x] ThemeProvider reads taxonomy themes (not hardcoded) and applies the token map to
+      the document's `[data-theme]` scope (`<html>`), so app chrome, previews and body
+      portals all consume `--rl-*`; `.theme-scope` supplies the paint
       (`src/theme/ThemeProvider.tsx`, `.theme-scope` paint in base.css)
 - [x] Theme switcher: labeled select (Auto + 6 themes) + prev/next cycle buttons
       (`src/theme/ThemePicker.tsx`)
@@ -600,6 +669,166 @@ data-theme` scope
       3-column grid, no overflow, fullscreen enabled, details collapsed. Pixel
       screenshots were again blocked by an undrawn client window — recorded as a
       limitation, never claimed.
+
+## 5.11) M8 - Preview audit and repair (2026-10-28)
+
+- [x] Repeatable zero-dependency audit: `npm run audit:previews` starts Vite,
+      drives installed Chrome/Edge over CDP, visits every local runnable
+      `#/preview/<id>` route, checks mount/runtime/network/console failures,
+      blank or collapsed stages, clipping, broken images, WebGL context loss,
+      screenshot stability and pointer response; then checks all 87 gallery
+      mini-stages (playable, heavy poster, external tile). Node >= 22.12 is
+      required for the built-in WebSocket; no package dependency was added.
+- [x] Audit output: `audit/preview-audit.json` (machine), `audit/PREVIEW_AUDIT.md`
+      (human report), `audit/screenshots/<id>.jpg` (workspace frame). Binary
+      screenshots and contact sheets are ignored; the report stays reviewable.
+- [x] Latest full run: 87 entries - 43 working, 28 workspace-only, 16 external
+      references, **0 requires-repair**; gallery - 18 live, 30 snapshots, 23 heavy
+      posters, 16 external, **0 problems**. Machine-specific WebGL availability is a
+      separate `requires-environment` status, never folded into code repair.
+- [x] Repairs verified in-browser: scroll-stage placement; Dome Gallery, Grid
+      Motion, Dock and Stack stage sizing; Bubble Menu and Card Nav ReactNode
+      logos; Staggered Menu logo/colors/height; Ribbons idle motion and seeded
+      trail; Text Pressure sizing; readable Magnet Lines, Beams, Particles,
+      Waves, Shiny Text, Letter Glitch and Word Rotate colors; and deferred
+      `WEBGL_lose_context` cleanup in Aurora, Ballpit, Beams, Circular Gallery,
+      Letter Glitch, Particles and Waves so StrictMode remounts do not reuse a
+      lost context.
+- [x] Reduced-motion run (12 representative animation/WebGL entries) and
+      390x844 mobile run (11 layout/nav/text entries) both returned
+      `0 requires-repair`; the reduced-motion entries render static frames
+      rather than blank canvases.
+- [x] Tests: `tests/audit-previews.test.mjs` covers the package command, help
+      contract, workspace/gallery/reduced-motion/WebGL audit paths.
+- [x] Gate: `npm run verify` green - validate+check-index, generate, 73/73 node
+      tests, 116/116 app tests, typecheck, production build.
+
+## 5.12) M9 - Visual discovery workspace + schema v3 (2026-10-29)
+
+Goal (user brief): turn the library into an agent-first visual discovery tool - not a
+component list - with real previews, faceted discovery, collections, source coverage and
+accurate prompt generation. `catalog/catalog.json` stays canonical; schema and tooling
+extend in place.
+
+### Schema and classification
+
+- [x] Bumped `catalog/catalog.json` to `schemaVersion: 3` and added required
+      `types`, `triggers`, `techniques`, `tagMeta` and `previewProfile` to all 87
+      entries. `types` and `triggers` must be non-empty; every taxonomy id is
+      validated.
+- [x] Added `taxonomy/types.json` (23), `taxonomy/triggers.json` (14) and
+      `taxonomy/techniques.json` (46). Kept `category` structural, `aesthetics` as
+      visual vibe and `behaviors` as interaction input; all four dimensions remain
+      independent.
+- [x] `scripts/classify-catalog.mjs` deterministically derives missing facets and
+      preview profiles from existing evidence (category, behavior, runtime, summary,
+      vendored source) and records `sourceProvided` vs `inferred` provenance plus
+      `reviewNeeded`. `npm run classify --check` exits 0 and does not write the
+      catalog; the test suite asserts this idempotency.
+- [x] `tagMeta` references must be declared on the entry (`facet:id` format), so
+      provenance can never point at a facet the record does not actually have.
+- [x] Extended `taxonomy/sources.json` with coverage records: discovered, usable,
+      locked, review-needed, blocked and checkedAt. Imported and preview-ready counts
+      are derived from entries. `discovered` means "tracked by this project", not
+      complete upstream enumeration.
+- [x] Validator covers v3 facets, provenance, preview enums/coupling, dimensions,
+      runtime requirements and real snapshot/loop path existence. `npm run validate
+      -- --check-index` passes; `catalog/index.json` is generated with v3 counts,
+      taxonomies, source coverage and preview statuses.
+
+### Honest previews
+
+- [x] `previewProfile` publishes mode (`live|snapshot|loop|external|unavailable`),
+      layout (`compact|standard|wide|showcase`), cost, aspect ratio, min dimensions,
+      grid spans, expansion recommendation, runtime requirements, autoplay permission,
+      real snapshot/loop paths, preview status and failure reason.
+- [x] `scripts/capture-previews.mjs` published **71 real audit screenshots** into
+      `public/previews/`; no thumbnail or poster was invented. All 71 ready entries
+      have `mode: live`, a real `.jpg` snapshot and `previewStatus: ready`; 16 shadcn
+      entries are honest external previews; 0 unavailable and 0 error.
+- [x] Gallery cards run live only for low/medium-cost autoplay previews that are
+      visible, not globally paused and not reduced-motion. 23 heavy entries use real
+      snapshots; 18 entries are autoplay-eligible. Expanded previews are lazy-loaded
+      and never mounted by the gallery.
+- [x] External records render an explicit external state, never a fake stage.
+      Error boundaries, retry/regeneration controls and explicit unavailable/error
+      labels prevent fallback content from being presented as successful live content.
+- [x] Layout distribution: compact 20 / standard 25 / wide 21 / showcase 21; cost
+      low 48 / medium 16 / high 23.
+
+### Discovery shell
+
+- [x] Browse is the default visual wall; Collections, Sources, Selected for AI and a
+      table view are first-class routes. The inspector and expanded preview are
+      overlays that preserve the current view, filters and scroll.
+- [x] Faceted search uses AND across dimensions and OR within one dimension. Facets:
+      type, trigger, technique, vibe, tech, category, source, entry type, preview mode
+      and availability. Search combines exact id/alias/name, prefix, whole-token,
+      substring and token-level typo signals; arbitrary letter-subsequence matching
+      was removed. `btn` resolves to `button`; `input` ranks `text-input` first.
+- [x] Lookup CLI exposes the same v3 dimensions (`--type`, `--entry-type`,
+      `--trigger`, `--technique`, `--vibe`, `--tech`, `--preview-mode`); repeated
+      flags OR within a dimension, and trigger/behavior remain independent.
+- [x] Collapsible desktop facet sidebar, mobile drawer, `/` search focus, Escape
+      clearing/closing, explicit accessible names with counts (for example
+      `Button (2)`), bulk selection, select-all-visible, compare, expand/collapse and
+      a persistent selection tray.
+- [x] Favorites, named collections, recents, saved filters, manual tags, notes and
+      compare state persist in localStorage and join catalog data by id. They never
+      mutate `catalog/catalog.json`.
+- [x] Shareable hash routes: `#/browse`, `#/component/:id`, `#/preview/:id`,
+      `#/collections/:id`, `#/sources/:id`, `#/selected`, `#/prompt`,
+      `#/browser/:id` and `#/filters`. Browse encodes filters/overlays; inspectors
+      opened from Collections/Sources/Selected/Table stay local to those views.
+      Malformed percent escapes no longer crash routing.
+- [x] Sources view exposes derived coverage and source limits. Collections view
+      supports named groups and `Open ... details` actions. Selected view is the
+      prompt input surface.
+
+### Ingestion and prompt
+
+- [x] `scripts/ingest-codepen.mjs` records author-owned CodePen references only:
+      official `https://codepen.io/<user>/pen/<slug>` URLs, official embed URLs,
+      attribution and a verified license. `--write` refuses without `--author` and
+      `--license`; re-runs preserve `addedDate`/`syncedAt`, filter aliases against
+      existing ids/aliases, and clear the saved blocked record unless
+      `--keep-blocked` is passed.
+- [x] `scripts/ingest-reference.mjs` is metadata-only: official URL, terms,
+      attribution and preview link; it never fetches or redistributes source files.
+      It rejects dedicated adapters (`shadcn`, `magic-ui`, `react-bits`) and redirects
+      CodePen to the dedicated adapter.
+- [x] Dry runs verified: `codepen-multi-page-view-transition` (external reference),
+      `getlayers-aurora-hero` (external reference) and rejection of `shadcn` with the
+      dedicated-adapter message. No fake record was written to the catalog.
+- [x] `src/lib/prompt.ts` includes selected components, dependencies, local paths vs
+      official retrieval instructions, licenses, constraints, preview limitations and
+      local annotations. External entries are constrained to official channels.
+- [x] Tests: `tests/ingest.test.mjs` covers CodePen URL parsing, external composition,
+      alias filtering, validation and source-coverage updates. A temp-repo `--write`
+      integration proves the CodePen and generic reference adapters are byte-idempotent,
+      preserve the target entry's own aliases and never write source files. Tooling
+      tests cover schema-v3 validation, AND/OR search parity, independent
+      trigger/behavior facets, v3 lookup filters (component type, entry type, trigger,
+      technique, vibe, tech, source and preview mode), classification idempotency and
+      the CLI contract (**94/94**). App tests cover routing, personal persistence,
+      source coverage, preview decisions and discovery integration: **128/128 tests in
+      22 files**.
+
+### Documentation and release
+
+- [x] Updated `README.md`, `docs/SCHEMA.md`, `MASTER_SPEC.md` (M9 + changelog v1.7),
+      `AGENTS.md` and this checklist for schema v3, discovery views, preview honesty
+      and reference-only ingestion.
+- [x] Source command copy corrected to require author/license for CodePen writes.
+- [x] Final `npm run verify` green after all code/docs changes: validate
+      --check-index, generate, **94/94** node tests, **128/128** app tests, typecheck
+      and production build. Real-browser audit rerun: **87/87** workspace routes
+      (43 working, 28 workspace-only, 16 external-reference, **0 requires-repair**);
+      gallery **18 live / 23 heavy posters / 30 snapshots / 16 external**, **0
+      problems**. Mobile 390x844 spot-check (button, Aurora, Dome Gallery,
+      shadcn-button, tabs) also 0 repairs. Evidence:
+      `audit/preview-audit.json`, `audit/PREVIEW_AUDIT.md`,
+      `audit/verify-final.log`, `audit/audit-final.log`.
 
 ## 6) Future work (explicitly not now)
 

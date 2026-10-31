@@ -2,17 +2,93 @@
   "schemaVersion": 2,
   "description": "Canonical component aesthetic classifications - the visual STYLE of a catalog entry. These are deliberately distinct from the six application appearance themes (taxonomy/themes.json), which style the React Library app itself, not the cataloged components. Entries may belong to several aesthetics at once; the implementation is stored once regardless.",
   "aesthetics": [
-    { "id": "professional", "label": "Professional" },
-    { "id": "casual", "label": "Casual" },
-    { "id": "minimal", "label": "Minimal" },
-    { "id": "luxury", "label": "Luxury" },
-    { "id": "cyberpunk", "label": "Cyberpunk" },
-    { "id": "retro-synthwave", "label": "Retro / Synthwave" },
-    { "id": "brutalist", "label": "Brutalist" },
-    { "id": "organic", "label": "Organic / Natural" },
-    { "id": "futuristic", "label": "Futuristic / 3D" },
-    { "id": "gaming", "label": "Gaming" },
-    { "id": "editorial", "label": "Editorial" },
-    { "id": "playful", "label": "Playful / Cartoon" }
+    {
+      "id": "professional",
+      "label": "Professional"
+    },
+    {
+      "id": "casual",
+      "label": "Casual"
+    },
+    {
+      "id": "minimal",
+      "label": "Minimal"
+    },
+    {
+      "id": "luxury",
+      "label": "Luxury"
+    },
+    {
+      "id": "cyberpunk",
+      "label": "Cyberpunk"
+    },
+    {
+      "id": "retro-synthwave",
+      "label": "Retro / Synthwave"
+    },
+    {
+      "id": "brutalist",
+      "label": "Brutalist"
+    },
+    {
+      "id": "organic",
+      "label": "Organic / Natural"
+    },
+    {
+      "id": "futuristic",
+      "label": "Futuristic / 3D"
+    },
+    {
+      "id": "gaming",
+      "label": "Gaming"
+    },
+    {
+      "id": "editorial",
+      "label": "Editorial"
+    },
+    {
+      "id": "playful",
+      "label": "Playful / Cartoon"
+    },
+    {
+      "id": "tron",
+      "label": "Tron"
+    },
+    {
+      "id": "vaporwave",
+      "label": "Vaporwave"
+    },
+    {
+      "id": "retro-terminal",
+      "label": "Retro terminal"
+    },
+    {
+      "id": "retrofuturism",
+      "label": "Retrofuturism"
+    },
+    {
+      "id": "y2k",
+      "label": "Y2K"
+    },
+    {
+      "id": "holographic",
+      "label": "Holographic"
+    },
+    {
+      "id": "glassmorphism",
+      "label": "Glassmorphism"
+    },
+    {
+      "id": "fantasy",
+      "label": "Fantasy"
+    },
+    {
+      "id": "horror",
+      "label": "Horror"
+    },
+    {
+      "id": "pixel-art",
+      "label": "Pixel art"
+    }
   ]
 }

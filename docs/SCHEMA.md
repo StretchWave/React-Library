@@ -1,204 +1,289 @@
-# Catalog Schema Reference — v2
+# Catalog Schema Reference - v3
 
-Normative source: `MASTER_SPEC.md` §5. This document carries the detailed field rules,
-worked examples, and the change history of the schema.
+Normative source: `MASTER_SPEC.md` section 5. This document carries field rules,
+worked examples and change history. The validator in
+`scripts/lib/catalog.mjs` is the executable enforcer; if this document and the
+validator disagree, the validator and `MASTER_SPEC.md` win.
 
 ## Files
 
 | File | Role | Hand-edited? |
 |---|---|---|
-| `catalog/catalog.json` | Canonical catalog of record | ✅ yes |
-| `catalog/index.json` | Derived agent-readable index | ❌ never — run `npm run generate` |
-| `taxonomy/themes.json` | App appearance-theme taxonomy (source of truth) | ✅ yes |
-| `taxonomy/categories.json` | Category taxonomy (source of truth) | ✅ yes |
-| `taxonomy/aesthetics.json` | Component aesthetic taxonomy (visual style — v2) | ✅ yes |
-| `taxonomy/behaviors.json` | Interaction-behavior taxonomy (M7.1 — what input drives the animation) | ✅ yes |
-| `taxonomy/attributes.json` | Independent attribute taxonomy, grouped appearance/motion/tech (v2) | ✅ yes |
-| `taxonomy/sources.json` | Component source registry: access methods, statuses, licensing (v2) | ✅ yes |
+| `catalog/catalog.json` | Canonical catalog of record | Yes |
+| `catalog/index.json` | Derived agent-readable index | Never - run `npm run generate` |
+| `taxonomy/themes.json` | Application appearance themes | Yes |
+| `taxonomy/categories.json` | Structural component categories | Yes |
+| `taxonomy/types.json` | Component type facets (v3) | Yes |
+| `taxonomy/triggers.json` | Animation trigger facets (v3) | Yes |
+| `taxonomy/techniques.json` | Animation technique facets (v3) | Yes |
+| `taxonomy/aesthetics.json` | Visual-vibe classifications | Yes |
+| `taxonomy/attributes.json` | Independent appearance/motion/tech attributes | Yes |
+| `taxonomy/behaviors.json` | Interaction behaviours (what input drives the animation) | Yes |
+| `taxonomy/sources.json` | Source access, licensing and coverage registry | Yes |
 
-## v1 rules (enforced by scripts/validate-catalog.mjs)
+## Top level
 
-Renamed "v1 rules (legacy core)" in v2; every rule below still applies unchanged.
+- `schemaVersion`: integer, currently **3**. The validator rejects other versions.
+- `entries`: array sorted lexicographically by `id`.
+- `meta`: optional `{ title, description }`.
+- Unknown top-level or entry fields are **warnings**, not errors, for forward
+  compatibility.
 
-### Top level
+## Entry rules
 
-- `schemaVersion` — integer, currently `2`.
-- `entries` — array, sorted lexicographically by `id`.
-- `meta` — optional `{ title, description }`.
-- Unknown top-level or entry fields produce **warnings**, not errors (forward compat).
+### Core fields (v1, still enforced)
 
-### Entry rules
+1. `id`: `^[a-z0-9]+(-[a-z0-9]+)*$`; unique across the catalog.
+2. `name`: non-empty display name.
+3. `summary`: non-empty, maximum 140 characters.
+4. `themes`: at least one id from `taxonomy/themes.json`.
+5. `category`: id from `taxonomy/categories.json`; this is the structural bucket.
+6. `aliases`: lowercase slugs, globally unique, may not collide with any entry id.
+7. `tags`: string array; lowercase slugs are conventional.
+8. `status`: `stable | beta | experimental | deprecated`.
+9. `version`: semver, `^\d+\.\d+\.\d+([-.+][\w.-]+)?$`.
+10. `addedDate`: `YYYY-MM-DD`.
+11. `externalDependencies`: array; may be empty. `react` and `react-dom` are implicit
+    and must not be listed.
+12. `props`: array of `{ name, type, required, default?, description? }`; camelCase
+    unique names, string `type`, boolean `required`, optional string `default`.
+13. `links`: optional `{ source?, demo?, docs? }`; repo-relative POSIX paths. `source`
+    and `demo` are existence-checked when present.
+14. `usedFrom`: optional string array of app import sites (documentation only).
+15. `a11yNotes`: optional string.
 
-1. `id`: `^[a-z0-9]+(-[a-z0-9]+)*$`; unique across catalog.
-2. `summary`: non-empty, ≤ 140 chars.
-3. `themes`: ≥ 1; every id must exist in `taxonomy/themes.json`.
-4. `category`: must exist in `taxonomy/categories.json`.
-5. `aliases`: all lowercase slugs; **globally unique** across the catalog; an alias may
-   not equal any entry `id` (avoids ambiguity in `npm run lookup`).
-6. `tags`, `version` (`^\d+\.\d+\.\d+([-.+][\w.-]+)?$`), `addedDate` (`YYYY-MM-DD`),
-   `status` ∈ `stable | beta | experimental | deprecated`.
-7. `externalDependencies`: array (may be empty). Any element that is not
-   `react`/`react-dom` is allowed; react/react-dom must **not** be listed (implicit).
-8. `props`: array (may be empty); unique `name`s; camelCase names; strings for `type`,
-   `default`, `description`; boolean `required`. `default` is required to be a valid
-   string form of the value; optional when the prop has no default.
-9. `links`: optional; keys `source`, `demo`, `docs`; values are repo-relative POSIX
-   paths. When present, `source` and `demo` must exist on disk (validator checks;
-   `docs` is not existence-checked). Paths use forward slashes.
-10. `usedFrom`: optional string[] of app import sites (documentation only).
+### v2 provenance and availability fields
 
-## Worked example (copied from the canonical catalog)
-```json
-{
-  "id": "alert",
-  "name": "Alert",
-  "summary": "Calls out a user-facing message with a tone-aware severity banner.",
-  "description": "Use an Alert to deliver a short, important message that belongs in the page flow.",
-  "category": "feedback",
-  "themes": ["brutalist-print", "classic-clean", "midnight-glass", "neon-cyberpunk", "retro-terminal", "soft-pastel"],
-  "aliases": ["banner", "notice"],
-  "tags": ["feedback", "message", "status"],
-  "status": "stable",
-  "version": "1.0.0",
-  "addedDate": "2026-10-24",
-  "externalDependencies": [],
-  "props": [
-    {
-      "name": "tone",
-      "type": "\"info\" | \"success\" | \"warning\" | \"danger\"",
-      "required": false,
-      "default": "\"info\"",
-      "description": "Severity class that drives color and icon."
-    },
-    { "name": "title", "type": "string", "required": true }
-  ],
-  "links": {
-    "source": "src/components/Alert/Alert.tsx",
-    "demo": "src/components/Alert/AlertDemo.tsx"
-  },
-  "a11yNotes": "role=\"alert\" so content announces on insert.",
-  "usedFrom": ["src/catalog/demos.ts"]
-}
-```
+All v2 fields remain supported. `entryType` is `local | external`; absent means
+`local`.
 
-## v2 fields (M5) — multi-source catalog, aesthetics, previews, provenance
+- **local**: implementation files are stored in this repository and may declare
+  `localDir`, `manifest` and `implementation`. Every declared path is
+  existence-checked.
+- **external**: code is not stored or redistributed locally. Required: `source`,
+  `sourceUrl` (absolute http(s)), `retrieval` (official CLI/MCP/docs instructions) and
+  `license` (object). `localDir`, `manifest` and `implementation` are forbidden.
+- `source`: id from `taxonomy/sources.json`.
+- `sourceUrl`: absolute `http(s)://` URL.
+- `externalId`: stable id inside the upstream source.
+- `syncedAt`: `YYYY-MM-DD` last successful synchronization.
+- `preview`: legacy render descriptor with `type` =
+  `local-demo | static | external | source-link | none`.
+  `static`, `external` and `source-link` require an http(s) `url`; `none` requires an
+  honest `note`; `local-demo` resolves through the reviewed showcase registry.
+- `license`: `{ spdx?, attribution?, note?, url? }`; unknown keys warn. Required for
+  external entries.
+- `dependencies`: array of `{ name, reason? }` for the target project; duplicates are
+  errors and `react`/`react-dom` must not be listed.
+- `aesthetics`: ids from `taxonomy/aesthetics.json` (visual vibe).
+- `attributes`: ids from `taxonomy/attributes.json`.
+- `behaviors`: ids from `taxonomy/behaviors.json`. Every current entry carries at
+  least one; the schema keeps the field optional for legacy compatibility.
+- `runtime`: optional preview engine classification (`dom`, `gsap`, `motion`,
+  `physics`, `webgl`, ...).
+- `heavy`: optional boolean; heavy entries are workspace-only and never autoplay in
+  the gallery.
 
-All v2 fields are **optional**, so every v1 entry stays valid. An entry without v2
-fields is a legacy `local` entry. The six built-in components are exactly that.
+### v3 discovery fields (required)
 
-### Local vs external (`entryType`)
-
-- `entryType` ∈ `local | external`; absent → `local`.
-- **local** — implementation files are stored in this repository under
-  `catalog/components/<source>/<category>/<id>/` (or in `src/components/` for the
-  built-in ones). May declare `localDir`, `manifest` (usually
-  `…/component.json`), and `implementation` (file paths); when present, every path
-  is existence-checked by the validator (same rules as `links`).
-- **external** — code may **not** be stored/redistributed locally. Required:
-  `source` (id from `taxonomy/sources.json`), `sourceUrl` (absolute http(s)),
-  `retrieval` (official CLI/MCP/docs retrieval instructions), `license` (an object).
-  Forbidden: `localDir`, `manifest`, `implementation` — the validator rejects
-  fabricated local paths, and the master-prompt generator relies on that guarantee.
-
-### Common optional fields
+These fields make the catalog filterable as a visual discovery tool and record how
+preview decisions were made.
 
 | Field | Rules |
 |---|---|
-| `source` | id from `taxonomy/sources.json` (validator enforces membership). |
-| `sourceUrl` | absolute `http(s)://` URL. |
-| `externalId` | stable id inside the source's own registry, when one exists. |
-| `syncedAt` | `YYYY-MM-DD` — last successful synchronization with the source. |
-| `preview` | object: `type` ∈ `local-demo | static | external | source-link | none`; `static/external/source-link` require an http(s) `url`; `none` requires an honest `note`; `local-demo` previews render in-app from the demo registry. |
-| `license` | object: `spdx` (SPDX-like id), `attribution`, `note`, `url`; unknown keys warn. Required for external entries. |
-| `dependencies` | array of `{ name, reason? }`; `react`/`react-dom` must not be listed (implicit); duplicate names error. These are the component's own requirements for the *target* project — they never become app dependencies. |
-| `aesthetics` | array of ids from `taxonomy/aesthetics.json`; an entry may carry many. |
-| `attributes` | array of ids from `taxonomy/attributes.json` (`appearance | motion | tech` groups); an entry may carry many. |
-| `behaviors` | array of ids from `taxonomy/behaviors.json` (M7.1); an entry may carry many; validator enforces membership and every entry carries at least one. Describes how the component's animation is triggered, not how it looks. |
+| `types` | Non-empty array of ids from `taxonomy/types.json`. Describes what the component is (button, card, background, transition, ...). |
+| `triggers` | Non-empty array of ids from `taxonomy/triggers.json`. Describes what starts the motion (hover, click, scroll, route-transition, ...). |
+| `techniques` | Array of ids from `taxonomy/techniques.json`; may be empty for genuinely static components. Describes how the motion is made (fade, shader, particles, ...). |
+| `tagMeta` | Object recording provenance for assisted classification. See below. |
+| `previewProfile` | Object publishing the honest preview decision. See below. |
 
-### Taxonomy files (v2)
+Facet dimensions are independent: an entry may be a `card` type, use a `hover`
+trigger and a `glitch` technique at the same time. Search applies **AND across
+dimensions** and **OR within one dimension**.
 
-- `taxonomy/aesthetics.json`: `aesthetics: [{ id, label }]` — twelve canonical visual
-  styles (professional … playful). Distinct from `taxonomy/themes.json`, which styles
-  the **application**, not the cataloged components.
-- `taxonomy/attributes.json`: `attributes: [{ id, label, group }]` with groups
-  `appearance / motion / tech`.
-- `taxonomy/behaviors.json` (M7.1): `behaviors: [{ id, label, description? }]` —
-  twelve canonical interaction behaviors (`auto`, `cursor-reactive`, `hover`, `click`,
-  `draggable`, `scroll`, `gesture`, `interactive-3d`, `interactive-text`,
-  `interactive-nav`, `stateful`, `static`). Deliberately distinct from
-  `taxonomy/aesthetics.json`: behaviors classify **what user input drives the
-  animation**, aesthetics classify **how it looks** — a neon cursor effect may be
-  cursor-reactive and cyberpunk at once. Classification rule: an animation that plays
-  with no user input is `auto`; only components that respond to pointer, keyboard,
-  drag, scroll, gesture or state changes carry the matching interactive behavior.
-  Exposed as the first-class "Interaction" filter in the browser and gallery, the
-  `--behavior` lookup CLI flag, and the index `taxonomies.behaviors` listing.
-- `taxonomy/sources.json`: `sources: [{ id, name, url, repo?, accessMethod, status,
-  license, auth?, limit?, notes }]`, plus a `statuses` vocabulary
-  (`available | partial | reference-only | requires-auth | unavailable`) and an
-  `evaluatedAt` stamp. Derived per-source entry counts live in `catalog/index.json`
-  (`counts.bySource`), never in this file.
-- `taxonomy/categories.json`: the original six buckets (kept for the built-in
-  library) plus the extended granular set (tabs, tooltips, modals, hero-sections,
-  pricing-sections, footers, backgrounds, gradients, text-effects, loaders, cursors,
-  charts, 3d-webgl, scroll-animations, page-sections, page-layouts) — 22 total.
-
-### Worked example (external entry, hypothetical id)
+#### `tagMeta`
 
 ```json
 {
-  "id": "ext-example-hero",
-  "name": "External Animated Hero",
-  "summary": "Reference to an animated hero section.",
-  "category": "hero-sections",
-  "themes": ["classic-clean"],
-  "aliases": [],
-  "tags": ["hero", "animation"],
-  "status": "beta",
-  "version": "0.1.0",
-  "addedDate": "2026-10-24",
-  "externalDependencies": [],
-  "props": [],
-  "entryType": "external",
-  "source": "aceternity",
-  "sourceUrl": "https://ui.aceternity.com/components/hero-…",
-  "externalId": "hero-…",
-  "retrieval": "Copy from the official component page. Do not look for local files.",
-  "preview": { "type": "external", "url": "https://ui.aceternity.com/components/…" },
-  "license": { "note": "Custom free license; source redistribution forbidden." },
-  "dependencies": [{ "name": "motion", "reason": "Animation runtime." }],
-  "aesthetics": ["futuristic", "editorial"],
-  "attributes": ["dark", "animated", "tailwind"],
-  "behaviors": ["auto", "scroll"]
+  "sourceProvided": ["type:card", "trigger:hover"],
+  "inferred": ["technique:glitch", "vibe:cyberpunk"],
+  "reviewNeeded": true
 }
 ```
 
-The illustrative URLs above describe the required format; only URLs verified against
-an official source may ship in real entries.
+- `sourceProvided`: facets present in the upstream source or supplied by a human
+  curator.
+- `inferred`: facets derived deterministically by `scripts/classify-catalog.mjs` from
+  existing evidence (category, behaviours, runtime, summary, vendored source).
+- Values use `facet:id` where `facet` is one of
+  `type | trigger | technique | vibe | tech | source`.
+- A referenced value must be declared on the entry (`type` checks `types`, `trigger`
+  checks `triggers`, and so on). Unknown facets and malformed values are errors.
+- `reviewNeeded` is a boolean. It means the classification needs human confirmation;
+  it never means the component is unusable.
 
-## Canonical theme tokens
+#### `previewProfile`
 
-Required in every theme's `tokens` map:
-
+```json
+{
+  "mode": "live",
+  "layout": "wide",
+  "cost": "medium",
+  "aspectRatio": "16 / 9",
+  "minWidth": 320,
+  "minHeight": 220,
+  "gridColumnSpan": 2,
+  "gridRowSpan": 1,
+  "expandedRecommended": true,
+  "requires": ["pointer", "reduced-motion"],
+  "autoplayAllowed": true,
+  "snapshotPath": "public/previews/example.jpg",
+  "loopPath": null,
+  "previewStatus": "ready",
+  "failureReason": null
+}
 ```
---rl-surface        page / component background
---rl-surface-alt    raised or alternate surface
---rl-text           primary text
---rl-text-muted     secondary text
---rl-accent         accent fill
---rl-accent-contrast  readable text on accent
---rl-border         border color
---rl-radius         border-radius token
---rl-font           font stack
+
+| Field | Rules |
+|---|---|
+| `mode` | `live | snapshot | loop | external | unavailable`. What a card may show. |
+| `layout` | `compact | standard | wide | showcase`. Published gallery layout. |
+| `cost` | `low | medium | high`. High-cost previews do not autoplay. |
+| `aspectRatio` | Positive ratio such as `4 / 3`, `16 / 9` or `1 / 1`. |
+| `minWidth`, `minHeight` | Positive integers in CSS pixels. |
+| `gridColumnSpan` | Positive integer, maximum 3. |
+| `gridRowSpan` | Positive integer, maximum 2. |
+| `expandedRecommended` | Boolean; prefer the full workspace over a tiny card. |
+| `requires` | Array from `webgl | canvas-2d | pointer | keyboard | scroll | gpu | user-input | reduced-motion`; duplicates warn. |
+| `autoplayAllowed` | Boolean; permission, not a promise. Live gating also checks cost, visibility, global pause and reduced motion. |
+| `snapshotPath` | Optional repo-relative POSIX path to a real captured image. Required for `mode: snapshot`; existence-checked. |
+| `loopPath` | Optional repo-relative POSIX path to a real captured loop. Required for `mode: loop`; existence-checked. |
+| `previewStatus` | `ready | external | unavailable | error`. |
+| `failureReason` | Non-empty string when present; required for unavailable previews. |
+
+Coupling rules enforced by the validator:
+
+- `previewStatus: external` requires `mode: external`, and vice versa.
+- `mode: unavailable` requires `previewStatus: unavailable` and a useful
+  `failureReason`.
+- `mode: snapshot` requires `snapshotPath`; `mode: loop` requires `loopPath`.
+- Paths must be repo-relative with forward slashes and must exist when link checks run.
+
+Project honesty rules on top of the validator:
+
+- Published snapshots come from the real browser audit; they are never invented.
+- A card never renders a fallback as successful live content.
+- External records render an explicit external state and an official link.
+- Heavy, paused, reduced-motion or off-screen previews use the published snapshot.
+- The expanded preview is lazy-loaded; the gallery does not mount heavy workspaces.
+
+## Taxonomy files
+
+- `taxonomy/themes.json`: six application appearance themes, each with the nine
+  required `--rl-*` tokens and optional shadow/focus/backdrop tokens. These style the
+  app, not cataloged components.
+- `taxonomy/categories.json`: 28 structural categories.
+- `taxonomy/types.json`: 23 component types.
+- `taxonomy/triggers.json`: 14 animation triggers.
+- `taxonomy/techniques.json`: 46 techniques.
+- `taxonomy/aesthetics.json`: 22 visual-vibe classifications.
+- `taxonomy/attributes.json`: 29 independent attributes grouped into
+  `appearance | motion | tech`.
+- `taxonomy/behaviors.json`: 12 interaction behaviours. Behaviours describe what user
+  input drives an animation; triggers describe the event that starts it. Both may
+  coexist and are validated separately.
+- `taxonomy/sources.json`: source registry with `id`, `name`, `url`, `repo?`,
+  `accessMethod`, `status` (`available | partial | reference-only | requires-auth |
+  unavailable`), `license`, `auth?`, `limit?`, `notes` and an optional `coverage`
+  record. Coverage records may include `discovered`, `usable`, `locked`,
+  `reviewNeeded`, `blocked` and `checkedAt`; imported/preview-ready counts are derived
+  from entries and never hard-coded in the app.
+
+## Worked v3 entry (abbreviated)
+
+```json
+{
+  "id": "example-spotlight-card",
+  "name": "Spotlight Card",
+  "summary": "A card whose border follows the pointer with a soft spotlight.",
+  "category": "display",
+  "themes": ["classic-clean", "midnight-glass"],
+  "aliases": ["spotlight-card"],
+  "tags": ["card", "pointer", "spotlight"],
+  "status": "stable",
+  "version": "0.1.0",
+  "addedDate": "2026-10-29",
+  "externalDependencies": [],
+  "props": [],
+  "types": ["card"],
+  "triggers": ["hover", "cursor-reactive"],
+  "techniques": ["spotlight", "glow"],
+  "behaviors": ["hover", "cursor-reactive"],
+  "aesthetics": ["futuristic"],
+  "attributes": ["dark", "animated"],
+  "tagMeta": {
+    "sourceProvided": ["type:card", "trigger:hover"],
+    "inferred": ["trigger:cursor-reactive", "technique:spotlight", "vibe:futuristic"],
+    "reviewNeeded": false
+  },
+  "previewProfile": {
+    "mode": "live",
+    "layout": "standard",
+    "cost": "low",
+    "aspectRatio": "4 / 3",
+    "minWidth": 240,
+    "minHeight": 200,
+    "gridColumnSpan": 1,
+    "gridRowSpan": 1,
+    "expandedRecommended": false,
+    "requires": ["pointer", "reduced-motion"],
+    "autoplayAllowed": false,
+    "snapshotPath": "public/previews/example-spotlight-card.jpg",
+    "previewStatus": "ready"
+  }
+}
 ```
 
-Optional (with inline fallbacks in component CSS): `--rl-shadow`, `--rl-focus`
-(full `outline` shorthand), `--rl-backdrop`.
+The illustrative id and snapshot path above are examples; only verified catalog
+records and real capture files may ship.
+
+## Search semantics
+
+`searchEntries(entries, query, filters)` (tooling) and `searchEntries` in
+`src/lib/search.ts` (app) implement the same contract:
+
+- Empty query returns all entries sorted by id.
+- Exact id and exact alias matches outrank prefix, whole-token, substring and
+  token-level typo matches.
+- Facet filters are ANDed across dimensions and ORed within one dimension:
+  `{ type: ["button", "input"], trigger: "click" }` means
+  `(button OR input) AND click`.
+- `trigger` filters the animation trigger and `behavior` filters the independent
+  interaction behavior; `vibe`/`aesthetic` and `tech`/`attribute` are paired aliases.
+- Availability and preview-mode filters read `previewProfile` when present and fall
+  back honestly for legacy records.
+
+## Validation and generated index
+
+`npm run validate` checks the catalog and every taxonomy, including link/path
+existence. `--check-index` fails when `catalog/index.json` is stale.
+`npm run generate` validates first and then rewrites the derived index.
+
+The generated index contains entry records plus derived counts:
+
+- `counts.entries`, `themes`, `categories`, `aesthetics`, `attributes`, `behaviors`,
+  `types`, `triggers`, `techniques`, `sources`
+- `counts.byEntryType` and `counts.bySource`
+- `counts.previewStatuses` (`ready | external | unavailable | error`)
+- taxonomy id listings for tooling and the app
+
+`catalog/index.json` is never edited by hand.
 
 ## Change history
 
 | Version | Date | Change |
 |---|---|---|
-| v1 | 2026-10-24 | Initial schema: 21 entry fields, taxonomy-linked enums, link existence rules. |
-| v2 | 2026-10-24 | M5: multi-source catalog. New optional entry fields (`entryType`, `source`, `sourceUrl`, `externalId`, `retrieval`, `preview`, `localDir`, `manifest`, `implementation`, `dependencies`, `license`, `aesthetics`, `attributes`, `syncedAt`); `taxonomy/aesthetics.json`, `taxonomy/attributes.json`, `taxonomy/sources.json`; 16 new categories (22 total); local-path existence checks; strict external-entry rules (no fabricated paths); index gains `counts.byEntryType`/`counts.bySource` and taxonomy listings. |
-| v2.1 | 2026-10-25 | M7.1: optional entry field `behaviors`; `taxonomy/behaviors.json` (12 interaction behaviors); entry behavior/aesthetic/attribute/source references now validate against the real taxonomy sets (behaviors were previously validated against an empty set); `lookup --behavior`; index `taxonomies.behaviors`. |
+| v1 | 2026-10-24 | Initial schema: core entry fields, themes/categories, link existence rules. |
+| v2 | 2026-10-24 | M5: local/external model, source/aesthetic/attribute taxonomies, preview/license/provenance fields, 16 new categories. |
+| v2.1 | 2026-10-25 | M7.1: interaction `behaviors` taxonomy and entry field; real taxonomy membership checks. |
+| v3 | 2026-10-29 | Discovery schema: required `types`, `triggers`, `techniques`, `tagMeta` and `previewProfile`; new type/trigger/technique taxonomies; validated preview modes/layouts/costs/requirements/assets/statuses; source coverage records; deterministic assisted classification and real snapshot publication. |

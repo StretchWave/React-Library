@@ -50,7 +50,8 @@ describe("buildMasterPrompt (M5.5)", () => {
     expect(prompt).toContain(`- Official retrieval (alternative channel): ${entry.retrieval}`);
     expect(prompt).toContain(`notice: ${entry.license?.note}`);
     expect(prompt).toContain("- Requires in the target project: gsap");
-    expect(prompt).toContain("- Preview: live in the React Library preview workspace (runtime: gsap)");
+    expect(prompt).toContain("- Preview: Live preview (Live, medium cost)");
+    expect(prompt).toContain("Captured fallback: public/previews/react-bits-split-text.jpg.");
   });
 
   it("never fabricates paths for external-reference records (synthetic catalog)", () => {
@@ -76,7 +77,7 @@ describe("buildMasterPrompt (M5.5)", () => {
     const prompt = buildMasterPrompt(["synthetic-ext"], [externalEntry]);
     expect(prompt).toContain("Synthetic Ext (synthetic-ext) — external reference");
     expect(prompt).toContain("- Official retrieval (use exactly): official channel only");
-    expect(prompt).toContain("- Preview: external only — rendered demo runs outside this app:");
+    expect(prompt).toContain("- Preview: External reference (External reference,");
     expect(prompt).not.toContain("- Source path in this repo:");
     expect(prompt).not.toContain("- Manifest:");
   });

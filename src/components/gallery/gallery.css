@@ -407,51 +407,81 @@
   cursor: not-allowed;
 }
 
-/* --- selection tray -------------------------------------------------------------*/
+/* --- selection tray: compact dock, details on demand ---------------------------*/
 .selection-tray {
-  border: 1px solid var(--rl-border);
-  border-radius: var(--rl-radius);
-  background: var(--rl-surface-alt);
-  padding: 0.8rem 1rem;
-  box-shadow: var(--rl-shadow, none);
   position: sticky;
   bottom: 0.75rem;
-  z-index: 3;
+  z-index: 20;
+  align-self: flex-end;
+  max-width: 100%;
 }
 
-.tray-head {
+.tray-dock {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
+  gap: 0.25rem;
+  padding: 0.28rem;
+  border: 1px solid var(--rl-border);
+  border-radius: 999px;
+  background: var(--rl-surface-alt);
+  box-shadow: var(--rl-shadow, none);
 }
 
-.tray-title {
-  font-size: 1rem;
-  font-family: var(--rl-font);
-  color: var(--rl-text);
-  margin: 0;
+.tray-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
+  border: 0;
+  background: transparent;
+  color: var(--rl-text);
+  border-radius: 999px;
+  padding: 0.2rem 0.35rem;
+  font-family: var(--rl-font);
+  cursor: pointer;
+}
+
+.tray-toggle:hover {
+  background: var(--rl-surface);
 }
 
 .tray-count {
+  min-width: 1.5rem;
+  text-align: center;
   color: var(--rl-accent-contrast);
   background: var(--rl-accent);
-  border-radius: var(--rl-radius);
-  padding: 0.05rem 0.55rem;
+  border-radius: 999px;
+  padding: 0.05rem 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
 }
 
-.tray-empty {
+.tray-toggle-label {
   color: var(--rl-text-muted);
-  font-size: 0.85rem;
-  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+}
+
+.tray-chevron {
+  color: var(--rl-text-muted);
+  font-size: 0.65rem;
+}
+
+.tray-details {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.45rem);
+  width: min(26rem, calc(100vw - 2rem));
+  max-height: min(24rem, 60vh);
+  overflow: auto;
+  padding: 0.65rem;
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius);
+  background: var(--rl-surface-alt);
+  box-shadow: var(--rl-shadow, none);
 }
 
 .tray-list {
   list-style: none;
-  margin: 0.6rem 0 0;
+  margin: 0;
   padding: 0;
   display: grid;
   gap: 0.45rem;
@@ -503,27 +533,30 @@
   list-style: disc;
 }
 
-.tray-actions {
-  margin-top: 0.75rem;
-  display: flex;
-  justify-content: flex-end;
-}
-
 .tray-generate {
   border: none;
   background: var(--rl-accent);
   color: var(--rl-accent-contrast);
-  border-radius: var(--rl-radius);
-  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
   font-family: var(--rl-font);
+}
+
+.tray-clear {
+  border-radius: 999px;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+  font-size: 1rem;
 }
 
 .tray-generate:hover {
   border-color: var(--rl-accent);
 }
 
+.tray-toggle:focus-visible,
 .tray-generate:focus-visible,
 .gallery-bulk-select:focus-visible,
 .tray-clear:focus-visible,
@@ -533,30 +566,4 @@
 .gallery-frame-select:focus-within {
   outline: var(--rl-focus, 2px solid var(--rl-accent));
   outline-offset: 2px;
-}
-
-@media (min-width: 900px) {
-  /* Tray compresses to a single row so it never covers the grid. */
-  .tray-list {
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
-    overflow-x: auto;
-    gap: 0.4rem;
-    padding-bottom: 0.25rem;
-  }
-
-  .tray-item {
-    max-width: 15rem;
-  }
-
-  .tray-warnings {
-    flex-basis: 0;
-    flex-grow: 1;
-    min-width: 8rem;
-    padding-left: 1.1rem;
-  }
-
-  .tray-item {
-    padding: 0.35rem 0.5rem;
-  }
 }

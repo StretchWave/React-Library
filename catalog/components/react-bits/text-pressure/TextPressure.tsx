@@ -250,7 +250,7 @@ const TextPressure: React.FC<TextPressureProps> = ({
 
     const resize = () => {
       const { width: containerW, height: containerH } = container.getBoundingClientRect();
-      const nextFontSize = Math.max(chars.length ? containerW / (chars.length / 2) : minFontSize, minFontSize);
+      const nextFontSize = Math.max(chars.length ? (containerW / (chars.length / 2)) * 0.78 : minFontSize, minFontSize);
       setFontSize(nextFontSize);
       setScaleY(scale && containerH > 0 ? containerH / nextFontSize : 1);
     };

@@ -983,7 +983,15 @@ const LetterGlitch = ({
       gl.deleteTexture(stateTexture);
       gl.deleteVertexArray(vao);
       gl.deleteProgram(program.program);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      // StrictMode runs setup/cleanup/setup on the same canvas in dev. Only
+      // release the context after the canvas is genuinely gone, otherwise the
+      // remount reuses a lost context and the preview renders blank.
+      const loseContext = gl.getExtension('WEBGL_lose_context');
+      if (loseContext) {
+        setTimeout(() => {
+          if (!canvas.isConnected) loseContext.loseContext();
+        }, 0);
+      }
     };
   }, []);
 

@@ -27,6 +27,24 @@ const FLAGGED_ENTRY: CatalogEntry = {
   addedDate: "2026-10-24",
   externalDependencies: [],
   props: [],
+  types: ["button"],
+  triggers: ["static"],
+  techniques: [],
+  tagMeta: { sourceProvided: [], inferred: [], reviewNeeded: false },
+  previewProfile: {
+    mode: "snapshot",
+    layout: "standard",
+    cost: "low",
+    aspectRatio: "4 / 3",
+    minWidth: 240,
+    minHeight: 220,
+    gridColumnSpan: 1,
+    gridRowSpan: 1,
+    expandedRecommended: false,
+    requires: [],
+    autoplayAllowed: false,
+    previewStatus: "ready",
+  },
 };
 
 describe("PromptStudio", () => {

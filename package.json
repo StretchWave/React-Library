@@ -15,11 +15,16 @@
     "ingest-shadcn": "node scripts/ingest-shadcn.mjs",
     "ingest-magicui": "node scripts/ingest-magicui.mjs",
     "ingest-reactbits": "node scripts/ingest-reactbits.mjs",
+    "ingest-codepen": "node scripts/ingest-codepen.mjs",
+    "ingest-reference": "node scripts/ingest-reference.mjs",
+    "classify": "node scripts/classify-catalog.mjs",
+    "capture:previews": "node scripts/capture-previews.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test:app": "vitest run",
+    "audit:previews": "node scripts/audit-previews.mjs",
     "verify": "npm run validate -- --check-index && npm run generate && npm test && npm run test:app && npm run typecheck && npm run build"
   },
   "devDependencies": {

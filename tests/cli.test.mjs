@@ -43,7 +43,7 @@ test("lookup --list honors category filters", () => {
   const result = run("scripts/lookup.mjs", ["--list", "--category", "inputs"]);
   assert.equal(result.status, 0);
   assert.ok(result.stdout.includes("text-input"));
-  assert.ok(!result.stdout.includes("button —"));
+  assert.ok(!result.stdout.includes("button -"));
 });
 
 test("lookup renders the human text block", () => {
@@ -66,6 +66,65 @@ test("lookup rejects unknown filters with exit code 2", () => {
   assert.equal(badType.status, 2);
   const badBehavior = run("scripts/lookup.mjs", ["button", "--behavior", "hover-into-the-void"]);
   assert.equal(badBehavior.status, 2);
+  for (const [flag, value] of [
+    ["--trigger", "not-a-trigger"],
+    ["--technique", "not-a-technique"],
+    ["--vibe", "not-a-vibe"],
+    ["--tech", "not-a-tech"],
+    ["--preview-mode", "not-a-mode"],
+    ["--entry-type", "not-an-entry-type"],
+  ]) {
+    const result = run("scripts/lookup.mjs", ["button", flag, value]);
+    assert.equal(result.status, 2, `${flag} should reject ${value}`);
+  }
+});
+
+// --- v3 discovery facets ----------------------------------------------------
+
+test("lookup --list combines component type and animation trigger with AND", () => {
+  const result = run("scripts/lookup.mjs", ["--list", "--type", "button", "--trigger", "hover"]);
+  assert.equal(result.status, 0, result.stderr);
+  const ids = result.stdout.trim().split(/\r?\n/).map((line) => line.split(" - ")[0]);
+  assert.deepEqual(ids, ["button", "shadcn-button"]);
+});
+
+test("lookup --list supports visual vibe and technology facets", () => {
+  const result = run("scripts/lookup.mjs", ["--list", "--vibe", "minimal", "--tech", "tailwind"]);
+  assert.equal(result.status, 0, result.stderr);
+  const ids = result.stdout.trim().split(/\r?\n/).map((line) => line.split(" - ")[0]);
+  assert.deepEqual(ids, ["magic-ui-blur-fade", "magic-ui-dot-pattern", "magic-ui-word-rotate", "shadcn-badge"]);
+  assert.ok(!ids.includes("button"));
+});
+
+test("lookup --list ORs repeated facet values and keeps legacy entry-type aliases", () => {
+  const types = run("scripts/lookup.mjs", ["--list", "--type", "button", "--type", "input"]);
+  assert.equal(types.status, 0, types.stderr);
+  assert.ok(types.stdout.includes("button -"));
+  assert.ok(types.stdout.includes("text-input -"));
+
+  const local = run("scripts/lookup.mjs", ["--list", "--type", "local"]);
+  assert.equal(local.status, 0, local.stderr);
+  assert.equal(local.stdout.trim().split(/\r?\n/).length, 87);
+
+  const explicit = run("scripts/lookup.mjs", ["--list", "--entry-type", "local"]);
+  assert.equal(explicit.status, 0, explicit.stderr);
+  assert.equal(explicit.stdout.trim().split(/\r?\n/).length, 87);
+});
+
+test("lookup --list filters preview profiles honestly", () => {
+  const result = run("scripts/lookup.mjs", ["--list", "--preview-mode", "external"]);
+  assert.equal(result.status, 0, result.stderr);
+  const ids = result.stdout.trim().split(/\r?\n/).map((line) => line.split(" - ")[0]);
+  assert.equal(ids.length, 16);
+  assert.ok(ids.includes("shadcn-button"));
+  assert.ok(!ids.includes("button"));
+});
+
+test("lookup --list supports the built-in source alias", () => {
+  const result = run("scripts/lookup.mjs", ["--list", "--source", "built-in"]);
+  assert.equal(result.status, 0, result.stderr);
+  const ids = result.stdout.trim().split(/\r?\n/).map((line) => line.split(" - ")[0]);
+  assert.deepEqual(ids, ["alert", "badge", "button", "card", "tabs", "text-input"]);
 });
 
 // --- M7.1 interaction-behavior filter (taxonomy/behaviors.json) --------------
@@ -85,7 +144,7 @@ test("lookup --list --behavior filters to entries classified with that behavior"
   }
   // And behaviorless ids stay out: a static entry is not interactive navigation.
   assert.ok(!result.stdout.includes("shadcn-badgetext"));
-  assert.ok(!result.stdout.replace(/shadcn-\S*/g, "").includes("button —"));
+  assert.ok(!result.stdout.replace(/shadcn-\S*/g, "").includes("button -"));
 });
 
 test("lookup emits the Behavior line for a multi-behavior entry", () => {

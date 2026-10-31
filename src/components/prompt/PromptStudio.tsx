@@ -7,23 +7,26 @@ import { useEffect, useMemo, useState } from "react";
 import { buildMasterPrompt } from "../../lib/prompt";
 import type { CatalogEntry } from "../../catalog/types";
 import { copyText } from "../../lib/clipboard";
+import type { AnnotationMap } from "../../lib/personal";
 import { availabilityNotes } from "../gallery/SelectionTray";
 
 export interface PromptStudioProps {
   items: CatalogEntry[];
   generatedAt?: string;
   onBack: () => void;
+  annotations?: AnnotationMap;
 }
 
-export function PromptStudio({ items, generatedAt, onBack }: PromptStudioProps) {
+export function PromptStudio({ items, generatedAt, onBack, annotations }: PromptStudioProps) {
   const [targetProject, setTargetProject] = useState("");
   const prompt = useMemo(
     () =>
       buildMasterPrompt(items.map((entry) => entry.id), items, {
         generatedAt,
         targetProject: targetProject.trim() || undefined,
+        annotations,
       }),
-    [items, generatedAt, targetProject],
+    [items, generatedAt, targetProject, annotations],
   );
   const warnings = useMemo(
     () =>

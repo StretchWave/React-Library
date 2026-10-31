@@ -3,11 +3,17 @@
 // normalization/composition/merge logic that feeds catalog.json.
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import {
+  composeCodePenEntry,
   composeMagicUiEntry,
   composeReactBitsEntry,
   composeReactBitsExternalEntry,
   composeReactBitsManifest,
+  composeReferenceEntry,
   composeShadcnEntry,
   composeShadcnManifest,
   fetchReactBitsItem,
@@ -15,6 +21,7 @@ import {
   humanizeReactBitsName,
   importPackages,
   mergeEntry,
+  parseCodePenUrl,
   reactBitsRegistryUrlFor,
   reactBitsRuntime,
   reactBitsSlugFor,
@@ -22,8 +29,25 @@ import {
   docsUrlFor,
   replaceEntry,
   shadcnClassification,
+  slugifyTitle,
   titleForSlug,
+  updateSourceCoverage,
 } from "../scripts/lib/ingest.mjs";
+import { loadCatalog, repoRoot, validateCatalog } from "../scripts/lib/catalog.mjs";
+
+const ROOT = repoRoot();
+const seed = loadCatalog(ROOT);
+const taxonomies = {
+  themes: seed.themes,
+  categories: seed.categories,
+  aesthetics: seed.aesthetics,
+  attributes: seed.attributes,
+  behaviors: seed.behaviors,
+  sources: seed.sources,
+  types: seed.types,
+  triggers: seed.triggers,
+  techniques: seed.techniques,
+};
 
 const STAMP = { fetchedAt: "2026-10-24" };
 
@@ -286,4 +310,237 @@ test("fetchReactBitsItem returns null registry on 404 via injectable fetch", asy
   const missing = async () => ({ ok: false, status: 404, json: async () => ({}) });
   const none = await fetchReactBitsItem("Y", "TS-CSS", { fetchImpl: missing });
   assert.equal(none.registry, null);
+});
+
+// --- Reference-only adapters (M7.6) ----------------------------------------
+
+const seedIds = seed.catalog.entries.map((entry) => entry.id);
+const seedAliases = seed.catalog.entries.flatMap((entry) => entry.aliases ?? []);
+const sourceDoc = (id) => seed.sources.sources.find((source) => source.id === id);
+
+function validateWith(entry) {
+  const entries = [...seed.catalog.entries, entry].sort((a, b) =>
+    a.id < b.id ? -1 : a.id > b.id ? 1 : 0,
+  );
+  return validateCatalog(
+    { ...seed.catalog, entries },
+    taxonomies,
+    { root: ROOT, checkLinks: true },
+  );
+}
+
+test("parseCodePenUrl accepts only official pen URLs and derives the embed URL", () => {
+  assert.deepEqual(parseCodePenUrl("https://codepen.io/ada/pen/AbC123?default-tab=result"), {
+    url: "https://codepen.io/ada/pen/AbC123",
+    user: "ada",
+    slug: "AbC123",
+    embedUrl: "https://codepen.io/ada/embed/AbC123?default-tab=result",
+  });
+  assert.throws(() => parseCodePenUrl("http://codepen.io/ada/pen/AbC123"), /codepen.io/);
+  assert.throws(() => parseCodePenUrl("https://example.com/ada/pen/AbC123"), /official codepen.io/);
+  assert.throws(() => parseCodePenUrl("https://codepen.io/ada/not-a-pen/AbC123"), /pen/);
+  assert.throws(() => parseCodePenUrl("not a url"), /absolute/);
+});
+
+test("composeCodePenEntry records verified metadata as a valid external reference", () => {
+  const { entry, info } = composeCodePenEntry({
+    sourceDoc: sourceDoc("codepen"),
+    url: "https://codepen.io/ada/pen/MultiPage",
+    title: "Multi-Page View Transition",
+    author: "Ada Lovelace",
+    license: "MIT",
+    licenseUrl: "https://example.test/license",
+    fetchedAt: "2026-10-29",
+    existingIds: [...seedIds, ...seedAliases],
+  });
+  assert.equal(entry.id, "codepen-multi-page-view-transition");
+  assert.equal(entry.entryType, "external");
+  assert.equal(entry.source, "codepen");
+  assert.equal(entry.sourceUrl, "https://codepen.io/ada/pen/MultiPage");
+  assert.equal(entry.externalId, "MultiPage");
+  assert.equal(entry.preview.type, "source-link");
+  assert.equal(entry.preview.url, info.embedUrl);
+  assert.equal(entry.category, "transitions");
+  assert.deepEqual(entry.types, ["transition"]);
+  assert.deepEqual(entry.triggers, ["route-transition"]);
+  assert.deepEqual(entry.behaviors, ["click"]);
+  assert.equal(entry.techniques.includes("reveal-mask"), true);
+  assert.equal(entry.license.spdx, "MIT");
+  assert.equal(entry.license.attribution, "Ada Lovelace");
+  assert.equal(entry.tagMeta.reviewNeeded, true);
+  assert.equal(entry.previewProfile.mode, "external");
+  assert.equal(entry.previewProfile.previewStatus, "external");
+  assert.deepEqual(entry.aliases, ["multipage", "multi-page-view-transition"]);
+  assert.equal("localDir" in entry, false);
+  assert.equal("manifest" in entry, false);
+  assert.deepEqual(validateWith(entry).errors, []);
+});
+
+test("composeReferenceEntry composes a valid, explicitly unverified reference", () => {
+  const entry = composeReferenceEntry({
+    sourceDoc: sourceDoc("getlayers"),
+    url: "https://www.getlayers.ai/templates/aurora-hero",
+    title: "Aurora Hero",
+    license: "NOASSERTION",
+    fetchedAt: "2026-10-29",
+    existingIds: [...seedIds, ...seedAliases],
+  });
+  assert.equal(entry.id, "getlayers-aurora-hero");
+  assert.equal(entry.entryType, "external");
+  assert.equal(entry.category, "backgrounds");
+  assert.ok(entry.types.includes("background") && entry.types.includes("section"));
+  assert.deepEqual(entry.triggers, ["static"]);
+  assert.equal(entry.license.spdx, "NOASSERTION");
+  assert.match(entry.retrieval, /getlayers\.ai/);
+  assert.match(entry.description, /No source is stored or redistributed/);
+  assert.equal(entry.previewProfile.mode, "external");
+  assert.deepEqual(validateWith(entry).errors, []);
+});
+
+test("reference adapters reject dedicated registries and invented metadata", () => {
+  assert.throws(
+    () =>
+      composeReferenceEntry({
+        sourceDoc: sourceDoc("shadcn"),
+        url: "https://ui.shadcn.com/docs/components/button",
+        title: "Button",
+        fetchedAt: "2026-10-29",
+      }),
+    /dedicated ingestion adapter/,
+  );
+  assert.throws(
+    () =>
+      composeReferenceEntry({
+        sourceDoc: sourceDoc("getlayers"),
+        url: "https://www.getlayers.ai/templates/x",
+        title: "",
+        fetchedAt: "2026-10-29",
+      }),
+    /explicit title/,
+  );
+  assert.throws(
+    () =>
+      composeReferenceEntry({
+        sourceDoc: sourceDoc("getlayers"),
+        url: "javascript:alert(1)",
+        title: "X",
+        fetchedAt: "2026-10-29",
+      }),
+    /absolute http/,
+  );
+  assert.equal(slugifyTitle("  Multi-Page View Transition!  "), "multi-page-view-transition");
+});
+
+test("updateSourceCoverage raises derived counts and clears only the resolved blocked record", () => {
+  const original = structuredClone(seed.sources);
+  const next = updateSourceCoverage(original, "codepen", {
+    imported: 1,
+    checkedAt: "2026-10-29",
+    clearBlockedLabel: "Saved Multi-Page View Transition example",
+    note: "Author-verified reference metadata.",
+  });
+  const coverage = next.sources.find((source) => source.id === "codepen").coverage;
+  assert.equal(coverage.discovered, 1);
+  assert.equal(coverage.usable, 1);
+  assert.equal(coverage.locked, 0);
+  assert.equal(coverage.reviewNeeded, 0);
+  assert.deepEqual(coverage.blocked, []);
+  assert.equal(coverage.checkedAt, "2026-10-29");
+  assert.equal(coverage.note, "Author-verified reference metadata.");
+  assert.equal(original.sources.find((source) => source.id === "codepen").coverage.blocked.length, 1);
+  assert.deepEqual(
+    updateSourceCoverage(next, "codepen", {
+      imported: 1,
+      checkedAt: "2026-10-29",
+      clearBlockedLabel: "Saved Multi-Page View Transition example",
+      note: "Author-verified reference metadata.",
+    }),
+    next,
+  );
+  assert.deepEqual(
+    updateSourceCoverage(original, "does-not-exist", { imported: 5, checkedAt: "2026-10-29" }),
+    original,
+  );
+});
+
+function writeFixtureRepo() {
+  const root = mkdtempSync(path.join(tmpdir(), "rl-ingest-write-"));
+  cpSync(path.join(ROOT, "scripts"), path.join(root, "scripts"), { recursive: true });
+  cpSync(path.join(ROOT, "taxonomy"), path.join(root, "taxonomy"), { recursive: true });
+  mkdirSync(path.join(root, "catalog"), { recursive: true });
+  writeFileSync(
+    path.join(root, "catalog", "catalog.json"),
+    JSON.stringify({ schemaVersion: 3, entries: [] }, null, 2) + "\n",
+    "utf8",
+  );
+  return root;
+}
+
+function runFixtureScript(root, script, args) {
+  return spawnSync(process.execPath, [`scripts/${script}`, ...args], {
+    cwd: root,
+    encoding: "utf8",
+  });
+}
+
+test("CodePen --write is idempotent and clears only the resolved blocked record", () => {
+  const root = writeFixtureRepo();
+  try {
+    const args = [
+      "--url=https://codepen.io/ada/pen/MultiPage",
+      "--title=Multi-Page View Transition",
+      "--author=Ada Lovelace",
+      "--license=MIT",
+      "--write",
+    ];
+    const first = runFixtureScript(root, "ingest-codepen.mjs", args);
+    assert.equal(first.status, 0, `${first.stdout}\n${first.stderr}`);
+    const catalogFile = path.join(root, "catalog", "catalog.json");
+    const sourcesFile = path.join(root, "taxonomy", "sources.json");
+    const firstCatalog = readFileSync(catalogFile, "utf8");
+    const firstSources = readFileSync(sourcesFile, "utf8");
+    const parsed = JSON.parse(firstCatalog);
+    assert.equal(parsed.entries.length, 1);
+    assert.equal(parsed.entries[0].id, "codepen-multi-page-view-transition");
+    const coverage = JSON.parse(firstSources).sources.find((source) => source.id === "codepen").coverage;
+    assert.deepEqual(coverage.blocked, []);
+    assert.equal(coverage.discovered, 1);
+
+    const second = runFixtureScript(root, "ingest-codepen.mjs", args);
+    assert.equal(second.status, 0, `${second.stdout}\n${second.stderr}`);
+    assert.equal(readFileSync(catalogFile, "utf8"), firstCatalog);
+    assert.equal(readFileSync(sourcesFile, "utf8"), firstSources);
+    assert.match(second.stdout, /No changes/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("generic reference --write records metadata only and is idempotent", () => {
+  const root = writeFixtureRepo();
+  try {
+    const args = [
+      "--source=getlayers",
+      "--url=https://www.getlayers.ai/templates/aurora-hero",
+      "--title=Aurora Hero",
+      "--license=NOASSERTION",
+      "--write",
+    ];
+    const first = runFixtureScript(root, "ingest-reference.mjs", args);
+    assert.equal(first.status, 0, `${first.stdout}\n${first.stderr}`);
+    const catalogFile = path.join(root, "catalog", "catalog.json");
+    const firstCatalog = readFileSync(catalogFile, "utf8");
+    const entry = JSON.parse(firstCatalog).entries[0];
+    assert.equal(entry.id, "getlayers-aurora-hero");
+    assert.equal(entry.entryType, "external");
+    assert.equal(entry.license.spdx, "NOASSERTION");
+    assert.equal("implementation" in entry, false);
+    assert.equal("localDir" in entry, false);
+    const second = runFixtureScript(root, "ingest-reference.mjs", args);
+    assert.equal(second.status, 0, `${second.stdout}\n${second.stderr}`);
+    assert.equal(readFileSync(catalogFile, "utf8"), firstCatalog);
+    assert.match(second.stdout, /No changes/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

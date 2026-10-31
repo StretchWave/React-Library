@@ -1,13 +1,15 @@
 // Theme context (M3): reads themes from taxonomy/themes.json via the catalog
-// client, persists the selection, and applies the token map on a scoped
-// [data-theme] container. No theme colors are defined in this source file.
+// client, persists the selection, and applies the token map to the document
+// element's [data-theme] scope. Tokens live on <html> (not just the wrapper)
+// so portals mounted under document.body inherit them too. No theme colors are
+// defined in this source file.
 import {
   createContext,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useState,
-  type CSSProperties,
   type ReactNode,
 } from "react";
 import { themes as themesFromTaxonomy } from "../catalog/client";
@@ -58,8 +60,26 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     writeStoredThemeId(id);
   };
 
+  // Apply the resolved theme on the document element, not just the wrapper:
+  // portals (inspector, expanded preview, compare) mount under document.body
+  // and could never see the --rl-* tokens otherwise, which left them with a
+  // transparent background. useLayoutEffect applies tokens before first paint.
+  const theme = useMemo(
+    () => resolveThemeId(selection, themesFromTaxonomy, prefersDark),
+    [selection, prefersDark],
+  );
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    const tokens = theme.tokens as unknown as Record<string, string>;
+    root.dataset.theme = theme.id;
+    for (const [name, value] of Object.entries(tokens)) root.style.setProperty(name, value);
+    return () => {
+      for (const name of Object.keys(tokens)) root.style.removeProperty(name);
+      if (root.dataset.theme === theme.id) delete root.dataset.theme;
+    };
+  }, [theme]);
+
   const contextValue = useMemo<ThemeContextValue>(() => {
-    const theme = resolveThemeId(selection, themesFromTaxonomy, prefersDark);
     return {
       selection,
       theme,
@@ -72,18 +92,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         setThemeId(nextThemeId(startId, themesFromTaxonomy, delta).id);
       },
     };
-    // setThemeId is stable per render (plain closure); include selection/prefersDark.
+    // setThemeId is stable per render (plain closure); theme derives from
+    // selection/prefersDark, so those are the dependencies.
   }, [selection, prefersDark]);
 
   return (
     <ThemeContext.Provider value={contextValue}>
-      <div
-        data-theme={contextValue.theme.id}
-        className="theme-scope"
-        style={contextValue.theme.tokens as unknown as CSSProperties}
-      >
-        {children}
-      </div>
+      <div className="theme-scope">{children}</div>
     </ThemeContext.Provider>
   );
 }

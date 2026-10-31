@@ -1,8 +1,5 @@
-// Gallery view (M5.3 + M5.4 + M6.4): the full searchable card grid over the
-// catalog, selection controls, the selection tray, and the global preview
-// motion toggle. Receives pre-filtered entries plus the app-level selection
-// state; every card is data-driven from the canonical record with an honest
-// preview.
+// Adaptive browse wall. The grid receives pre-filtered entries and owns only
+// presentation + bulk actions; filters, routing and personal data live in App.
 import { useSyncExternalStore } from "react";
 import type { CatalogEntry } from "../../catalog/types";
 import { isMotionPlaying, setMotionPlaying, subscribeMotion } from "../../lib/motion";
@@ -14,15 +11,19 @@ export interface GalleryProps {
   totalCount: number;
   filtersActive: boolean;
   onResetFilters: () => void;
-  /** M5.4 selection state (stable ids, order preserved). */
   selectedIds: string[];
   selectionItems: CatalogEntry[];
+  favoriteIds: string[];
   onToggleSelect: (id: string, next: boolean) => void;
+  onToggleFavorite: (id: string) => void;
+  onOpenEntry: (id: string) => void;
+  onExpandEntry: (id: string) => void;
   onSelectAllVisible: () => void;
   onRemoveSelection: (id: string) => void;
   onMoveSelection: (id: string, delta: -1 | 1) => void;
   onClearSelection: () => void;
   onGeneratePrompt: () => void;
+  onCompare: () => void;
 }
 
 export function Gallery({
@@ -32,22 +33,29 @@ export function Gallery({
   onResetFilters,
   selectedIds,
   selectionItems,
+  favoriteIds,
   onToggleSelect,
+  onToggleFavorite,
+  onOpenEntry,
+  onExpandEntry,
   onSelectAllVisible,
   onRemoveSelection,
   onMoveSelection,
   onClearSelection,
   onGeneratePrompt,
+  onCompare,
 }: GalleryProps) {
   const selectedSet = new Set(selectedIds);
+  const favorites = new Set(favoriteIds);
   const motionOn = useSyncExternalStore(subscribeMotion, isMotionPlaying);
+  const sourceCount = new Set(entries.map((entry) => entry.source).filter(Boolean)).size;
+
   return (
-    <section className="gallery-view" aria-label="Component gallery">
+    <section className="gallery-view" aria-label="Browse components">
       <div className="gallery-toolbar">
         <p className="result-count" role="status">
-          {filtersActive
-            ? `${entries.length} of ${totalCount} entries`
-            : `${totalCount} entries · ${new Set(entries.map((entry) => entry.source).filter(Boolean)).size} source libraries`}
+          {filtersActive ? `${entries.length} of ${totalCount} components` : `${totalCount} components`}
+          {sourceCount > 0 ? ` \u00b7 ${sourceCount} source libraries` : ""}
         </p>
         <div className="gallery-bulk-actions">
           <button
@@ -56,7 +64,7 @@ export function Gallery({
             aria-pressed={!motionOn}
             onClick={() => setMotionPlaying(!motionOn)}
           >
-            {motionOn ? "Pause previews" : "Play previews"}
+            {motionOn ? "Pause previews" : "Resume previews"}
           </button>
           <button
             type="button"
@@ -67,13 +75,21 @@ export function Gallery({
           >
             Select all visible
           </button>
+          <button
+            type="button"
+            className="gallery-compare"
+            onClick={onCompare}
+            disabled={selectionItems.length < 2}
+          >
+            Compare selected
+          </button>
         </div>
       </div>
       {entries.length === 0 ? (
-        <div className="list-empty">
-          <p>No entries match the current filters (0 of {totalCount}).</p>
+        <div className="list-empty gallery-empty">
+          <p>No components match these filters.</p>
           <button type="button" className="reset-filters" onClick={onResetFilters}>
-            Reset filters
+            Clear all filters
           </button>
         </div>
       ) : (
@@ -83,7 +99,11 @@ export function Gallery({
               key={entry.id}
               entry={entry}
               selected={selectedSet.has(entry.id)}
+              favorite={favorites.has(entry.id)}
               onToggleSelect={onToggleSelect}
+              onToggleFavorite={onToggleFavorite}
+              onOpen={onOpenEntry}
+              onExpand={onExpandEntry}
             />
           ))}
         </ul>

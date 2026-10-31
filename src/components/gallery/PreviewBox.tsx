@@ -1,68 +1,31 @@
-// Honest preview renderer (M5.3, extended M6.4 with lazy mini stages; M7.2 de-
-// cluttered). Policy: never execute ingested third-party code inside the main
-// application context. Live previews render only through reviewed wrappers:
-//   - vendored react-bits entries  → src/catalog/showcases registry (MiniStage)
-//   - seeded in-app components     → the vetted demo registry (MiniStage wraps
-//                                    the same demo used by the detail pane)
-// Every other entry renders a compact, data-driven VISUAL tile — no hostnames,
-// no explanatory paragraphs, no duplicate open actions inside the grid:
-//   - "external"     → honest "official demo" tile (the source link lives in
-//                      the preview workspace's honest fallback card)
-//   - "source-link"  → the same honest tile, labeled "Source"
-//   - "static"       → the verified image alone (no link chrome)
-//   - "none"         → one short restrained line
-// Every card's open action is the gallery card's stretched link to the
-// in-app #/preview/<id> route (GalleryCard) — link tiles no longer navigate
-// off-site from the grid there.
+// Honest preview renderer. The card decides from the canonical preview profile:
+//   - low/medium-cost, autoplay-capable live previews mount only while visible;
+//   - expensive, paused, reduced-motion and static cards use the real captured
+//     component screenshot published by `npm run capture:previews`;
+//   - external references show an explicit reference tile, never a screenshot
+//     of this app pretending to be the source component;
+//   - failures are labelled and offer a retry, never a silent success state.
 //
-// MiniStage playback policy (M6.4): stages auto-play only when the card is in
-// the viewport AND the global motion preference is playing; a manual Play
-// button covers environments without IntersectionObserver (and honors users
-// who start playback deliberately). Heavy entries never auto-play — their
-// safe, full-fidelity home is the preview workspace.
-//
-// M7.2 interactive stages: when a live stage is playing and the entry's VERIFIED
-// behavior tags include a pointer/hover/text-capable interaction (cursor-reactive,
-// hover, gesture, interactive-text, interactive-nav, stateful), the stage
-// publishes data-interactive="true"; gallery.css then lets the pointer reach
-// the demo (hover demos demonstrate themselves) while the card-open link
-// retracts to the title strip. Click-triggered and draggable effects keep the
-// full-card overlay — a click still opens the workspace consistently.
-//
-// The showcase registry is code-split (M6.6): mini stages pull it with a
-// dynamic import on first playback, so the vendored components and their
-// animation runtimes (gsap, motion, matter-js, three, @hugeicons,
-// @use-gesture) stay out of the main bundle and share the preview
-// workspace's async chunk.
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+// Third-party code still executes only through the reviewed showcase/demo
+// registry, never directly from vendored source inside the gallery.
+import { Component, useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { ComponentType } from "react";
 import { getDemo } from "../../catalog/demos";
+import { sourceById } from "../../catalog/client";
 import { entryTypeOf, type CatalogEntry, type PreviewType } from "../../catalog/types";
+import {
+  preferredPreviewKind,
+  profileOf,
+  previewStatusLabel,
+  snapshotUrl,
+} from "../../catalog/preview";
 import type { ShowcaseValues } from "../../catalog/showcases";
 import { isMotionPlaying, subscribeMotion } from "../../lib/motion";
-
-/** Behavior ids whose live demos demonstrably respond to pointer/hover/typing
- *  input (verified against the vendored implementations). anything driven by
- *  clicks or drag-release is demoed in the workspace, not behind a card link. */
-const POINTER_INTERACTIVE_BEHAVIORS = new Set([
-  "cursor-reactive",
-  "hover",
-  "gesture",
-  "interactive-text",
-  "interactive-nav",
-  "stateful",
-]);
-
-function entrySupportsPointerInteraction(entry: CatalogEntry): boolean {
-  return (entry.behaviors ?? []).some((behavior) => POINTER_INTERACTIVE_BEHAVIORS.has(behavior));
-}
 
 type ShowcaseRegistry = typeof import("../../catalog/showcases");
 
 let showcaseRegistryPromise: Promise<ShowcaseRegistry> | null = null;
 
-/** Loads the code-split showcase registry once per session; a rejected load
- *  clears the cache so the next playback request can retry. */
 function loadShowcaseRegistry(): Promise<ShowcaseRegistry> {
   if (!showcaseRegistryPromise) {
     showcaseRegistryPromise = import("../../catalog/showcases").catch((error: unknown) => {
@@ -75,196 +38,258 @@ function loadShowcaseRegistry(): Promise<ShowcaseRegistry> {
 
 export type PreviewKind = PreviewType;
 
-/** Resolves the preview kind actually rendered for an entry. Entries without a
- *  recorded preview fall back to a source link when an official sourceUrl
- *  exists; otherwise they are "none". */
+/** Compatibility helper used by tests and the inspector. */
 export function previewKind(entry: CatalogEntry): PreviewKind {
+  const profile = profileOf(entry);
+  if (profile.mode === "external") return "external";
+  if (profile.mode === "unavailable") return "none";
   if (entryTypeOf(entry) === "local" && getDemo(entry.id)) return "local-demo";
-  if (entry.preview) return entry.preview.type;
-  if (entry.sourceUrl) return "source-link";
-  return "none";
+  return entry.preview?.type ?? "local-demo";
 }
 
-const LINK_CARD_COPY: Record<"external" | "source-link", string> = {
-  external: "Open official preview",
-  "source-link": "View at source",
-};
-
-interface MiniStageProps {
-  name: string;
-  /** null while the showcase chunk is still loading (mini stages are
-   *  code-split: the registry only loads when playback starts). */
-  Component: ComponentType<ShowcaseValues> | null;
-  heavy: boolean;
-  /** M7.2: the entry's verified behaviors allow pointer/hover interaction; the
-   *  stage publishes data-interactive while actually playing so gallery.css
-   *  can pass pointer events through and retract the card link. */
-  interactive: boolean;
-  /** Invoked when playback starts (or is retried) so the host can fetch the
-   *  code-split showcase component before the stage can render. */
-  onPlaybackStart?: () => void;
+function prefersReducedMotion(): boolean {
+  try {
+    return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  } catch {
+    return false;
+  }
 }
 
-function MiniStage({ name, Component, heavy, interactive, onPlaybackStart }: MiniStageProps) {
-  const hostRef = useRef<HTMLDivElement | null>(null);
-  const [autoVisible, setAutoVisible] = useState(false);
-  const [manualPlay, setManualPlay] = useState(false);
-  const motionOn = useSyncExternalStore(subscribeMotion, isMotionPlaying);
-
-  // Re-observ(ed) on resume so a card sitting in the viewport while the user
-  // re-enables playback becomes active again (IO fires once per observe).
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(prefersReducedMotion);
   useEffect(() => {
-    const host = hostRef.current;
-    if (!host || typeof IntersectionObserver !== "function") return;
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => setReduced(media.matches);
+    media.addEventListener?.("change", onChange);
+    return () => media.removeEventListener?.("change", onChange);
+  }, []);
+  return reduced;
+}
+
+function useVisible(ref: React.RefObject<HTMLElement | null>): boolean {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const host = ref.current;
+    if (!host) return;
+    if (typeof IntersectionObserver !== "function") {
+      setVisible(true);
+      return;
+    }
     const observer = new IntersectionObserver(
       (records) => {
         for (const record of records) {
-          if (record.target === host) setAutoVisible(record.isIntersecting);
+          if (record.target === host) setVisible(record.isIntersecting);
         }
       },
-      { rootMargin: "100px" },
+      { rootMargin: "120px" },
     );
     observer.observe(host);
     return () => observer.disconnect();
-  }, [motionOn]);
+  }, [ref]);
+  return visible;
+}
 
-  const active = !heavy && motionOn && (manualPlay || autoVisible);
+interface BoundaryProps {
+  children: ReactNode;
+  fallback: ReactNode;
+  resetKey: number;
+}
 
-  // Autoplay path: the registry load fires on the transition to active. The
-  // manual Play button also requests directly, so a failed load retries on
-  // every deliberate click.
-  useEffect(() => {
-    if (active) onPlaybackStart?.();
-  }, [active, onPlaybackStart]);
+class PreviewBoundary extends Component<BoundaryProps, { failed: boolean }> {
+  state = { failed: false };
 
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidUpdate(previous: BoundaryProps) {
+    if (previous.resetKey !== this.props.resetKey && this.state.failed) {
+      this.setState({ failed: false });
+    }
+  }
+
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
+
+interface MiniStageProps {
+  entry: CatalogEntry;
+  Component: ComponentType<ShowcaseValues> | null;
+  interactive: boolean;
+}
+
+function MiniStage({ entry, Component, interactive }: MiniStageProps) {
+  if (!Component) {
+    return <SnapshotImage entry={entry} label="Loading live preview..." />;
+  }
   return (
     <div
-      className={`preview-frame ${heavy ? "is-heavy" : ""}`}
-      ref={hostRef}
-      data-preview-kind="local-demo"
-      data-played={active ? "true" : "false"}
-      data-heavy={heavy ? "true" : "false"}
+      className="preview-mini-stage"
+      aria-label={`Live miniature preview of ${entry.name}`}
+      data-interactive={interactive ? "true" : undefined}
     >
-      {heavy ? (
-        // M7.2 poster state: component-specific atlas-backed tile, a single
-        // truthful chip, and no paragraph copy. The card's stretched link is
-        // the open affordance — no duplicated actions inside the frame.
-        <div className="preview-mini-placeholder">
-          <span className="preview-mini-kindchip">Heavy preview</span>
-          <span className="preview-mini-open" aria-hidden="true">
-            ↗
-          </span>
-        </div>
-      ) : Component && active ? (
-        <div
-          className="preview-mini-stage"
-          aria-label={`Live mini preview of ${name}`}
-          data-interactive={interactive ? "true" : undefined}
-        >
-          <div className="preview-mini-scaler" aria-hidden="true">
-            <Component />
-          </div>
-        </div>
-      ) : motionOn ? (
-        <div className="preview-mini-loading">
-          {!Component ? <p className="preview-mini-note" aria-hidden="true">Loading preview…</p> : null}
-          <button
-            type="button"
-            className="preview-mini-play"
-            aria-label={`Play preview of ${name}`}
-            onClick={() => {
-              setManualPlay(true);
-              onPlaybackStart?.();
-            }}
-          >
-            Play
-          </button>
-        </div>
-      ) : (
-        <p className="preview-mini-note" aria-label={`Previews paused for ${name}`}>
-          Previews are paused.
-        </p>
-      )}
+      <div className="preview-mini-scaler" aria-hidden="true">
+        <Component />
+      </div>
     </div>
   );
 }
 
-export function PreviewBox({ entry }: { entry: CatalogEntry }) {
-  const kind = previewKind(entry);
-  // The showcase registry arrives asynchronously (code-split); null until the
-  // first playback request resolves the shared async chunk.
-  const [registry, setRegistry] = useState<ShowcaseRegistry | null>(null);
-  const requestComponent = useCallback(() => {
-    void loadShowcaseRegistry().then(setRegistry).catch(() => {
-      // Mini stages fail soft: the Play affordance stays, and the loader
-      // clears its cache so the next request retries the chunk.
-    });
-  }, []);
-
-  if (kind === "local-demo") {
-    const showcase = registry?.getShowcase(entry.id);
-    const SeedDemo = getDemo(entry.id);
-    const Component = showcase?.Component ?? SeedDemo ?? null;
-    if (!Component && registry) {
-      // Registry loaded but nothing to run (registry invariant breach):
-      // render nothing rather than a stuck loading state.
-      return null;
-    }
-    const heavy = Boolean(entry.heavy ?? showcase?.heavy);
+function SnapshotImage({ entry, label }: { entry: CatalogEntry; label?: string }) {
+  const url = snapshotUrl(entry);
+  if (!url) {
     return (
-      <MiniStage
-        name={entry.name}
-        Component={Component}
-        heavy={heavy}
-        interactive={!heavy && entrySupportsPointerInteraction(entry)}
-        onPlaybackStart={heavy ? undefined : requestComponent}
-      />
-    );
-  }
-
-  if (kind === "external" || kind === "source-link") {
-    // Honest, compact visual tile. The hostname and the official URL stay in
-    // the preview workspace's honest fallback card / detail pane — the card
-    // keeps one quiet cue, and the card's stretched link opens the workspace.
-    const url = entry.preview?.url ?? entry.sourceUrl;
-    if (!url) {
-      return (
-        <div className="preview-frame is-empty" data-preview-kind="none">
-          <span className="preview-frame-cue" aria-hidden="true">◦</span>
-          <p>Preview link missing from the record.</p>
-        </div>
-      );
-    }
-    return (
-      <div
-        className="preview-frame is-link"
-        data-preview-kind={kind}
-        title={`${LINK_CARD_COPY[kind]} — official link in the preview workspace`}
-      >
-        <span className="preview-frame-cue" aria-hidden="true">↗</span>
-        <span className="preview-frame-title">{LINK_CARD_COPY[kind]}</span>
+      <div className="preview-frame is-empty" data-preview-kind="none">
+        <span className="preview-frame-cue" aria-hidden="true">
+          !
+        </span>
+        <p>{label ?? "No snapshot has been captured for this component yet."}</p>
       </div>
     );
   }
-
-  if (kind === "static") {
-    const url = entry.preview?.url ?? "";
-    return (
-      <div className="preview-frame is-static" data-preview-kind="static">
-        {url ? (
-          <img src={url} alt={`${entry.name} static preview`} loading="lazy" />
-        ) : (
-          <p>Static preview missing from the record.</p>
-        )}
-      </div>
-    );
-  }
-
-  const note = entry.preview?.note ?? "No preview is available for this entry yet.";
   return (
-    <div className="preview-frame is-empty" data-preview-kind="none">
-      <span className="preview-frame-cue" aria-hidden="true">◦</span>
-      <p>{note}</p>
+    <div className="preview-frame is-snapshot" data-preview-kind="snapshot">
+      <img src={url} alt={`Captured preview of ${entry.name}`} loading="lazy" decoding="async" />
+      {label ? <span className="preview-mini-kindchip">{label}</span> : null}
+    </div>
+  );
+}
+
+function ExternalPreview({ entry }: { entry: CatalogEntry }) {
+  const source = entry.source ? sourceById(entry.source) : undefined;
+  const url = entry.preview?.url ?? entry.sourceUrl;
+  return (
+    <div className="preview-frame is-external" data-preview-kind="external">
+      <span className="preview-external-mark" aria-hidden="true">
+        {"\u2197"}
+      </span>
+      <span className="preview-external-source">{source?.name ?? "External source"}</span>
+      <span className="preview-external-note">
+        {url ? "Official preview linked in the inspector" : "Official link missing from the record"}
+      </span>
+    </div>
+  );
+}
+
+export interface PreviewBoxProps {
+  entry: CatalogEntry;
+  /** Deliberate hover previews may run entries the gallery keeps on snapshots. */
+  forceLive?: boolean;
+}
+
+export function PreviewBox({ entry, forceLive = false }: PreviewBoxProps) {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const visible = useVisible(hostRef);
+  const motionOn = useSyncExternalStore(subscribeMotion, isMotionPlaying);
+  const reducedMotion = usePrefersReducedMotion();
+  const [registry, setRegistry] = useState<ShowcaseRegistry | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [retryNonce, setRetryNonce] = useState(0);
+  const profile = profileOf(entry);
+  // Seed demos are already part of the shell; do not pull the whole showcase
+  // chunk (and its WebGL/three runtime) just to run one of them on hover.
+  const SeedDemo = getDemo(entry.id);
+
+  const requestComponent = useCallback(() => {
+    if (registry) return;
+    setLoadFailed(false);
+    void loadShowcaseRegistry()
+      .then(setRegistry)
+      .catch(() => setLoadFailed(true));
+  }, [registry]);
+
+  const kind = preferredPreviewKind(entry, {
+    globalPaused: !motionOn,
+    reducedMotion,
+    visible,
+    forceLive,
+  });
+
+  useEffect(() => {
+    if (kind === "live" && !SeedDemo) requestComponent();
+  }, [kind, requestComponent, SeedDemo]);
+
+  if (kind === "external") {
+    return (
+      <div ref={hostRef} className="preview-shell">
+        <ExternalPreview entry={entry} />
+      </div>
+    );
+  }
+
+  if (kind === "unavailable") {
+    return (
+      <div ref={hostRef} className="preview-shell">
+        <div className="preview-frame is-empty" data-preview-kind="none">
+          <span className="preview-frame-cue" aria-hidden="true">
+            !
+          </span>
+          <p>{profile.failureReason ?? "No local preview is available for this component."}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (kind === "snapshot") {
+    const label =
+      profile.cost === "high"
+        ? "Live in workspace"
+        : !motionOn
+          ? "Previews paused"
+          : profile.autoplayAllowed
+            ? undefined
+            : previewStatusLabel(entry);
+    return (
+      <div ref={hostRef} className="preview-shell" data-preview-status={profile.previewStatus}>
+        <SnapshotImage entry={entry} label={label} />
+      </div>
+    );
+  }
+
+  const showcase = registry?.getShowcase(entry.id);
+  const DemoComponent = showcase?.Component ?? SeedDemo ?? null;
+  const interactive = (entry.behaviors ?? []).some((behavior) =>
+    ["cursor-reactive", "hover", "gesture", "interactive-text", "interactive-nav", "stateful"].includes(behavior),
+  );
+  const retry = () => {
+    setRetryNonce((value) => value + 1);
+    setLoadFailed(false);
+    requestComponent();
+  };
+  const fallback = (
+    <div className="preview-failed">
+      <SnapshotImage entry={entry} label="Live preview failed - captured snapshot" />
+      <button type="button" className="preview-regenerate" onClick={retry}>
+        Retry live preview
+      </button>
+    </div>
+  );
+
+  return (
+    <div ref={hostRef} className="preview-shell" data-preview-status={profile.previewStatus}>
+      {DemoComponent === null ? (
+        <div className="preview-failed">
+          <SnapshotImage
+            entry={entry}
+            label={
+              loadFailed
+                ? "Live preview unavailable - captured snapshot"
+                : "Loading live preview..."
+            }
+          />
+          {loadFailed ? (
+            <button type="button" className="preview-regenerate" onClick={retry}>
+              Retry live preview
+            </button>
+          ) : null}
+        </div>
+      ) : (
+        <PreviewBoundary fallback={fallback} resetKey={retryNonce}>
+          <MiniStage entry={entry} Component={DemoComponent} interactive={interactive} />
+        </PreviewBoundary>
+      )}
     </div>
   );
 }

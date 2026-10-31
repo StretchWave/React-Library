@@ -156,7 +156,9 @@ const createRibbon = (index: number, x: number, y: number): Ribbon => {
   const points = new Float32Array(POINTS * 2);
   for (let i = 0; i < POINTS; i++) {
     points[i * 2] = x;
-    points[i * 2 + 1] = y;
+    // Seed a short vertical segment so the ribbon is visible before the
+    // pointer enters; otherwise every point collapses onto one coordinate.
+    points[i * 2 + 1] = y + (i - (POINTS - 1) / 2) * 1.5;
   }
   return {
     x,
@@ -464,6 +466,13 @@ export default function Ribbons({
       state.time += dt;
       syncRibbons();
       state.accumulator += dt;
+      if (!state.placed) {
+        // Keep the ribbon alive while the preview is idle. Any real pointer
+        // movement takes over immediately via state.placed.
+        const t = now * 0.001;
+        state.mouseX = state.width / 2 + Math.cos(t * 2.2) * state.width * 0.28;
+        state.mouseY = state.height / 2 + Math.sin(t * 3.1) * state.height * 0.22;
+      }
       while (state.accumulator >= STEP) {
         simulate(STEP);
         state.accumulator -= STEP;

@@ -108,7 +108,7 @@ export const webglShowcases: Showcase[] = [
     "react-bits-beams",
     ({ speed, rotation }) => (
       <WebGLStage height={340}>
-        <Beams speed={Number(speed)} rotation={Number(rotation)} />
+        <Beams speed={Number(speed)} rotation={Number(rotation)} color="#6366f1" />
       </WebGLStage>
     ),
     { speed: 1, rotation: 30 },
@@ -320,7 +320,7 @@ export const webglShowcases: Showcase[] = [
     "react-bits-letter-glitch",
     ({ fontSize, density }) => (
       <WebGLStage height={320}>
-        <LetterGlitch fontSize={Number(fontSize)} density={Number(density)} />
+        <LetterGlitch fontSize={Number(fontSize)} density={Number(density)} lightMode />
       </WebGLStage>
     ),
     { fontSize: 14, density: 0.9 },
@@ -357,7 +357,14 @@ export const webglShowcases: Showcase[] = [
     "react-bits-magnet-lines",
     ({ rows, columns }) => (
       <WebGLStage height={400}>
-        <MagnetLines rows={Math.round(Number(rows))} columns={Math.round(Number(columns))} spacing={30} />
+        <MagnetLines
+          rows={Math.round(Number(rows))}
+          columns={Math.round(Number(columns))}
+          spacing={30}
+          lineColor="#6366f1"
+          accentColor="#f472b6"
+          lineWidth={3}
+        />
       </WebGLStage>
     ),
     { rows: 12, columns: 12 },
@@ -414,7 +421,11 @@ export const webglShowcases: Showcase[] = [
     "react-bits-particles",
     ({ particleCount, speed }) => (
       <WebGLStage height={380}>
-        <Particles particleCount={Math.round(Number(particleCount))} speed={Number(speed)} />
+        <Particles
+          particleCount={Math.round(Number(particleCount))}
+          speed={Number(speed)}
+          particleColors={["#6366f1", "#ec4899", "#38bdf8"]}
+        />
       </WebGLStage>
     ),
     { particleCount: 200, speed: 0.1 },
@@ -432,7 +443,7 @@ export const webglShowcases: Showcase[] = [
     "react-bits-ribbons",
     ({ thickness, stiffness, bounce }) => (
       <WebGLStage height={380}>
-        <Ribbons thickness={Number(thickness)} stiffness={Number(stiffness)} bounce={Number(bounce)} />
+        <Ribbons thickness={Number(thickness)} stiffness={Number(stiffness)} bounce={Number(bounce)} length={3.2} />
       </WebGLStage>
     ),
     { thickness: 30, stiffness: 0.5, bounce: 0.5 },
@@ -442,7 +453,7 @@ export const webglShowcases: Showcase[] = [
         { id: "stiffness", label: "Stiffness", type: "number", default: 0.5, min: 0, max: 1, step: 0.05 },
         { id: "bounce", label: "Bounce", type: "number", default: 0.5, min: 0, max: 1, step: 0.05 },
       ],
-      hint: WEBGL_HINT,
+      hint: "The ribbon drifts on its own; move the pointer across the stage to steer it.",
       heavy: true,
       stage: "inverted",
     },
@@ -451,7 +462,7 @@ export const webglShowcases: Showcase[] = [
     "react-bits-waves",
     ({ amplitude, spacing }) => (
       <WebGLStage height={360}>
-        <Waves amplitude={Number(amplitude)} spacing={Number(spacing)} />
+        <Waves amplitude={Number(amplitude)} spacing={Number(spacing)} lineColor="#6366f1" accentColor="#ec4899" />
       </WebGLStage>
     ),
     { amplitude: 32, spacing: 10 },

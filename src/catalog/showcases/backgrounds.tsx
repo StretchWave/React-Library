@@ -72,7 +72,7 @@ export const backgroundShowcases: Showcase[] = [
 function CenteredStageFull({ children }: { children: ReactNode }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 360, width: "100%", padding: "12px 6px" }}>
-      <div style={{ width: "min(620px, 96%)" }}>{children}</div>
+      <div style={{ width: "min(620px, 96%)", height: 360 }}>{children}</div>
     </div>
   );
 }

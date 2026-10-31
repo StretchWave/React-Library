@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 3,
+  "description": "Canonical component-type facet (schema v3). A catalog entry may carry several types (for example a navigation card or a background scene). Category remains the primary structural bucket; types add the finer discovery vocabulary requested by the adaptive gallery.",
+  "types": [
+    { "id": "button", "label": "Button", "description": "Pressable action." },
+    { "id": "input", "label": "Input", "description": "Form or value-entry control." },
+    { "id": "card", "label": "Card", "description": "Surface that groups content or actions." },
+    { "id": "navigation", "label": "Navigation", "description": "Menus, docks, breadcrumbs and movement controls." },
+    { "id": "text-effect", "label": "Text effect", "description": "Animated or stylised text treatment." },
+    { "id": "loader", "label": "Loader", "description": "Loading or progress indicator." },
+    { "id": "background", "label": "Background", "description": "Decorative environment behind content." },
+    { "id": "gradient", "label": "Gradient", "description": "Colour-field or gradient-driven visual." },
+    { "id": "section", "label": "Section", "description": "Reusable page section." },
+    { "id": "template", "label": "Template", "description": "Complete page or composition." },
+    { "id": "transition", "label": "Transition", "description": "State, view or content transition." },
+    { "id": "scene", "label": "3D / WebGL scene", "description": "Spatial, shader or GPU-rendered scene." },
+    { "id": "visual-effect-recipe", "label": "Visual-effect recipe", "description": "Reference or recipe for a visual treatment rather than a drop-in component." },
+    { "id": "modal", "label": "Modal", "description": "Dialog or overlay." },
+    { "id": "tooltip", "label": "Tooltip", "description": "Contextual popover or tooltip." },
+    { "id": "tabs", "label": "Tabs", "description": "Tabbed navigation and panels." },
+    { "id": "chart", "label": "Chart", "description": "Data visualisation." },
+    { "id": "cursor", "label": "Cursor", "description": "Pointer follower or custom cursor." },
+    { "id": "layout", "label": "Layout", "description": "Structural arrangement." },
+    { "id": "feedback", "label": "Feedback", "description": "Status, alert or response message." },
+    { "id": "motion", "label": "Motion primitive", "description": "Moving element or animation primitive." },
+    { "id": "micro-interaction", "label": "Micro-interaction", "description": "Small, focused interaction effect." },
+    { "id": "display", "label": "Display", "description": "Informational content." }
+  ]
+}
