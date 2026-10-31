@@ -13,7 +13,7 @@
 // an accessible <details> so they never compete with the stage.
 // M7.2 behavior treatment: scroll-triggered entries get an inner-scrollable
 // wrap so the viewport entrance can be triggered without scrolling the app.
-import { Component, useRef, useState, type ReactNode } from "react";
+import { Component, useEffect, useRef, useState, type ReactNode } from "react";
 import {
   aestheticById,
   attributeById,
@@ -24,12 +24,14 @@ import {
 } from "../../catalog/client";
 import { entryTypeOf, type CatalogEntry } from "../../catalog/types";
 import {
-  getShowcase,
+  loadShowcase,
+  peekShowcase,
   type Showcase,
   type ShowcaseControl,
   type ShowcaseValues,
 } from "../../catalog/showcases";
 import { statusChipClass } from "../browser/statusChip";
+import { snapshotUrl } from "../../catalog/preview";
 
 type StageMode = "neutral" | "inverted" | "grid";
 type Viewport = "full" | "1280" | "768" | "375";
@@ -69,13 +71,16 @@ function honestReason(entry: CatalogEntry): string {
 /** Honest failure card when a stage component throws at mount (for example
  *  when WebGL2 is unavailable): the vendored source still ships to the target
  *  project; nothing on-stage executes off-machine. */
-class StageErrorBoundary extends Component<{ entry: CatalogEntry; children: ReactNode }, { error: string }> {
+class StageErrorBoundary extends Component<
+  { entry: CatalogEntry; onRetry: () => void; children: ReactNode },
+  { error: string }
+> {
   state = { error: "" };
   static getDerivedStateFromError(error: unknown) {
     return { error: error instanceof Error ? `${error.name}: ${error.message}` : String(error) };
   }
   render() {
-    const entry = this.props.entry;
+    const { entry, onRetry } = this.props;
     if (!this.state.error) return this.props.children;
     return (
       <div className="workspace-honest" data-testid="preview-stage-error">
@@ -87,6 +92,9 @@ class StageErrorBoundary extends Component<{ entry: CatalogEntry; children: Reac
           Runtime previews degrade honestly when the browser lacks WebGL2. The vendored source still ships to the target project through the export path; nothing ran outside this catalog.
         </p>
         <div className="workspace-honest-actions">
+          <button type="button" onClick={onRetry}>
+            Retry stage
+          </button>
           {entry.sourceUrl ? (
             <a href={entry.sourceUrl} target="_blank" rel="noreferrer noopener">
               Official source ↗
@@ -99,6 +107,176 @@ class StageErrorBoundary extends Component<{ entry: CatalogEntry; children: Reac
       </div>
     );
   }
+}
+
+interface ShowcaseLoadState {
+  status: "loading" | "ready" | "failed";
+  showcase?: Showcase;
+  error?: string;
+}
+
+/** Loads only the selected group, converting a failed chunk import into a
+ *  retryable state instead of a blank stage. */
+function useEntryShowcase(entry: CatalogEntry): ShowcaseLoadState & { retry: () => void } {
+  const [retryKey, setRetryKey] = useState(0);
+  const [state, setState] = useState<ShowcaseLoadState>(() => {
+    const cached = peekShowcase(entry.id);
+    return cached ? { status: "ready", showcase: cached } : { status: "loading" };
+  });
+
+  useEffect(() => {
+    let active = true;
+    const cached = peekShowcase(entry.id);
+    if (cached) {
+      setState({ status: "ready", showcase: cached });
+      return;
+    }
+    setState({ status: "loading" });
+    void loadShowcase(entry.id)
+      .then((showcase) => {
+        if (!active) return;
+        setState(
+          showcase
+            ? { status: "ready", showcase }
+            : { status: "failed", error: "No runnable showcase is registered for this entry." },
+        );
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+        setState({
+          status: "failed",
+          error: error instanceof Error ? error.message : String(error),
+        });
+      });
+    return () => {
+      active = false;
+    };
+  }, [entry.id, retryKey]);
+
+  return { ...state, retry: () => setRetryKey((value) => value + 1) };
+}
+
+/** Detects whether the mounted stage produced a usable surface (canvas,
+ *  image, svg or text) and whether its WebGL context is alive. */
+function ShowcaseStage({
+  entry,
+  showcase,
+  values,
+  onRetry,
+}: {
+  entry: CatalogEntry;
+  showcase: Showcase;
+  values: ShowcaseValues;
+  onRetry: () => void;
+}) {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const [phase, setPhase] = useState<"mounting" | "ready" | "restricted">("mounting");
+  const [restriction, setRestriction] = useState("");
+  const requiresWebGL =
+    entry.runtime === "webgl" ||
+    (entry.previewProfile?.requires ?? []).some((requirement) => requirement === "webgl" || requirement === "gpu");
+
+  useEffect(() => {
+    let cancelled = false;
+    let attempts = 0;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const inspect = () => {
+      if (cancelled) return;
+      const host = hostRef.current;
+      if (!host) {
+        if (attempts++ < 20) timer = setTimeout(inspect, 80);
+        return;
+      }
+      const stillLoading = host.querySelector('[data-testid="showcase-loading"]');
+      const failed = host.querySelector('[data-testid="preview-load-error"]');
+      if (failed) {
+        setPhase("ready");
+        return;
+      }
+      if (stillLoading && attempts++ < 60) {
+        timer = setTimeout(inspect, 100);
+        return;
+      }
+      const canvases = [...host.querySelectorAll("canvas")];
+      for (const canvas of canvases) {
+        let lost = false;
+        try {
+          const gl = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
+          lost = Boolean(gl?.isContextLost?.());
+          if (lost || (entry.heavy && requiresWebGL && !gl)) {
+            setPhase("restricted");
+            setRestriction(
+              lost
+                ? "The WebGL context was lost. Reload the stage to recreate it."
+                : "This machine could not create a WebGL context. The live GPU effect cannot run here; the captured snapshot remains the honest fallback.",
+            );
+            return;
+          }
+        } catch {
+          // A canvas that refuses inspection is handled by the audit, not by
+          // treating the whole stage as broken.
+        }
+      }
+      const meaningful =
+        canvases.length > 0 ||
+        Boolean(host.querySelector("img, svg")) ||
+        (host.textContent ?? "").trim().length > 0;
+      if (!meaningful && attempts++ < 12) {
+        timer = setTimeout(inspect, 100);
+        return;
+      }
+      setPhase("ready");
+    };
+
+    timer = setTimeout(inspect, 40);
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [entry.heavy, requiresWebGL, showcase]);
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    const canvases = [...host.querySelectorAll("canvas")];
+    const onLost = (event: Event) => {
+      event.preventDefault();
+      setRestriction("The WebGL context was lost. Reload the stage to recreate it.");
+      setPhase("restricted");
+    };
+    for (const canvas of canvases) canvas.addEventListener("webglcontextlost", onLost);
+    return () => {
+      for (const canvas of canvases) canvas.removeEventListener("webglcontextlost", onLost);
+    };
+  }, [phase, showcase]);
+
+  return (
+    <div ref={hostRef} className="workspace-stage-live" data-preview-phase={phase}>
+      <showcase.Component {...values} />
+      {phase === "restricted" && snapshotUrl(entry) ? (
+        <img
+          className="workspace-stage-fallback"
+          src={snapshotUrl(entry)}
+          alt={`Captured fallback of ${entry.name}`}
+        />
+      ) : null}
+      {phase === "mounting" ? (
+        <div className="workspace-stage-status" data-testid="preview-stage-status" role="status">
+          <span className="workspace-stage-pulse" aria-hidden="true" />
+          {entry.heavy ? "Initializing renderer…" : "Mounting component…"}
+        </div>
+      ) : null}
+      {phase === "restricted" ? (
+        <div className="workspace-stage-status is-restricted" data-testid="preview-stage-status" role="alert">
+          <p>{restriction}</p>
+          <button type="button" onClick={onRetry}>
+            Reload stage
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 export function PreviewWorkspace({ entry, selected, onToggleSelection }: PreviewWorkspaceProps) {
@@ -114,13 +292,18 @@ export function PreviewWorkspace({ entry, selected, onToggleSelection }: Preview
     );
   }
 
-  const showcase = getShowcase(entry.id);
-  return <WorkspaceShell key={entry.id} entry={entry} showcase={showcase} selected={selected} onToggleSelection={onToggleSelection} />;
+  return (
+    <WorkspaceShell
+      key={entry.id}
+      entry={entry}
+      selected={selected}
+      onToggleSelection={onToggleSelection}
+    />
+  );
 }
 
 interface WorkspaceShellProps {
   entry: CatalogEntry;
-  showcase: Showcase | undefined;
   selected?: boolean;
   onToggleSelection?: (id: string, next: boolean) => void;
 }
@@ -157,16 +340,25 @@ function stageInteractionCue(entry: CatalogEntry): string | null {
   return cues.join(" ");
 }
 
-function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: WorkspaceShellProps) {
+function WorkspaceShell({ entry, selected, onToggleSelection }: WorkspaceShellProps) {
   const stageRef = useRef<HTMLDivElement | null>(null);
+  const stageModeTouched = useRef(false);
+  const showcaseState = useEntryShowcase(entry);
+  const showcase = showcaseState.status === "ready" ? showcaseState.showcase : undefined;
   const [viewport, setViewport] = useState<Viewport>("full");
-  const [stageMode, setStageMode] = useState<StageMode>(showcase?.stage ?? "neutral");
+  const [stageMode, setStageMode] = useState<StageMode>("neutral");
   const [replayKey, setReplayKey] = useState(0);
-  const [values, setValues] = useState<ShowcaseValues>(() => {
+  const [values, setValues] = useState<ShowcaseValues>({});
+
+  // The group loads asynchronously; seed canvas mode and control defaults when
+  // its descriptor arrives, without overwriting a user's stage choice.
+  useEffect(() => {
+    if (!showcase) return;
+    if (!stageModeTouched.current) setStageMode(showcase.stage ?? "neutral");
     const initial: ShowcaseValues = {};
-    for (const control of showcase?.controls ?? []) initial[control.id] = control.default;
-    return initial;
-  });
+    for (const control of showcase.controls ?? []) initial[control.id] = control.default;
+    setValues(initial);
+  }, [showcase]);
 
   const related = entries
     .filter((candidate) => candidate.source && entry.source && candidate.source === entry.source && candidate.id !== entry.id)
@@ -178,7 +370,7 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
     .slice(0, 6);
 
   const runnable = Boolean(showcase);
-  const kind = previewKindOf(entry, showcase);
+  const kind = showcaseState.status === "loading" ? "loading" : previewKindOf(entry, showcase);
   const categoryLabel = categoryById(entry.category)?.label ?? entry.category;
   const viewportWidth = VIEWPORTS.find((candidate) => candidate.id === viewport)?.width ?? null;
   const cue = stageInteractionCue(entry);
@@ -293,7 +485,10 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
               data-testid="preview-stage-mode"
               aria-label="Stage background mode"
               value={stageMode}
-              onChange={(event) => setStageMode(event.target.value as StageMode)}
+              onChange={(event) => {
+                stageModeTouched.current = true;
+                setStageMode(event.target.value as StageMode);
+              }}
             >
               <option value="neutral">neutral</option>
               <option value="inverted">inverted</option>
@@ -338,7 +533,18 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
             Fullscreen
           </button>
         </div>
-        {runnable && showcase ? (
+        {showcaseState.status === "loading" ? (
+          <div
+            className="workspace-stage-wrap"
+            data-stage={stageMode}
+            data-testid="preview-stage-wrap"
+          >
+            <div className="workspace-stage-loading" data-testid="preview-stage-loading" role="status">
+              <span className="workspace-stage-pulse" aria-hidden="true" />
+              Loading preview implementation…
+            </div>
+          </div>
+        ) : runnable && showcase ? (
           <>
             <div
               className="workspace-stage-wrap"
@@ -354,14 +560,24 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
                 data-testid="preview-stage"
                 style={viewportWidth ? { maxWidth: viewportWidth } : undefined}
               >
-                <StageErrorBoundary entry={entry}>
-                  <showcase.Component {...values} />
+                <StageErrorBoundary
+                  key={`boundary-${replayKey}`}
+                  entry={entry}
+                  onRetry={() => setReplayKey((current) => current + 1)}
+                >                    <ShowcaseStage
+                    key={`stage-${replayKey}`}
+                    entry={entry}
+                    showcase={showcase}
+                    values={values}
+                    onRetry={() => setReplayKey((current) => current + 1)}
+                  />
                 </StageErrorBoundary>
               </div>
             </div>
             <p className="workspace-hint" data-testid="preview-interaction-cue">
               {cue ?? showcase.hint ?? "Press Replay to restart the animation."}
-            </p>          </>
+            </p>
+          </>
         ) : (
           <div className="workspace-honest" data-testid="preview-honest">
             <h2>{entry.name}</h2>
@@ -370,8 +586,17 @@ function WorkspaceShell({ entry, showcase, selected, onToggleSelection }: Worksp
               {entry.runtime ? ` · runtime: ${entry.runtime}` : ""}
               {entry.heavy ? " · heavy" : ""}
             </p>
-            <p className="workspace-honest-reason">{honestReason(entry)}</p>
+            <p className="workspace-honest-reason">
+              {showcaseState.status === "failed" && showcaseState.error
+                ? showcaseState.error
+                : honestReason(entry)}
+            </p>
             <div className="workspace-honest-actions">
+              {showcaseState.status === "failed" ? (
+                <button type="button" onClick={showcaseState.retry}>
+                  Retry preview
+                </button>
+              ) : null}
               {entry.preview?.url ? (
                 <a href={entry.preview.url} target="_blank" rel="noreferrer noopener">
                   Open official preview ↗

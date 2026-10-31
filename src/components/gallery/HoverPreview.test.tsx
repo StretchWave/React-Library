@@ -1,5 +1,7 @@
-// Hover previews are interactive enlarged duplicates: they run live demos for
-// legibility and accept pointer input, but dismissal stays explicit and local.
+// The floating preview is one controller-owned panel. These tests cover its
+// presentational contract: a real interactive region, truthful heavy content,
+// dismissal listeners and a mounted exit phase.
+import { createRef } from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { findEntry } from "../../catalog/client";
@@ -13,25 +15,31 @@ vi.mock("./PreviewBox", () => ({
 }));
 
 const button = findEntry("button") as CatalogEntry;
+const heavy = findEntry("react-bits-aurora") as CatalogEntry;
 const external = findEntry("shadcn-button") as CatalogEntry;
 const anchor = new DOMRect(400, 100, 300, 250);
 
-function renderPreview(entry: CatalogEntry = button, pinned = false) {
-  const onClose = vi.fn();
-  const onKeepOpen = vi.fn();
-  const onScheduleClose = vi.fn();
+function renderPreview(entry: CatalogEntry = button, overrides: Record<string, unknown> = {}) {
+  const onDismiss = vi.fn();
+  const onPanelEnter = vi.fn();
+  const onPanelLeave = vi.fn();
+  const onExpand = vi.fn();
   render(
     <HoverPreview
       entry={entry}
       anchor={anchor}
-      id="test-preview-panel"
-      onClose={onClose}
-      onKeepOpen={onKeepOpen}
-      onScheduleClose={onScheduleClose}
-      pinned={pinned}
+      id="preview-panel"
+      panelRef={createRef<HTMLElement>()}
+      phase="open"
+      pinned={false}
+      onDismiss={onDismiss}
+      onPanelEnter={onPanelEnter}
+      onPanelLeave={onPanelLeave}
+      onExpand={onExpand}
+      {...overrides}
     />,
   );
-  return { onClose, onKeepOpen, onScheduleClose };
+  return { onDismiss, onPanelEnter, onPanelLeave, onExpand };
 }
 
 describe("hoverPanelRect", () => {
@@ -64,6 +72,7 @@ describe("HoverPreview", () => {
     const panel = screen.getByRole("region", { name: "Enlarged preview of Button" });
     expect(panel.hasAttribute("inert")).toBe(false);
     expect(panel.getAttribute("aria-hidden")).toBeNull();
+    expect(panel.getAttribute("data-phase")).toBe("open");
     expect(screen.getByRole("button", { name: "Close enlarged preview" })).toBeTruthy();
     expect(screen.getByTestId("mock-preview").getAttribute("data-entry")).toBe("button");
     expect(screen.getByTestId("mock-preview").getAttribute("data-force")).toBe("true");
@@ -75,48 +84,57 @@ describe("HoverPreview", () => {
   });
 
   it("closes on Escape, page scroll, outside click and the close button", () => {
-    const { onClose } = renderPreview();
+    const { onDismiss } = renderPreview();
     const panel = screen.getByRole("region", { name: "Enlarged preview of Button" });
 
     fireEvent.click(panel);
-    expect(onClose).not.toHaveBeenCalled();
+    expect(onDismiss).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Close enlarged preview" }));
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(onDismiss).toHaveBeenCalledTimes(1);
     fireEvent.keyDown(document, { key: "Escape" });
-    expect(onClose).toHaveBeenCalledTimes(2);
+    expect(onDismiss).toHaveBeenCalledTimes(2);
     fireEvent.scroll(window);
-    expect(onClose).toHaveBeenCalledTimes(3);
+    expect(onDismiss).toHaveBeenCalledTimes(3);
     fireEvent.click(document.body);
-    expect(onClose).toHaveBeenCalledTimes(4);
+    expect(onDismiss).toHaveBeenCalledTimes(4);
   });
 
-  it("keeps the panel while the pointer is inside and schedules close outside", () => {
-    const { onClose, onKeepOpen, onScheduleClose } = renderPreview();
+  it("reports pointer entry and exit without dismissing on its own", () => {
+    const { onDismiss, onPanelEnter, onPanelLeave } = renderPreview();
     const panel = screen.getByRole("region", { name: "Enlarged preview of Button" });
 
-    fireEvent.pointerMove(panel, { pointerId: 1 });
-    expect(onKeepOpen).toHaveBeenCalledTimes(1);
     fireEvent.pointerEnter(panel);
-    expect(onKeepOpen).toHaveBeenCalledTimes(2);
     fireEvent.pointerLeave(panel);
-    expect(onScheduleClose).toHaveBeenCalledTimes(1);
-    fireEvent.pointerMove(document, { pointerId: 1 });
-    expect(onScheduleClose).toHaveBeenCalledTimes(2);
-    expect(onClose).not.toHaveBeenCalled();
+    expect(onPanelEnter).toHaveBeenCalledTimes(1);
+    expect(onPanelLeave).toHaveBeenCalledTimes(1);
+    expect(onDismiss).not.toHaveBeenCalled();
   });
 
-  it("pins an explicitly opened panel, focuses it and ignores pointer movement", () => {
-    const { onClose, onKeepOpen, onScheduleClose } = renderPreview(button, true);
-    const panel = screen.getByRole("region", { name: "Enlarged preview of Button" });
-
+  it("keeps pinned panels pointer-independent and offers the heavy workspace route", () => {
+    const { onDismiss, onPanelEnter, onPanelLeave, onExpand } = renderPreview(heavy, {
+      pinned: true,
+    });
+    const panel = screen.getByRole("region", {
+      name: "Enlarged preview of Aurora (React Bits)",
+    });
     expect(panel.getAttribute("data-pinned")).toBe("true");
-    expect(document.activeElement).toBe(panel);
     fireEvent.pointerEnter(panel);
     fireEvent.pointerLeave(panel);
-    fireEvent.pointerMove(document, { pointerId: 1 });
-    expect(onKeepOpen).not.toHaveBeenCalled();
-    expect(onScheduleClose).not.toHaveBeenCalled();
-    fireEvent.keyDown(document, { key: "Escape" });
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(onPanelEnter).not.toHaveBeenCalled();
+    expect(onPanelLeave).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Open full preview" }));
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    expect(onExpand).toHaveBeenCalledWith("react-bits-aurora");
+  });
+
+  it("stays mounted with an exit phase so the closing animation can run", () => {
+    renderPreview(button, { phase: "closing" });
+    const panel = screen.getByTestId("hover-preview");
+    expect(panel.getAttribute("data-phase")).toBe("closing");
+    expect(panel.getAttribute("aria-hidden")).toBe("true");
+    expect(
+      screen.getByRole("button", { name: "Close enlarged preview", hidden: true }).getAttribute("tabindex"),
+    ).toBe("-1");
   });
 });

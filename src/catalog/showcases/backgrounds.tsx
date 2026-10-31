@@ -1,16 +1,16 @@
 // Background showcases (M6.2): the vendored React Bits background components
 // whose official CSS variant runs on plain DOM/CSS (no WebGL). Noise renders
 // in-flow (fixed: false) so it stays inside the preview stage.
-import type { ComponentType, ReactNode } from "react";
-import NoiseRaw from "../../../catalog/components/react-bits/noise/Noise";
-import GridMotionRaw from "../../../catalog/components/react-bits/grid-motion/GridMotion";
+import type { ReactNode } from "react";
+const Noise = createLazyRaw(() => import("../../../catalog/components/react-bits/noise/Noise"));
+const GridMotion = createLazyRaw(() => import("../../../catalog/components/react-bits/grid-motion/GridMotion"));
 import { defineShowcase, type Showcase } from "./types";
 import { placeholderUri } from "./helpers";
+import { createLazyRaw } from "./lazyRaw";
 
-type Raw = ComponentType<Record<string, unknown>>;
 
-const Noise = NoiseRaw as unknown as Raw;
-const GridMotion = GridMotionRaw as unknown as Raw;
+
+
 
 export const backgroundShowcases: Showcase[] = [
   defineShowcase(

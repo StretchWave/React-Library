@@ -35,6 +35,27 @@ test("audit previews keeps the full workspace, gallery and reduced-motion paths"
   assert.match(source, /contextLostCanvases/);
 });
 
+test("audit distinguishes trigger verification from rendering", () => {
+  const source = readFileSync(`${ROOT}/scripts/audit-previews.mjs`, "utf8");
+  assert.match(source, /byVerification/);
+  assert.match(source, /animation-verified/);
+  assert.match(source, /interaction-verified/);
+  assert.match(source, /needs-manual-review/);
+  assert.match(source, /expectedInteractions/);
+  assert.match(source, /exerciseScroll/);
+  assert.match(source, /exerciseControl/);
+});
+
+test("audit exercises hover previews, rapid pointer movement and component chunks", () => {
+  const source = readFileSync(`${ROOT}/scripts/audit-previews.mjs`, "utf8");
+  assert.match(source, /data-testid=\\"hover-preview\\"/);
+  assert.match(source, /hoverPassed/);
+  assert.match(source, /rapidHover/);
+  assert.match(source, /maxPanels/);
+  assert.match(source, /threeLoaded/);
+  assert.match(source, /unexpectedThreeLoads/);
+});
+
 test("gallery audit reads the current preview DOM and profile decisions", () => {
   const source = readFileSync(`${ROOT}/scripts/audit-previews.mjs`, "utf8");
   assert.match(source, /data-preview-kind/);

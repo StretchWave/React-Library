@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { findEntry, entries } from "../../catalog/client";
 import type { CatalogEntry } from "../../catalog/types";
-import { SHOWCASE_IDS, getShowcase } from "../../catalog/showcases";
+import { SHOWCASE_IDS, loadShowcase, peekShowcase } from "../../catalog/showcases";
 import { ThemeProvider } from "../../theme/ThemeProvider";
 import { PreviewWorkspace } from "./PreviewWorkspace";
 
@@ -22,10 +22,11 @@ function renderWorkspace(entry: CatalogEntry | null, selected = false, onToggleS
 describe("PreviewWorkspace", () => {
   it("runs a vendored stage with live controls and viewport switches", async () => {
     renderWorkspace(findEntry("react-bits-shiny-text") as CatalogEntry);
-    const stage = await screen.findByTestId("preview-stage");
-    expect(stage.textContent).toContain("Shiny text shimmer");
+    const stage = await screen.findByTestId("preview-stage", {}, { timeout: 8000 });
+    expect((await screen.findAllByText("Shiny text shimmer", {}, { timeout: 8000 })).length).toBeGreaterThan(0);
     expect(screen.getByTestId("preview-controls")).toBeTruthy();
     expect(screen.getByTestId("preview-replay")).toBeTruthy();
+    expect(stage.getAttribute("data-viewport")).toBe("full");
 
     const text = screen.getByLabelText("Text") as HTMLInputElement;
     expect(text.value).toBe("Shiny text shimmer");
@@ -39,7 +40,7 @@ describe("PreviewWorkspace", () => {
     const frame = screen.getByTestId("preview-stage");
     expect(frame.getAttribute("data-viewport")).toBe("375");
     expect((frame as HTMLElement).style.maxWidth).toBe("375px");
-  });
+  }, 30_000);
 
   it("keeps provenance and selection facts in the info rail", async () => {
     const { onToggleSelection } = renderWorkspace(
@@ -81,16 +82,20 @@ describe("PreviewWorkspace", () => {
     expect(screen.getByTestId("preview-rail").textContent).toContain("local record");
   });
 
-  it("resolves every runnable local showcase and keeps ids unique", () => {
+  it("resolves every runnable local showcase and keeps ids unique", async () => {
     const live = entries.filter(
       (entry) => entry.previewProfile?.previewStatus === "ready" && entry.previewProfile.mode === "live",
     );
     expect(live.length).toBe(71);
-    for (const entry of live) expect(getShowcase(entry.id)).toBeTruthy();
+    for (const entry of live) expect(await loadShowcase(entry.id)).toBeTruthy();
     for (const seededId of ["alert", "badge", "button", "card", "tabs", "text-input"]) {
-      expect(getShowcase(seededId)).toBeTruthy();
+      expect(peekShowcase(seededId)).toBeTruthy();
     }
-    expect(getShowcase("shadcn-accordion")).toBeUndefined();
+    expect(await loadShowcase("shadcn-accordion")).toBeUndefined();
     expect(new Set(SHOWCASE_IDS).size).toBe(SHOWCASE_IDS.length);
-  });
+    expect(SHOWCASE_IDS.length).toBe(65);
+    for (const entry of entries.filter((candidate) => candidate.heavy)) {
+      expect(await loadShowcase(entry.id)).toBeTruthy();
+    }
+  }, 30_000);
 });

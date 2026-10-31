@@ -1,22 +1,21 @@
 // Surface showcases (M6.2): wrappers around vendored React Bits card and
 // glass surfaces. Every placeholder image is generated locally (data URI), so
 // previews run offline and tests never depend on the network.
-import type { ComponentType } from "react";
-import TiltedCardRaw from "../../../catalog/components/react-bits/tilted-card/TiltedCard";
-import BorderGlowRaw from "../../../catalog/components/react-bits/border-glow/BorderGlow";
-import SpotlightCardRaw from "../../../catalog/components/react-bits/spotlight-card/SpotlightCard";
-import PixelCardRaw from "../../../catalog/components/react-bits/pixel-card/PixelCard";
-import ChromaGridRaw from "../../../catalog/components/react-bits/chroma-grid/ChromaGrid";
+const TiltedCard = createLazyRaw(() => import("../../../catalog/components/react-bits/tilted-card/TiltedCard"));
+const BorderGlow = createLazyRaw(() => import("../../../catalog/components/react-bits/border-glow/BorderGlow"));
+const SpotlightCard = createLazyRaw(() => import("../../../catalog/components/react-bits/spotlight-card/SpotlightCard"));
+const PixelCard = createLazyRaw(() => import("../../../catalog/components/react-bits/pixel-card/PixelCard"));
+const ChromaGrid = createLazyRaw(() => import("../../../catalog/components/react-bits/chroma-grid/ChromaGrid"));
 import { defineShowcase, type Showcase } from "./types";
 import { CenteredStage, placeholderUri, svgDataUri } from "./helpers";
+import { createLazyRaw } from "./lazyRaw";
 
-type Raw = ComponentType<Record<string, unknown>>;
 
-const TiltedCard = TiltedCardRaw as unknown as Raw;
-const BorderGlow = BorderGlowRaw as unknown as Raw;
-const SpotlightCard = SpotlightCardRaw as unknown as Raw;
-const PixelCard = PixelCardRaw as unknown as Raw;
-const ChromaGrid = ChromaGridRaw as unknown as Raw;
+
+
+
+
+
 
 export const surfaceShowcases: Showcase[] = [
   defineShowcase(

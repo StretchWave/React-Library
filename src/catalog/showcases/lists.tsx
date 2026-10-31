@@ -2,14 +2,13 @@
 // AnimatedList originally shipped as `external` in M6.1 because @hugeicons was
 // excluded from the runtime union; the M6.2 §12 amendment installs that runtime,
 // so this component runs live again (plain string items per its source type).
-import type { ComponentType } from "react";
-import AnimatedListRaw from "../../../catalog/components/react-bits/animated-list/AnimatedList";
+const AnimatedList = createLazyRaw(() => import("../../../catalog/components/react-bits/animated-list/AnimatedList"));
 import { defineShowcase, type Showcase } from "./types";
 import { CenteredStage } from "./helpers";
+import { createLazyRaw } from "./lazyRaw";
 
-type Raw = ComponentType<Record<string, unknown>>;
 
-const AnimatedList = AnimatedListRaw as unknown as Raw;
+
 
 export const listShowcases: Showcase[] = [
   defineShowcase(

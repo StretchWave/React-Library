@@ -1,15 +1,16 @@
-// Enlarged preview. A single low/medium-cost local entry runs at its native
-// scale in a fixed panel near the card, so small UI demos stay legible and
-// interactive without opening the full workspace. Pointer users open it by
-// hovering (moving into the panel keeps it open); keyboard and touch users use
-// the card's enlarged-preview control, which pins the panel and moves focus
-// into it. Leaving both surfaces, scrolling the page, pressing Escape,
-// clicking outside, or the close button dismisses it.
-import { useEffect, useRef } from "react";
+// Enlarged preview panel. Gallery owns the lifetime through
+// useHoverPreviewController; this component is presentational plus local
+// dismissal listeners. It stays mounted during the closing animation and is
+// removed by the controller when that animation has finished.
+//
+// Hover mode opens automatically and closes when the pointer leaves both the
+// card and the panel. Pinned mode (keyboard/touch control) ignores pointer
+// movement, moves focus into the panel and returns it to the trigger later.
+import { useEffect, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { hasUsablePreview, profileOf } from "../../catalog/preview";
 import type { CatalogEntry } from "../../catalog/types";
-import { suppressHoverPreview } from "./hoverPreviewGuard";
+import type { HoverPreviewPhase } from "./useHoverPreviewController";
 import { PreviewBox } from "./PreviewBox";
 
 export interface HoverPreviewProps {
@@ -17,14 +18,14 @@ export interface HoverPreviewProps {
   anchor: DOMRect;
   /** Stable id so the card's trigger can expose aria-controls. */
   id: string;
-  onClose: () => void;
-  /** Pointer entered the card or panel: cancel any pending dismissal. */
-  onKeepOpen: () => void;
-  /** Pointer left both surfaces: dismiss shortly unless it returns. */
-  onScheduleClose: () => void;
-  /** Opened explicitly (keyboard/touch): keep it open across pointer moves and
-   *  move focus into the panel until it is dismissed. */
-  pinned?: boolean;
+  panelRef: RefObject<HTMLElement | null>;
+  phase: HoverPreviewPhase;
+  pinned: boolean;
+  onDismiss: () => void;
+  onPanelEnter: () => void;
+  onPanelLeave: () => void;
+  /** Heavy entries: explicit route to the full workspace. */
+  onExpand?: (id: string) => void;
 }
 
 const MARGIN = 16;
@@ -68,12 +69,14 @@ export function HoverPreview({
   entry,
   anchor,
   id,
-  onClose,
-  onKeepOpen,
-  onScheduleClose,
-  pinned = false,
+  panelRef,
+  phase,
+  pinned,
+  onDismiss,
+  onPanelEnter,
+  onPanelLeave,
+  onExpand,
 }: HoverPreviewProps) {
-  const panelRef = useRef<HTMLElement | null>(null);
   const profile = profileOf(entry);
   const rect =
     typeof window === "undefined"
@@ -82,10 +85,6 @@ export function HoverPreview({
 
   useEffect(() => {
     if (!rect) return;
-    const close = () => {
-      suppressHoverPreview();
-      onClose();
-    };
     const isInside = (target: EventTarget | null) => {
       if (!(target instanceof Node)) return false;
       if (panelRef.current?.contains(target)) return true;
@@ -95,47 +94,40 @@ export function HoverPreview({
       );
     };
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
-    };
-    // Mouseleave can be missed when the page re-renders or the pointer leaves
-    // the window; use the actual pointer target as the source of truth.
-    const onPointerMove = (event: PointerEvent) => {
-      if (pinned) return;
-      if (isInside(event.target)) onKeepOpen();
-      else onScheduleClose();
+      if (event.key === "Escape") onDismiss();
     };
     const onScroll = (event: Event) => {
       const target = event.target;
       if (target instanceof Node && panelRef.current?.contains(target)) return;
-      close();
+      onDismiss();
     };
     const onDocumentClick = (event: MouseEvent) => {
       if (isInside(event.target)) return;
-      close();
+      onDismiss();
     };
     window.addEventListener("scroll", onScroll, true);
-    window.addEventListener("resize", close);
+    window.addEventListener("resize", onDismiss);
     document.addEventListener("keydown", onKeyDown);
-    document.addEventListener("pointermove", onPointerMove, { passive: true });
     document.addEventListener("click", onDocumentClick, true);
     return () => {
       window.removeEventListener("scroll", onScroll, true);
-      window.removeEventListener("resize", close);
+      window.removeEventListener("resize", onDismiss);
       document.removeEventListener("keydown", onKeyDown);
-      document.removeEventListener("pointermove", onPointerMove);
       document.removeEventListener("click", onDocumentClick, true);
     };
-  }, [anchor, entry.id, onClose, onKeepOpen, onScheduleClose, pinned]);
+  }, [entry.id, onDismiss, panelRef, rect]);
 
   // An explicit open is a keyboard/touch interaction: move focus to the panel
   // region so the demo (and the close button) are reachable without a pointer.
   useEffect(() => {
-    if (pinned) panelRef.current?.focus();
-  }, [pinned]);
+    if (pinned && phase === "open") panelRef.current?.focus();
+  }, [panelRef, phase, pinned]);
 
   if (!rect) return null;
   if (profile.mode === "external" || profile.previewStatus === "unavailable") return null;
   if (!hasUsablePreview(entry)) return null;
+
+  const heavy = profile.cost === "high" || Boolean(entry.heavy);
 
   return createPortal(
     <aside
@@ -144,28 +136,45 @@ export function HoverPreview({
       className="hover-preview"
       role="region"
       aria-label={`Enlarged preview of ${entry.name}`}
+      aria-hidden={phase === "closing" ? "true" : undefined}
       tabIndex={-1}
       data-testid="hover-preview"
+      data-phase={phase}
       data-pinned={pinned ? "true" : undefined}
-      data-heavy={profile.cost === "high" || entry.heavy ? "true" : undefined}
+      data-heavy={heavy ? "true" : undefined}
       style={{ left: rect.left, top: rect.top, width: rect.width, height: rect.height }}
-      onPointerEnter={pinned ? undefined : onKeepOpen}
-      onPointerLeave={pinned ? undefined : onScheduleClose}
+      onPointerEnter={pinned ? undefined : onPanelEnter}
+      onPointerLeave={pinned ? undefined : onPanelLeave}
     >
       <button
         type="button"
         className="hover-preview-close"
-        onClick={() => {
-          suppressHoverPreview();
-          onClose();
-        }}
+        onClick={onDismiss}
         aria-label="Close enlarged preview"
+        tabIndex={phase === "closing" ? -1 : undefined}
       >
         <span aria-hidden="true">×</span>
       </button>
       <div className="hover-preview-canvas">
         <PreviewBox entry={entry} forceLive />
       </div>
+      {heavy && onExpand ? (
+        <div className="hover-preview-heavy">
+          <p>
+            <strong>Heavy preview.</strong> The gallery keeps it on a real captured snapshot.
+          </p>
+          <button
+            type="button"
+            className="hover-preview-open"
+            onClick={() => {
+              onDismiss();
+              onExpand(entry.id);
+            }}
+          >
+            Open full preview
+          </button>
+        </div>
+      ) : null}
     </aside>,
     document.body,
   );

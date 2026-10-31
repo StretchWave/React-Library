@@ -1,26 +1,26 @@
 // Motion showcases (M6.2): wrappers around vendored React Bits motion and
 // interaction primitives. Reveal components read ScrollTrigger-like viewport
 // thresholds, so the stage note says when to press Replay.
-import type { ComponentType, ReactNode } from "react";
-import AnimatedContentRaw from "../../../catalog/components/react-bits/animated-content/AnimatedContent";
-import FadeContentRaw from "../../../catalog/components/react-bits/fade-content/FadeContent";
-import ClickSparkRaw from "../../../catalog/components/react-bits/click-spark/ClickSpark";
-import MagnetRaw from "../../../catalog/components/react-bits/magnet/Magnet";
-import PixelTransitionRaw from "../../../catalog/components/react-bits/pixel-transition/PixelTransition";
-import GlareHoverRaw from "../../../catalog/components/react-bits/glare-hover/GlareHover";
-import StarBorderRaw from "../../../catalog/components/react-bits/star-border/StarBorder";
+import type { ReactNode } from "react";
+const AnimatedContent = createLazyRaw(() => import("../../../catalog/components/react-bits/animated-content/AnimatedContent"));
+const FadeContent = createLazyRaw(() => import("../../../catalog/components/react-bits/fade-content/FadeContent"));
+const ClickSpark = createLazyRaw(() => import("../../../catalog/components/react-bits/click-spark/ClickSpark"));
+const Magnet = createLazyRaw(() => import("../../../catalog/components/react-bits/magnet/Magnet"));
+const PixelTransition = createLazyRaw(() => import("../../../catalog/components/react-bits/pixel-transition/PixelTransition"));
+const GlareHover = createLazyRaw(() => import("../../../catalog/components/react-bits/glare-hover/GlareHover"));
+const StarBorder = createLazyRaw(() => import("../../../catalog/components/react-bits/star-border/StarBorder"));
 import { defineShowcase, type Showcase } from "./types";
 import { CenteredStage, svgDataUri } from "./helpers";
+import { createLazyRaw } from "./lazyRaw";
 
-type Raw = ComponentType<Record<string, unknown>>;
 
-const AnimatedContent = AnimatedContentRaw as unknown as Raw;
-const FadeContent = FadeContentRaw as unknown as Raw;
-const ClickSpark = ClickSparkRaw as unknown as Raw;
-const Magnet = MagnetRaw as unknown as Raw;
-const PixelTransition = PixelTransitionRaw as unknown as Raw;
-const GlareHover = GlareHoverRaw as unknown as Raw;
-const StarBorder = StarBorderRaw as unknown as Raw;
+
+
+
+
+
+
+
 
 function TintedPanel({ children, tone = 0 }: { children: ReactNode; tone?: number }) {
   return (

@@ -156,7 +156,7 @@ try {
     const label = `[${String(index + 1).padStart(2, "0")}/${entries.length}] ${entry.id}`;
     process.stdout.write(`${label} … `);
 
-    const events = { console: [], exceptions: [], log: [], network: [] };
+    const events = { console: [], exceptions: [], log: [], network: [], scripts: [] };
     const stop = cdp.on((event) => {
       if (event.sessionId !== sessionId) return;
       const { method, params } = event;
@@ -176,6 +176,7 @@ try {
       } else if (method === "Network.loadingFailed") {
         if (!params.canceled) events.network.push(`${params.type}: ${params.errorText}`);
       } else if (method === "Network.responseReceived") {
+        if (params.response.type === "Script") events.scripts.push(params.response.url);
         if (params.response.status >= 400 && isAsset(params.response.type)) {
           events.network.push(`HTTP ${params.response.status} ${params.response.url}`);
         }
@@ -199,17 +200,47 @@ try {
       // their rail as if pointer motion were a component interaction.
       const pointer = metrics.stage ? await exercisePointer(send, metrics.targetRect) : false;
       const shotInteraction = pointer ? await capture(send, metrics.capture) : null;
-      const interactionChanged = Boolean(pointer && shotLater && shotInteraction && shotInteraction.hash !== shotLater.hash);
+      const pointerChanged = Boolean(pointer && shotLater && shotInteraction && shotInteraction.hash !== shotLater.hash);
+
+      // Trigger-aware probes: only run the interaction the catalog declares.
+      const triggers = entry.triggers ?? [];
+      const scrollExpected = triggers.includes("scroll") || triggers.includes("viewport-entry");
+      const stateExpected = triggers.includes("state-change");
+      const scrollTested = metrics.stage && scrollExpected ? await exerciseScroll(send) : false;
+      const shotScroll = scrollTested ? await capture(send, metrics.capture) : null;
+      const scrollChanged = Boolean(scrollTested && shotInteraction && shotScroll && shotScroll.hash !== shotInteraction.hash);
+      const controlTested = metrics.stage && stateExpected ? await exerciseControl(send) : false;
+      const shotControl = controlTested ? await capture(send, metrics.capture) : null;
+      const controlChanged = Boolean(controlTested && shotScroll && shotControl && shotControl.hash !== shotScroll.hash);
+      const interactionChanged = pointerChanged || scrollChanged || controlChanged;
 
       const shotPath = join(shotDir, `${entry.id}.jpg`);
       if (shot?.data) writeFileSync(shotPath, Buffer.from(shot.data, "base64"));
 
+      const scripts = events.scripts ?? [];
+      const resources = await evaluate(
+        send,
+        "performance.getEntriesByType('resource').map((entry) => entry.name)",
+      ).catch(() => []);
+      const resourceUrls = Array.isArray(resources) ? resources : [];
+      const threeLoaded =
+        scripts.some((url) => /three(\.module)?[-.\/]/i.test(url) || /@react-three/i.test(url)) ||
+        resourceUrls.some((url) => /three(\.module)?[-.\/]|\.vite\/deps\/three|@react-three/i.test(url));
       const result = classify(entry, metrics, events, {
         visuallyChanged,
         interactionChanged,
         pointerTested: Boolean(pointer),
+        pointerChanged,
+        scrollTested,
+        scrollChanged,
+        controlTested,
+        controlChanged,
         global,
         screenshot: `audit/screenshots/${entry.id}.jpg`,
+        assets: {
+          threeLoaded,
+          scriptCount: Math.max(scripts.length, resourceUrls.length),
+        },
       });
       results.push(result);
       process.stdout.write(`${result.status}\n`);
@@ -234,7 +265,7 @@ try {
 
   let gallery = null;
   try {
-    gallery = await auditGallery(send, baseUrl, results);
+    gallery = await auditGallery(send, baseUrl, results, viewport);
     const byId = new Map(gallery.items.map((item) => [item.id, item]));
     for (const result of results) result.gallery = byId.get(result.id) ?? null;
   } catch (error) {
@@ -247,14 +278,25 @@ try {
         snapshot: 0,
         external: 0,
         unavailable: 0,
+        hoverChecked: 0,
+        hoverPassed: 0,
+        rapid: null,
         problems: [{ id: "*", status: "untested", problem: String(error) }],
       },
       items: [],
     };
   }
 
+  let importRecovery = null;
+  try {
+    importRecovery = await auditImportRecovery(send, baseUrl, cdp, sessionId);
+  } catch (error) {
+    importRecovery = { failedImport: false, recovered: false, error: String(error).slice(0, 400) };
+  }
+
   const summary = summarize(results);
   summary.gallery = gallery.summary;
+  summary.importRecovery = importRecovery;
   const report = {
     generatedAt: new Date().toISOString(),
     startedAt: startedAt.toISOString(),
@@ -263,6 +305,7 @@ try {
     viewport,
     reducedMotion: Boolean(args["reduced-motion"]),
     summary,
+    importRecovery,
     entries: results,
   };
   writeFileSync(join(outDir, "preview-audit.json"), `${JSON.stringify(report, null, 2)}\n`);
@@ -369,11 +412,16 @@ async function waitForWorkspace(send, entry, timeoutMs) {
           honest: Boolean(document.querySelector('[data-testid="preview-honest"]')),
           error: Boolean(document.querySelector('[data-testid="preview-stage-error"]')),
           loadError: Boolean(document.querySelector('[data-testid="preview-load-error"]')),
-          loading: document.body.innerText.includes('Loading preview…'),
+          phase: document.querySelector('[data-preview-phase]')?.getAttribute('data-preview-phase') ?? null,
+          loading: Boolean(document.querySelector('[data-testid="showcase-loading"]')),
         };
       })()`,
     });
-    if (state && state.label.includes(entry.name) && (state.stage || state.honest || state.error || state.loadError)) {
+    if (
+      state &&
+      state.label.includes(entry.name) &&
+      (state.honest || state.error || state.loadError || state.phase === "ready" || state.phase === "restricted")
+    ) {
       return state;
     }
     await sleep(100);
@@ -430,7 +478,202 @@ const GALLERY_STATE = (id) => `(() => {
   };
 })()`;
 
-async function auditGallery(send, baseUrl, results) {
+const HOVER_STATE = `(() => {
+  const panel = document.querySelector('[data-testid="hover-preview"]');
+  return {
+    open: Boolean(panel),
+    phase: panel?.getAttribute('data-phase') ?? null,
+    label: panel?.getAttribute('aria-label') ?? null,
+    pinned: panel?.getAttribute('data-pinned') === 'true',
+    live: Boolean(panel?.querySelector('.preview-mini-stage')),
+    snapshot: Boolean(panel?.querySelector('.preview-frame.is-snapshot')),
+    canvases: panel?.querySelectorAll('canvas').length ?? 0,
+  };
+})()`;
+
+function hoverEligible(result, viewport) {
+  if (viewport.width < 900 || viewport.height < 600) return false;
+  if (result.previewMode === "external" || result.previewStatus === "external") return false;
+  if (result.previewStatus === "unavailable") return false;
+  return true;
+}
+
+async function movePointerAway(send) {
+  // Scrolling to the top both dismisses the panel (page scroll is an explicit
+  // dismissal) and gives us header space that never contains a gallery card.
+  await evaluate(send, "window.scrollTo({ top: 0, behavior: 'instant' })").catch(() => undefined);
+  await sleep(150);
+  const point = await evaluate(
+    send,
+    `(() => {
+      const header = document.querySelector('header');
+      if (!header) return { x: 4, y: 4 };
+      const rect = header.getBoundingClientRect();
+      return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+    })()`,
+  ).catch(() => ({ x: 4, y: 4 }));
+  await send("Input.dispatchMouseEvent", {
+    type: "mouseMoved",
+    x: point?.x ?? 4,
+    y: point?.y ?? 4,
+    button: "none",
+    buttons: 0,
+  });
+  await sleep(700);
+  return evaluate(send, "!document.querySelector('[data-testid=\"hover-preview\"]')").catch(() => false);
+}
+
+async function hoverCard(send, id) {
+  const target = await evaluate(
+    send,
+    `(() => {
+      const card = document.querySelector('[data-entry-id="${id}"]');
+      if (!card) return null;
+      card.scrollIntoView({ block: 'center' });
+      const rect = card.getBoundingClientRect();
+      return { x: Math.min(rect.x + rect.width / 2, 1430), y: Math.min(rect.y + 70, 970) };
+    })()`,
+  );
+  if (!target) return { eligible: false, reason: "card missing" };
+  try {
+    await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: target.x, y: target.y, button: "none", buttons: 0 });
+    await sleep(650);
+    const opened = await evaluate(send, HOVER_STATE);
+    const closed = await movePointerAway(send);
+    return {
+      eligible: true,
+      opened: Boolean(opened?.open),
+      label: opened?.label ?? null,
+      phase: opened?.phase ?? null,
+      live: Boolean(opened?.live),
+      snapshot: Boolean(opened?.snapshot),
+      canvases: opened?.canvases ?? 0,
+      closed: Boolean(closed),
+    };
+  } catch (error) {
+    return { eligible: true, opened: false, closed: false, error: String(error).slice(0, 300) };
+  }
+}
+
+async function rapidHover(send, results, viewport) {
+  const ids = results.filter((result) => hoverEligible(result, viewport) && result.gallery?.status !== "missing").slice(0, 4).map((result) => result.id);
+  if (ids.length < 2) return null;
+  let maxPanels = 0;
+  try {
+    for (let index = 0; index < ids.length; index += 1) {
+      const target = await evaluate(
+        send,
+        `(() => {
+          const card = document.querySelector('[data-entry-id="${ids[index]}"]');
+          if (!card) return null;
+          card.scrollIntoView({ block: 'center' });
+          const rect = card.getBoundingClientRect();
+          return { x: Math.min(rect.x + rect.width / 2, 1430), y: Math.min(rect.y + 70, 970) };
+        })()`,
+      );
+      if (!target) continue;
+      await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: target.x, y: target.y, button: "none", buttons: 0 });
+      // Let the first panel open, then cross the remaining cards quickly.
+      await sleep(index === 0 ? 430 : 80);
+      const panels = await evaluate(send, "document.querySelectorAll('[data-testid=\"hover-preview\"]').length");
+      maxPanels = Math.max(maxPanels, Number(panels));
+    }
+    const closed = await movePointerAway(send);
+    const remaining = closed ? null : await evaluate(send, HOVER_STATE).catch(() => null);
+    return { cards: ids.length, maxPanels, closed: Boolean(closed), remaining };
+  } catch (error) {
+    return { cards: ids.length, maxPanels, closed: false, error: String(error).slice(0, 300) };
+  }
+}
+
+async function auditImportRecovery(send, baseUrl, cdpClient, cdpSessionId) {
+  // Block one lazy implementation module, verify the honest error card and its
+  // retry, then unblock and prove the retry actually recovers the stage. This
+  // runs after the gallery sweep so it cannot influence per-entry results.
+  const probe = {
+    failedImport: false,
+    retryVisible: false,
+    errorText: "",
+    recovered: false,
+    error: null,
+  };
+  try {
+    await send("Network.setCacheDisabled", { cacheDisabled: true });
+    await send("Network.setBlockedURLs", { urls: ["*shiny-text/ShinyText.tsx*"] });
+    await send("Page.navigate", {
+      url: `${baseUrl}/?audit=recovery-${Date.now()}#/preview/react-bits-shiny-text`,
+    });
+    await waitForLoad(cdpClient, cdpSessionId, 12_000).catch(() => undefined);
+    const deadline = Date.now() + 12_000;
+    while (Date.now() < deadline) {
+      const state = await evaluate(
+        send,
+        `(() => {
+          const error = document.querySelector('[data-testid="preview-load-error"]');
+          return { error: Boolean(error), text: error?.innerText?.slice(0, 400) ?? '' };
+        })()`,
+      ).catch(() => ({ error: false, text: "" }));
+      if (state.error) {
+        probe.failedImport = true;
+        probe.errorText = state.text;
+        break;
+      }
+      await sleep(200);
+    }
+    probe.retryVisible = await evaluate(
+      send,
+      "Boolean([...document.querySelectorAll('button')].find((button) => /Retry implementation/i.test(button.textContent || '')))",
+    ).catch(() => false);
+    if (probe.retryVisible) {
+      await evaluate(
+        send,
+        `(() => {
+          const button = [...document.querySelectorAll('button')].find((candidate) => /Retry implementation/i.test(candidate.textContent || ''));
+          button?.click();
+          return Boolean(button);
+        })()`,
+      ).catch(() => false);
+      await sleep(600);
+      probe.stillFailingWhileBlocked = await evaluate(
+        send,
+        "Boolean(document.querySelector('[data-testid=\"preview-load-error\"]'))",
+      ).catch(() => null);
+      await send("Network.setBlockedURLs", { urls: [] });
+      await evaluate(
+        send,
+        `(() => {
+          const button = [...document.querySelectorAll('button')].find((candidate) => /Retry implementation/i.test(candidate.textContent || ''));
+          button?.click();
+          return Boolean(button);
+        })()`,
+      ).catch(() => false);
+      const recoverDeadline = Date.now() + 12_000;
+      while (Date.now() < recoverDeadline) {
+        const state = await evaluate(
+          send,
+          `(() => ({
+            error: Boolean(document.querySelector('[data-testid="preview-load-error"]')),
+            loading: Boolean(document.querySelector('[data-testid="showcase-loading"]')),
+            phase: document.querySelector('[data-preview-phase]')?.getAttribute('data-preview-phase') ?? null,
+          }))()`,
+        ).catch(() => ({ error: true, loading: true, phase: null }));
+        if (!state.error && !state.loading && state.phase === "ready") {
+          probe.recovered = true;
+          break;
+        }
+        await sleep(250);
+      }
+    }
+  } catch (error) {
+    probe.error = String(error).slice(0, 400);
+  } finally {
+    await send("Network.setBlockedURLs", { urls: [] }).catch(() => undefined);
+    await send("Network.setCacheDisabled", { cacheDisabled: false }).catch(() => undefined);
+  }
+  return probe;
+}
+
+async function auditGallery(send, baseUrl, results, viewport) {
   await send("Page.navigate", { url: `${baseUrl}/?audit=gallery-${Date.now()}#/gallery` });
   await waitForGallery(send, results.length, 15_000);
   const items = [];
@@ -481,9 +724,24 @@ async function auditGallery(send, baseUrl, results) {
       else item.status = "play-failed";
     } else if (after.kind === "none" || result.previewStatus === "unavailable") item.status = "unavailable";
     else item.status = "external-or-seeded";
+
+    if (hoverEligible(result, viewport) && item.status !== "missing") {
+      const hover = await hoverCard(send, result.id);
+      item.hover = hover;
+      if (!hover.opened) item.status = "hover-failed";
+      else if (!hover.closed) item.status = "hover-stuck";
+      else if (item.heavy && (hover.live || hover.canvases > 0)) item.status = "heavy-autoplay";
+    }
     items.push(item);
   }
-  const problems = items.filter((item) => ["missing", "broken-image", "play-failed", "untested"].includes(item.status));
+  const rapid = await rapidHover(send, results, viewport);
+  const problems = items.filter((item) =>
+    ["missing", "broken-image", "play-failed", "untested", "hover-failed", "hover-stuck", "heavy-autoplay"].includes(item.status),
+  );
+  if (rapid && (rapid.maxPanels > 1 || !rapid.closed)) {
+    problems.push({ id: "*", status: "rapid-hover", problem: `max panels ${rapid.maxPanels}, closed ${rapid.closed}` });
+  }
+  const hoverItems = items.filter((item) => item.hover?.eligible);
   return {
     checked: items.length,
     summary: {
@@ -493,6 +751,9 @@ async function auditGallery(send, baseUrl, results) {
       snapshot: items.filter((item) => item.status === "snapshot").length,
       external: items.filter((item) => item.status === "external-or-seeded").length,
       unavailable: items.filter((item) => item.status === "unavailable").length,
+      hoverChecked: hoverItems.length,
+      hoverPassed: hoverItems.filter((item) => item.hover?.opened && item.hover?.closed).length,
+      rapid,
       problems: problems.map((item) => ({ id: item.id, status: item.status, problem: item.problem ?? "check gallery item" })),
     },
     items,
@@ -521,6 +782,57 @@ async function exercisePointer(send, rect) {
     await sleep(80);
     await send("Input.dispatchMouseEvent", { type: "mouseReleased", x: drag.x, y: drag.y, button: "left", buttons: 0, clickCount: 1 });
     await sleep(350);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function exerciseScroll(send) {
+  try {
+    const found = await evaluate(
+      send,
+      `(() => {
+        const scroller = document.querySelector('[data-testid="preview-stage-wrap"][data-scroll="true"]');
+        if (!scroller) return false;
+        scroller.scrollTop = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+        scroller.dispatchEvent(new Event('scroll', { bubbles: true }));
+        return true;
+      })()`,
+    );
+    if (!found) return false;
+    await sleep(550);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function exerciseControl(send) {
+  try {
+    const changed = await evaluate(
+      send,
+      `(() => {
+        const root = document.querySelector('[data-testid="preview-controls"]');
+        if (!root) return false;
+        const field = root.querySelector('select, input[type="number"], input[type="text"]');
+        if (!field) return false;
+        if (field.tagName === 'SELECT') {
+          const next = field.selectedIndex === 0 ? 1 : 0;
+          if (!field.options[next]) return false;
+          const setter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set;
+          setter.call(field, field.options[next].value);
+        } else {
+          const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+          setter.call(field, String(Number(field.value || 0) + 1));
+        }
+        field.dispatchEvent(new Event('input', { bubbles: true }));
+        field.dispatchEvent(new Event('change', { bubbles: true }));
+        return true;
+      })()`,
+    );
+    if (!changed) return false;
+    await sleep(550);
     return true;
   } catch {
     return false;
@@ -618,6 +930,12 @@ function classify(entry, metrics, events, extra) {
     heavy: Boolean(entry.heavy),
     behaviors: entry.behaviors ?? [],
     status,
+    verification: verificationFor(entry, metrics, extra, status),
+    expectedInteractions: expectedInteractions(entry),
+    assets: {
+      threeLoaded: Boolean(extra.assets?.threeLoaded),
+      scriptCount: extra.assets?.scriptCount ?? 0,
+    },
     problems,
     runtimeRequirements: {
       runtime: entry.runtime ?? null,
@@ -634,6 +952,11 @@ function classify(entry, metrics, events, extra) {
       visuallyChanged: extra.visuallyChanged,
       interactionChanged: extra.interactionChanged,
       pointerTested: extra.pointerTested,
+      pointerChanged: extra.pointerChanged,
+      scrollTested: extra.scrollTested,
+      scrollChanged: extra.scrollChanged,
+      controlTested: extra.controlTested,
+      controlChanged: extra.controlChanged,
     },
     console: events.console,
     exceptions: events.exceptions,
@@ -642,6 +965,36 @@ function classify(entry, metrics, events, extra) {
     screenshot: extra.screenshot,
     recommendedRepair: recommendation(status, problems, metrics),
   };
+}
+
+function expectedInteractions(entry) {
+  const triggers = new Set(entry.triggers ?? []);
+  const behaviors = new Set(entry.behaviors ?? []);
+  const expected = [];
+  if (["automatic-loop", "mount", "physics"].some((value) => triggers.has(value))) expected.push("animation");
+  if (
+    ["hover", "cursor-reactive", "click", "drag", "gesture", "keyboard"].some((value) => triggers.has(value)) ||
+    ["hover", "cursor-reactive", "click", "draggable", "gesture"].some((value) => behaviors.has(value))
+  ) {
+    expected.push("interaction");
+  }
+  if (triggers.has("scroll") || triggers.has("viewport-entry")) expected.push("scroll");
+  if (triggers.has("state-change")) expected.push("control");
+  return expected;
+}
+
+function verificationFor(entry, metrics, extra, status) {
+  if (status === "external-reference") return "external-reference";
+  if (!metrics.stage) return status === "unavailable" ? "workspace-only" : "external-reference";
+  if (metrics.stageError || metrics.loadError || metrics.blank) return "failed";
+  if (status === "requires-environment") return "environment-restricted";
+  const expected = expectedInteractions(entry);
+  if (expected.includes("animation") && extra.visuallyChanged) return "animation-verified";
+  if (expected.includes("interaction") && extra.interactionChanged) return "interaction-verified";
+  if (expected.includes("scroll") && extra.scrollChanged) return "interaction-verified";
+  if (expected.includes("control") && extra.controlChanged) return "interaction-verified";
+  if (expected.length === 0) return "render-verified";
+  return "needs-manual-review";
 }
 
 function recommendation(status, problems, metrics) {
@@ -667,12 +1020,20 @@ function recommendation(status, problems, metrics) {
 }
 
 function summarize(results) {
-  const summary = { total: results.length, byStatus: {} };
+  const summary = { total: results.length, byStatus: {}, byVerification: {} };
   for (const result of results) {
     summary.byStatus[result.status] = (summary.byStatus[result.status] ?? 0) + 1;
+    const verification = result.verification ?? "unverified";
+    summary.byVerification[verification] = (summary.byVerification[verification] ?? 0) + 1;
   }
   summary.requiresRepair = results.filter((result) => result.status === "requires-repair").map((result) => result.id);
   summary.workspaceOnly = results.filter((result) => result.status === "workspace-only").map((result) => result.id);
+  summary.needsManualReview = results
+    .filter((result) => result.verification === "needs-manual-review")
+    .map((result) => result.id);
+  summary.unexpectedThreeLoads = results
+    .filter((result) => result.assets?.threeLoaded && (result.runtime !== "webgl" || result.previewMode === "external"))
+    .map((result) => result.id);
   summary.interactionOnly = results
     .filter((result) => result.metrics?.pointerTested && result.metrics.interactionChanged && !result.metrics.visuallyChanged)
     .map((result) => result.id);
@@ -698,6 +1059,12 @@ function renderMarkdown(report) {
   for (const [status, count] of Object.entries(report.summary.byStatus)) {
     lines.push(`- **${status}**: ${count}`);
   }
+  if (report.summary.byVerification) {
+    lines.push("", "### Verification outcomes", "");
+    for (const [verification, count] of Object.entries(report.summary.byVerification)) {
+      lines.push(`- **${verification}**: ${count}`);
+    }
+  }
   if (report.summary.gallery) {
     const gallery = report.summary.gallery;
     lines.push(
@@ -705,12 +1072,30 @@ function renderMarkdown(report) {
       "### Gallery mini-stages",
       "",
       `Checked ${gallery.checked} cards: ${gallery.ok} live, ${gallery.poster} heavy posters, ${gallery.snapshot} snapshots, ${gallery.external} external/seeded, ${gallery.unavailable} unavailable, ${gallery.problems.length} problem(s).`,
+      "",
+      `Hover panels: ${gallery.hoverPassed}/${gallery.hoverChecked} opened and dismissed cleanly.`,
+      gallery.rapid
+        ? `Rapid pointer sweep over ${gallery.rapid.cards} cards: max ${gallery.rapid.maxPanels} panel(s), closed ${gallery.rapid.closed ? "yes" : "no"}.`
+        : "Rapid pointer sweep skipped (not enough eligible cards).",
     );
+    if (report.summary.importRecovery) {
+      const recovery = report.summary.importRecovery;
+      lines.push(
+        "",
+        `Failed-import recovery: ${recovery.failedImport ? "honest error shown" : "probe did not trigger"} · retry ${recovery.retryVisible ? "present" : "missing"} · recovered ${recovery.recovered ? "yes" : "no"}.`,
+      );
+    }
     for (const problem of gallery.problems) {
       lines.push(`- \`${problem.id}\`: ${problem.status} — ${problem.problem}`);
     }
   }
-  lines.push("", "## Entries", "", "| Component | Status | Gallery | Motion | Problems | Recommended repair |", "|---|---|---|---|---|---|");
+  lines.push(
+    "",
+    "## Entries",
+    "",
+    "| Component | Status | Verification | Gallery | Motion | Three.js | Problems | Recommended repair |",
+    "|---|---|---|---|---|---|---|---|",
+  );
   for (const entry of report.entries) {
     const problems = entry.problems.length > 0 ? entry.problems.join("; ") : "—";
     const motion = entry.metrics?.visuallyChanged
@@ -719,7 +1104,9 @@ function renderMarkdown(report) {
         ? "pointer"
         : "static";
     const gallery = entry.gallery?.status ?? "—";
-    lines.push(`| \`${entry.id}\` | ${entry.status} | ${gallery} | ${motion} | ${escapeCell(problems)} | ${escapeCell(entry.recommendedRepair)} |`);
+    lines.push(
+      `| \`${entry.id}\` | ${entry.status} | ${entry.verification ?? "—"} | ${gallery} | ${motion} | ${entry.assets?.threeLoaded ? "loaded" : "—"} | ${escapeCell(problems)} | ${escapeCell(entry.recommendedRepair)} |`,
+    );
   }
   lines.push("", "Screenshots: `audit/screenshots/<id>.jpg`. Full console/network details: `audit/preview-audit.json`.", "");
   if (report.summary.interactionOnly?.length) {
@@ -727,6 +1114,15 @@ function renderMarkdown(report) {
   }
   if (report.summary.noVisibleChange?.length) {
     lines.push(`No visible change during autoplay or the pointer sweep: ${report.summary.noVisibleChange.join(", ")}.`, "");
+  }
+  if (report.summary.needsManualReview?.length) {
+    lines.push(
+      `Rendered correctly but the declared trigger produced no observable change (manual review): ${report.summary.needsManualReview.join(", ")}.`,
+      "",
+    );
+  }
+  if (report.summary.unexpectedThreeLoads?.length) {
+    lines.push(`Three.js loaded outside a WebGL preview: ${report.summary.unexpectedThreeLoads.join(", ")}.`, "");
   }
   return lines.join("\n");
 }

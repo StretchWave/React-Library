@@ -660,14 +660,12 @@ export default function App() {
         />
       ) : null}
 
-      {expanded ? (
-        <ExpandedPreview
-          entry={expanded}
-          selected={selection.includes(expanded.id)}
-          onToggleSelection={toggleSelection}
-          onClose={closeExpanded}
-        />
-      ) : null}
+      <ExpandedPreview
+        entry={expanded ?? null}
+        selected={expanded ? selection.includes(expanded.id) : false}
+        onToggleSelection={toggleSelection}
+        onClose={closeExpanded}
+      />
 
       {compareOpen && selectionItems.length >= 2 ? (
         <CompareDialog

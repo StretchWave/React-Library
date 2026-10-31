@@ -8,10 +8,11 @@
 //
 // Third-party code still executes only through the reviewed showcase/demo
 // registry, never directly from vendored source inside the gallery.
-import { Component, useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { Component, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { ComponentType } from "react";
 import { getDemo } from "../../catalog/demos";
 import { sourceById } from "../../catalog/client";
+import { loadShowcase, peekShowcase, type Showcase } from "../../catalog/showcases";
 import { entryTypeOf, type CatalogEntry, type PreviewType } from "../../catalog/types";
 import {
   preferredPreviewKind,
@@ -22,18 +23,48 @@ import {
 import type { ShowcaseValues } from "../../catalog/showcases";
 import { isMotionPlaying, subscribeMotion } from "../../lib/motion";
 
-type ShowcaseRegistry = typeof import("../../catalog/showcases");
+type ShowcaseLoadState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "ready"; showcase?: Showcase }
+  | { status: "failed"; message: string };
 
-let showcaseRegistryPromise: Promise<ShowcaseRegistry> | null = null;
+/** Loads exactly the selected entry's showcase group; caches through the
+ *  registry. Off-screen/non-live cards never trigger a request. */
+function useEntryShowcase(id: string, enabled: boolean, retryNonce: number): ShowcaseLoadState & { retry: () => void } {
+  const [state, setState] = useState<ShowcaseLoadState>(() => {
+    const cached = peekShowcase(id);
+    return cached ? { status: "ready", showcase: cached } : { status: "idle" };
+  });
+  const [retryKey, setRetryKey] = useState(0);
 
-function loadShowcaseRegistry(): Promise<ShowcaseRegistry> {
-  if (!showcaseRegistryPromise) {
-    showcaseRegistryPromise = import("../../catalog/showcases").catch((error: unknown) => {
-      showcaseRegistryPromise = null;
-      throw error;
-    });
-  }
-  return showcaseRegistryPromise;
+  useEffect(() => {
+    if (!enabled) return;
+    const cached = peekShowcase(id);
+    if (cached) {
+      setState({ status: "ready", showcase: cached });
+      return;
+    }
+    let active = true;
+    setState((current) => (current.status === "ready" ? current : { status: "loading" }));
+    void loadShowcase(id)
+      .then((showcase) => {
+        if (!active) return;
+        setState(showcase ? { status: "ready", showcase } : { status: "failed", message: "No showcase is registered for this entry." });
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+        setState({ status: "failed", message: error instanceof Error ? error.message : String(error) });
+      });
+    return () => {
+      active = false;
+    };
+  }, [enabled, id, retryKey, retryNonce]);
+
+  return {
+    ...state,
+    retry: () => setRetryKey((value) => value + 1),
+  };
 }
 
 export type PreviewKind = PreviewType;
@@ -184,21 +215,11 @@ export function PreviewBox({ entry, forceLive = false }: PreviewBoxProps) {
   const visible = useVisible(hostRef);
   const motionOn = useSyncExternalStore(subscribeMotion, isMotionPlaying);
   const reducedMotion = usePrefersReducedMotion();
-  const [registry, setRegistry] = useState<ShowcaseRegistry | null>(null);
-  const [loadFailed, setLoadFailed] = useState(false);
   const [retryNonce, setRetryNonce] = useState(0);
   const profile = profileOf(entry);
-  // Seed demos are already part of the shell; do not pull the whole showcase
-  // chunk (and its WebGL/three runtime) just to run one of them on hover.
+  // Seed demos are already part of the shell; do not pull any showcase group
+  // (and its gsap/motion/three runtime) just to run one of them on hover.
   const SeedDemo = getDemo(entry.id);
-
-  const requestComponent = useCallback(() => {
-    if (registry) return;
-    setLoadFailed(false);
-    void loadShowcaseRegistry()
-      .then(setRegistry)
-      .catch(() => setLoadFailed(true));
-  }, [registry]);
 
   const kind = preferredPreviewKind(entry, {
     globalPaused: !motionOn,
@@ -207,9 +228,7 @@ export function PreviewBox({ entry, forceLive = false }: PreviewBoxProps) {
     forceLive,
   });
 
-  useEffect(() => {
-    if (kind === "live" && !SeedDemo) requestComponent();
-  }, [kind, requestComponent, SeedDemo]);
+  const showcaseState = useEntryShowcase(entry.id, kind === "live" && !SeedDemo, retryNonce);
 
   if (kind === "external") {
     return (
@@ -248,15 +267,16 @@ export function PreviewBox({ entry, forceLive = false }: PreviewBoxProps) {
     );
   }
 
-  const showcase = registry?.getShowcase(entry.id);
+  const showcase = showcaseState.status === "ready" ? showcaseState.showcase : undefined;
   const DemoComponent = showcase?.Component ?? SeedDemo ?? null;
+  const loadFailed = showcaseState.status === "failed";
+  const loadError = showcaseState.status === "failed" ? showcaseState.message : undefined;
   const interactive = (entry.behaviors ?? []).some((behavior) =>
     ["cursor-reactive", "hover", "gesture", "interactive-text", "interactive-nav", "stateful"].includes(behavior),
   );
   const retry = () => {
     setRetryNonce((value) => value + 1);
-    setLoadFailed(false);
-    requestComponent();
+    showcaseState.retry();
   };
   const fallback = (
     <div className="preview-failed">
@@ -280,7 +300,12 @@ export function PreviewBox({ entry, forceLive = false }: PreviewBoxProps) {
             }
           />
           {loadFailed ? (
-            <button type="button" className="preview-regenerate" onClick={retry}>
+            <button
+              type="button"
+              className="preview-regenerate"
+              onClick={retry}
+              title={loadError}
+            >
               Retry live preview
             </button>
           ) : null}

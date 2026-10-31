@@ -3,20 +3,20 @@
 // src/lib/cn.ts shim serving their "@/lib/utils" import. Vendored Tailwind
 // classes ship verbatim; magicui.css restores only the layout the animations
 // need, via --rl-* tokens.
-import type { ComponentType, ReactNode } from "react";
-import { BlurFade as BlurFadeRaw } from "../../../catalog/components/magic-ui/blur-fade/blur-fade";
-import { BorderBeam as BorderBeamRawN } from "../../../catalog/components/magic-ui/border-beam/border-beam";
-import { DotPattern as DotPatternRawN } from "../../../catalog/components/magic-ui/dot-pattern/dot-pattern";
-import { WordRotate as WordRotateRawN } from "../../../catalog/components/magic-ui/word-rotate/word-rotate";
+import type { ReactNode } from "react";
+const BlurFade = createLazyRaw(() => import("../../../catalog/components/magic-ui/blur-fade/blur-fade").then((module) => ({ default: module.BlurFade })));
+const BorderBeam = createLazyRaw(() => import("../../../catalog/components/magic-ui/border-beam/border-beam").then((module) => ({ default: module.BorderBeam })));
+const DotPattern = createLazyRaw(() => import("../../../catalog/components/magic-ui/dot-pattern/dot-pattern").then((module) => ({ default: module.DotPattern })));
+const WordRotate = createLazyRaw(() => import("../../../catalog/components/magic-ui/word-rotate/word-rotate").then((module) => ({ default: module.WordRotate })));
 import { defineShowcase, type Showcase } from "./types";
 import "./magicui.css";
+import { createLazyRaw } from "./lazyRaw";
 
-type Raw = ComponentType<Record<string, unknown>>;
 
-const BlurFade = BlurFadeRaw as unknown as Raw;
-const BorderBeam = BorderBeamRawN as unknown as Raw;
-const DotPattern = DotPatternRawN as unknown as Raw;
-const WordRotate = WordRotateRawN as unknown as Raw;
+
+
+
+
 
 /** Stage with relative positioning the absolutely positioned vendored parts rely on. */
 function MagicStage({ children, height = 220 }: { children: ReactNode; height?: number }) {

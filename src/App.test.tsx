@@ -58,7 +58,7 @@ describe("App discovery shell", () => {
     expect(galleryCard("shadcn-button")).toBeTruthy();
     expect(document.querySelectorAll('li[data-preview-kind="external"]').length).toBe(16);
     await waitFor(() => expect(window.location.hash).toBe("#/browse"));
-  });
+  }, 20_000);
 
   it("filters by query, shows an honest empty state, and resets", async () => {
     renderApp();

@@ -1,10 +1,12 @@
 // Adaptive browse wall. The grid receives pre-filtered entries and owns only
 // presentation + bulk actions; filters, routing and personal data live in App.
-import { useSyncExternalStore } from "react";
+import { useId, useSyncExternalStore } from "react";
 import type { CatalogEntry } from "../../catalog/types";
 import { isMotionPlaying, setMotionPlaying, subscribeMotion } from "../../lib/motion";
 import { GalleryCard } from "./GalleryCard";
+import { HoverPreview } from "./HoverPreview";
 import { SelectionTray } from "./SelectionTray";
+import { useHoverPreviewController } from "./useHoverPreviewController";
 
 export interface GalleryProps {
   entries: CatalogEntry[];
@@ -49,6 +51,8 @@ export function Gallery({
   const favorites = new Set(favoriteIds);
   const motionOn = useSyncExternalStore(subscribeMotion, isMotionPlaying);
   const sourceCount = new Set(entries.map((entry) => entry.source).filter(Boolean)).size;
+  const preview = useHoverPreviewController();
+  const previewPanelId = useId();
 
   return (
     <section className="gallery-view" aria-label="Browse components">
@@ -102,12 +106,40 @@ export function Gallery({
               favorite={favorites.has(entry.id)}
               onToggleSelect={onToggleSelect}
               onToggleFavorite={onToggleFavorite}
-              onOpen={onOpenEntry}
-              onExpand={onExpandEntry}
+              onOpen={(id) => {
+                preview.dismiss();
+                onOpenEntry(id);
+              }}
+              onExpand={(id) => {
+                preview.dismiss();
+                onExpandEntry(id);
+              }}
+              previewActive={preview.state?.entry.id === entry.id}
+              previewPanelId={previewPanelId}
+              onPreviewEnter={preview.notifyEnter}
+              onPreviewLeave={preview.notifyLeave}
+              onTogglePreview={preview.togglePinned}
             />
           ))}
         </ul>
       )}
+      {preview.state ? (
+        <HoverPreview
+          entry={preview.state.entry}
+          anchor={preview.state.anchor}
+          id={previewPanelId}
+          panelRef={preview.panelRef}
+          phase={preview.state.phase}
+          pinned={preview.state.pinned}
+          onDismiss={preview.dismiss}
+          onPanelEnter={preview.notifyPanelEnter}
+          onPanelLeave={preview.notifyPanelLeave}
+          onExpand={(id) => {
+            preview.dismiss();
+            onExpandEntry(id);
+          }}
+        />
+      ) : null}
       <SelectionTray
         items={selectionItems}
         onRemove={onRemoveSelection}

@@ -1,38 +1,37 @@
 // Text-animation showcases (M6.2): reviewed wrappers around vendored React Bits
 // text components. Each wrapper applies showcase defaults; the preview workspace
 // overrides come from the recorded control specs (identity prop names).
-import type { ComponentType } from "react";
-import SplitTextRaw from "../../../catalog/components/react-bits/split-text/SplitText";
-import ScrambledTextRaw from "../../../catalog/components/react-bits/scrambled-text/ScrambledText";
-import DecryptedTextRaw from "../../../catalog/components/react-bits/decrypted-text/DecryptedText";
-import ShinyTextRaw from "../../../catalog/components/react-bits/shiny-text/ShinyText";
-import GradientTextRaw from "../../../catalog/components/react-bits/gradient-text/GradientText";
-import BlurTextRaw from "../../../catalog/components/react-bits/blur-text/BlurText";
-import TextTypeRaw from "../../../catalog/components/react-bits/text-type/TextType";
-import RotatingTextRaw from "../../../catalog/components/react-bits/rotating-text/RotatingText";
-import GlitchTextRaw from "../../../catalog/components/react-bits/glitch-text/GlitchText";
-import FallingTextRaw from "../../../catalog/components/react-bits/falling-text/FallingText";
-import TextPressureRaw from "../../../catalog/components/react-bits/text-pressure/TextPressure";
-import CountUpRaw from "../../../catalog/components/react-bits/count-up/CountUp";
-import CircularTextRaw from "../../../catalog/components/react-bits/circular-text/CircularText";
+const SplitText = createLazyRaw(() => import("../../../catalog/components/react-bits/split-text/SplitText"));
+const ScrambledText = createLazyRaw(() => import("../../../catalog/components/react-bits/scrambled-text/ScrambledText"));
+const DecryptedText = createLazyRaw(() => import("../../../catalog/components/react-bits/decrypted-text/DecryptedText"));
+const ShinyText = createLazyRaw(() => import("../../../catalog/components/react-bits/shiny-text/ShinyText"));
+const GradientText = createLazyRaw(() => import("../../../catalog/components/react-bits/gradient-text/GradientText"));
+const BlurText = createLazyRaw(() => import("../../../catalog/components/react-bits/blur-text/BlurText"));
+const TextType = createLazyRaw(() => import("../../../catalog/components/react-bits/text-type/TextType"));
+const RotatingText = createLazyRaw(() => import("../../../catalog/components/react-bits/rotating-text/RotatingText"));
+const GlitchText = createLazyRaw(() => import("../../../catalog/components/react-bits/glitch-text/GlitchText"));
+const FallingText = createLazyRaw(() => import("../../../catalog/components/react-bits/falling-text/FallingText"));
+const TextPressure = createLazyRaw(() => import("../../../catalog/components/react-bits/text-pressure/TextPressure"));
+const CountUp = createLazyRaw(() => import("../../../catalog/components/react-bits/count-up/CountUp"));
+const CircularText = createLazyRaw(() => import("../../../catalog/components/react-bits/circular-text/CircularText"));
 import { defineShowcase, type Showcase } from "./types";
 import { CenteredStage } from "./helpers";
+import { createLazyRaw } from "./lazyRaw";
 
-type Raw = ComponentType<Record<string, unknown>>;
 
-const SplitText = SplitTextRaw as unknown as Raw;
-const ScrambledText = ScrambledTextRaw as unknown as Raw;
-const DecryptedText = DecryptedTextRaw as unknown as Raw;
-const ShinyText = ShinyTextRaw as unknown as Raw;
-const GradientText = GradientTextRaw as unknown as Raw;
-const BlurText = BlurTextRaw as unknown as Raw;
-const TextType = TextTypeRaw as unknown as Raw;
-const RotatingText = RotatingTextRaw as unknown as Raw;
-const GlitchText = GlitchTextRaw as unknown as Raw;
-const FallingText = FallingTextRaw as unknown as Raw;
-const TextPressure = TextPressureRaw as unknown as Raw;
-const CountUp = CountUpRaw as unknown as Raw;
-const CircularText = CircularTextRaw as unknown as Raw;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export const textShowcases: Showcase[] = [
   defineShowcase(

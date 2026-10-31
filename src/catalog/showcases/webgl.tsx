@@ -5,54 +5,54 @@
 // heavy, so the gallery shows a workspace-bound placeholder and only the
 // preview workspace mounts one canvas at a time. Control defaults come from
 // the vendored sources (scan-verified), and image text uses local data URIs.
-import type { ComponentType, ReactNode } from "react";
-import AuroraRaw from "../../../catalog/components/react-bits/aurora/Aurora";
-import BallpitRaw from "../../../catalog/components/react-bits/ballpit/Ballpit";
-import BeamsRaw from "../../../catalog/components/react-bits/beams/Beams";
-import BlobCursorRaw from "../../../catalog/components/react-bits/blob-cursor/BlobCursor";
-import CircularGalleryRaw from "../../../catalog/components/react-bits/circular-gallery/CircularGallery";
-import DotGridRaw from "../../../catalog/components/react-bits/dot-grid/DotGrid";
-import FluidGlassRaw from "../../../catalog/components/react-bits/fluid-glass/FluidGlass";
-import GlassSurfaceRaw from "../../../catalog/components/react-bits/glass-surface/GlassSurface";
-import GooeyNavRaw from "../../../catalog/components/react-bits/gooey-nav/GooeyNav";
-import HyperspeedRaw from "../../../catalog/components/react-bits/hyperspeed/Hyperspeed";
-import IridescenceRaw from "../../../catalog/components/react-bits/iridescence/Iridescence";
-import LanyardRaw from "../../../catalog/components/react-bits/lanyard/Lanyard";
-import LaserFlowRaw from "../../../catalog/components/react-bits/laser-flow/LaserFlow";
-import LetterGlitchRaw from "../../../catalog/components/react-bits/letter-glitch/LetterGlitch";
-import LightningRaw from "../../../catalog/components/react-bits/lightning/Lightning";
-import MagnetLinesRaw from "../../../catalog/components/react-bits/magnet-lines/MagnetLines";
-import MetaBallsRaw from "../../../catalog/components/react-bits/meta-balls/MetaBalls";
-import MetallicPaintRaw from "../../../catalog/components/react-bits/metallic-paint/MetallicPaint";
-import ParticlesRaw from "../../../catalog/components/react-bits/particles/Particles";
-import RibbonsRaw from "../../../catalog/components/react-bits/ribbons/Ribbons";
-import WavesRaw from "../../../catalog/components/react-bits/waves/Waves";
+import type { ReactNode } from "react";
+const Aurora = createLazyRaw(() => import("../../../catalog/components/react-bits/aurora/Aurora"));
+const Ballpit = createLazyRaw(() => import("../../../catalog/components/react-bits/ballpit/Ballpit"));
+const Beams = createLazyRaw(() => import("../../../catalog/components/react-bits/beams/Beams"));
+const BlobCursor = createLazyRaw(() => import("../../../catalog/components/react-bits/blob-cursor/BlobCursor"));
+const CircularGallery = createLazyRaw(() => import("../../../catalog/components/react-bits/circular-gallery/CircularGallery"));
+const DotGrid = createLazyRaw(() => import("../../../catalog/components/react-bits/dot-grid/DotGrid"));
+const FluidGlass = createLazyRaw(() => import("../../../catalog/components/react-bits/fluid-glass/FluidGlass"));
+const GlassSurface = createLazyRaw(() => import("../../../catalog/components/react-bits/glass-surface/GlassSurface"));
+const GooeyNav = createLazyRaw(() => import("../../../catalog/components/react-bits/gooey-nav/GooeyNav"));
+const Hyperspeed = createLazyRaw(() => import("../../../catalog/components/react-bits/hyperspeed/Hyperspeed"));
+const Iridescence = createLazyRaw(() => import("../../../catalog/components/react-bits/iridescence/Iridescence"));
+const Lanyard = createLazyRaw(() => import("../../../catalog/components/react-bits/lanyard/Lanyard"));
+const LaserFlow = createLazyRaw(() => import("../../../catalog/components/react-bits/laser-flow/LaserFlow"));
+const LetterGlitch = createLazyRaw(() => import("../../../catalog/components/react-bits/letter-glitch/LetterGlitch"));
+const Lightning = createLazyRaw(() => import("../../../catalog/components/react-bits/lightning/Lightning"));
+const MagnetLines = createLazyRaw(() => import("../../../catalog/components/react-bits/magnet-lines/MagnetLines"));
+const MetaBalls = createLazyRaw(() => import("../../../catalog/components/react-bits/meta-balls/MetaBalls"));
+const MetallicPaint = createLazyRaw(() => import("../../../catalog/components/react-bits/metallic-paint/MetallicPaint"));
+const Particles = createLazyRaw(() => import("../../../catalog/components/react-bits/particles/Particles"));
+const Ribbons = createLazyRaw(() => import("../../../catalog/components/react-bits/ribbons/Ribbons"));
+const Waves = createLazyRaw(() => import("../../../catalog/components/react-bits/waves/Waves"));
 import { defineShowcase, type Showcase } from "./types";
 import { placeholderUri } from "./helpers";
+import { createLazyRaw } from "./lazyRaw";
 
-type Raw = ComponentType<Record<string, unknown>>;
 
-const Aurora = AuroraRaw as unknown as Raw;
-const Ballpit = BallpitRaw as unknown as Raw;
-const Beams = BeamsRaw as unknown as Raw;
-const BlobCursor = BlobCursorRaw as unknown as Raw;
-const CircularGallery = CircularGalleryRaw as unknown as Raw;
-const DotGrid = DotGridRaw as unknown as Raw;
-const FluidGlass = FluidGlassRaw as unknown as Raw;
-const GlassSurface = GlassSurfaceRaw as unknown as Raw;
-const GooeyNav = GooeyNavRaw as unknown as Raw;
-const Hyperspeed = HyperspeedRaw as unknown as Raw;
-const Iridescence = IridescenceRaw as unknown as Raw;
-const Lanyard = LanyardRaw as unknown as Raw;
-const LaserFlow = LaserFlowRaw as unknown as Raw;
-const LetterGlitch = LetterGlitchRaw as unknown as Raw;
-const Lightning = LightningRaw as unknown as Raw;
-const MagnetLines = MagnetLinesRaw as unknown as Raw;
-const MetaBalls = MetaBallsRaw as unknown as Raw;
-const MetallicPaint = MetallicPaintRaw as unknown as Raw;
-const Particles = ParticlesRaw as unknown as Raw;
-const Ribbons = RibbonsRaw as unknown as Raw;
-const Waves = WavesRaw as unknown as Raw;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /** Fixed-size stage frame: WebGL canvases render into a clipped scene box so
  *  workspace layout stays predictable regardless of vendored aspect handling. */

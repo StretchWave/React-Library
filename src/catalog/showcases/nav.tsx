@@ -1,22 +1,21 @@
 // Navigation showcases (M6.2): wrappers around vendored React Bits navigation
 // components (dock, menus). Item arrays live inside the wrappers so that
 // showcase defaults/controls stay scalar values only.
-import type { ComponentType } from "react";
-import DockRaw from "../../../catalog/components/react-bits/dock/Dock";
-import BubbleMenuRaw from "../../../catalog/components/react-bits/bubble-menu/BubbleMenu";
-import StaggeredMenuRaw from "../../../catalog/components/react-bits/staggered-menu/StaggeredMenu";
-import FlowingMenuRaw from "../../../catalog/components/react-bits/flowing-menu/FlowingMenu";
-import CardNavRaw from "../../../catalog/components/react-bits/card-nav/CardNav";
+const Dock = createLazyRaw(() => import("../../../catalog/components/react-bits/dock/Dock"));
+const BubbleMenu = createLazyRaw(() => import("../../../catalog/components/react-bits/bubble-menu/BubbleMenu"));
+const StaggeredMenu = createLazyRaw(() => import("../../../catalog/components/react-bits/staggered-menu/StaggeredMenu"));
+const FlowingMenu = createLazyRaw(() => import("../../../catalog/components/react-bits/flowing-menu/FlowingMenu"));
+const CardNav = createLazyRaw(() => import("../../../catalog/components/react-bits/card-nav/CardNav"));
 import { defineShowcase, type Showcase } from "./types";
 import { CenteredStage, svgDataUri } from "./helpers";
+import { createLazyRaw } from "./lazyRaw";
 
-type Raw = ComponentType<Record<string, unknown>>;
 
-const Dock = DockRaw as unknown as Raw;
-const BubbleMenu = BubbleMenuRaw as unknown as Raw;
-const StaggeredMenu = StaggeredMenuRaw as unknown as Raw;
-const FlowingMenu = FlowingMenuRaw as unknown as Raw;
-const CardNav = CardNavRaw as unknown as Raw;
+
+
+
+
+
 
 function Glyph({ d, viewBox = "0 0 24 24" }: { d: string; viewBox?: string }) {
   return (

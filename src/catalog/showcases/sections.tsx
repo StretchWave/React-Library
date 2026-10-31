@@ -1,26 +1,29 @@
 // Section showcases (M6.2): wrappers around vendored React Bits page-section
 // components (galleries, stack, stepper, slider, counters). Item arrays and
 // image placeholders are built locally (data URIs) — no network, no fakes.
-import type { ComponentType } from "react";
-import MasonryRaw from "../../../catalog/components/react-bits/masonry/Masonry";
-import CarouselRaw from "../../../catalog/components/react-bits/carousel/Carousel";
-import StackRaw from "../../../catalog/components/react-bits/stack/Stack";
-import DomeGalleryRaw from "../../../catalog/components/react-bits/dome-gallery/DomeGallery";
-import StepperRaw, { Step } from "../../../catalog/components/react-bits/stepper/Stepper";
-import ElasticSliderRaw from "../../../catalog/components/react-bits/elastic-slider/ElasticSlider";
-import CounterRaw from "../../../catalog/components/react-bits/counter/Counter";
+import type { ReactNode } from "react";
+const Masonry = createLazyRaw(() => import("../../../catalog/components/react-bits/masonry/Masonry"));
+const Carousel = createLazyRaw(() => import("../../../catalog/components/react-bits/carousel/Carousel"));
+const Stack = createLazyRaw(() => import("../../../catalog/components/react-bits/stack/Stack"));
+const DomeGallery = createLazyRaw(() => import("../../../catalog/components/react-bits/dome-gallery/DomeGallery"));
+const Stepper = createLazyRaw(() => import("../../../catalog/components/react-bits/stepper/Stepper"));
+const ElasticSlider = createLazyRaw(() => import("../../../catalog/components/react-bits/elastic-slider/ElasticSlider"));
+const Counter = createLazyRaw(() => import("../../../catalog/components/react-bits/counter/Counter"));
 import { defineShowcase, type Showcase } from "./types";
 import { CenteredStage, placeholderUri, svgDataUri } from "./helpers";
+import { createLazyRaw } from "./lazyRaw";
 
-type Raw = ComponentType<Record<string, unknown>>;
-
-const Masonry = MasonryRaw as unknown as Raw;
-const Carousel = CarouselRaw as unknown as Raw;
-const Stack = StackRaw as unknown as Raw;
-const DomeGallery = DomeGalleryRaw as unknown as Raw;
-const Stepper = StepperRaw as unknown as Raw;
-const ElasticSlider = ElasticSliderRaw as unknown as Raw;
-const Counter = CounterRaw as unknown as Raw;
+/** Shape-only marker for Stepper's children. The real Step component lives in
+ *  the same lazily imported module; keeping it out of this descriptor module
+ *  lets Stepper's chunk stay a pure dynamic import. */
+function Step(_props: {
+  title?: ReactNode;
+  description?: ReactNode;
+  icon?: ReactNode;
+  children?: ReactNode;
+}): null {
+  return null;
+}
 
 function StackCard({ index }: { index: number }) {
   return (

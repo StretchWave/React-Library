@@ -82,6 +82,61 @@
   cursor: not-allowed;
 }
 
+/* --- lazy implementation states ------------------------------------------------- */
+.showcase-load-state {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.45rem;
+  inline-size: 100%;
+  min-height: 180px;
+  padding: 1rem;
+  color: var(--rl-text-muted);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.showcase-load-state p {
+  margin: 0;
+}
+
+.showcase-load-message {
+  max-inline-size: 42ch;
+  font-size: 0.75rem;
+  word-break: break-word;
+}
+
+.showcase-load-state button {
+  border: 1px solid var(--rl-border);
+  border-radius: calc(var(--rl-radius) / 2);
+  background: var(--rl-surface);
+  color: var(--rl-text);
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+
+.showcase-load-state button:hover {
+  border-color: var(--rl-accent);
+}
+
+.showcase-load-state.is-failed strong {
+  color: var(--rl-text);
+}
+
+.showcase-load-dot {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 999px;
+  background: var(--rl-accent);
+  animation: stage-pulse 900ms ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase-load-dot {
+    animation: none;
+  }
+}
+
 /* --- stage ---------------------------------------------------------------------- */
 .workspace-stage-wrap {
   border: 1px solid var(--rl-border);
@@ -118,6 +173,96 @@
 .workspace-stage-frame {
   width: 100%;
   max-width: 100%;
+}
+
+.workspace-stage-live {
+  position: relative;
+  width: 100%;
+  min-height: 220px;
+}
+
+.workspace-stage-fallback {
+  display: block;
+  inline-size: 100%;
+  max-block-size: clamp(360px, 54vh, 620px);
+  object-fit: contain;
+  border-radius: calc(var(--rl-radius) / 2);
+  opacity: 0.85;
+}
+
+.workspace-stage-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: clamp(360px, 54vh, 640px);
+  color: var(--rl-text-muted);
+  font-size: 0.9rem;
+}
+
+.workspace-stage-status {
+  position: absolute;
+  inset-block-end: 0.75rem;
+  inset-inline-start: 0.75rem;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-inline-size: min(460px, calc(100% - 1.5rem));
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--rl-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rl-surface) 92%, transparent);
+  color: var(--rl-text-muted);
+  font-size: 0.76rem;
+  pointer-events: none;
+}
+
+.workspace-stage-status.is-restricted {
+  display: grid;
+  gap: 0.4rem;
+  border-radius: calc(var(--rl-radius) / 2);
+  padding: 0.7rem 0.85rem;
+  pointer-events: auto;
+}
+
+.workspace-stage-status.is-restricted p {
+  margin: 0;
+}
+
+.workspace-stage-status.is-restricted button {
+  justify-self: start;
+  border: 1px solid var(--rl-border);
+  border-radius: calc(var(--rl-radius) / 2);
+  background: var(--rl-surface);
+  color: var(--rl-text);
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+}
+
+.workspace-stage-pulse {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 999px;
+  background: var(--rl-accent);
+  animation: stage-pulse 900ms ease-in-out infinite alternate;
+}
+
+@keyframes stage-pulse {
+  from {
+    opacity: 0.3;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-stage-pulse {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 .workspace-stage-frame[data-viewport="1280"] {
